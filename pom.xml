@@ -6,7 +6,7 @@
 
     <groupId>dev.tbm00</groupId>
     <artifactId>PermCheck64</artifactId>
-    <version>1.0.0-beta</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>PermCheck64</name>

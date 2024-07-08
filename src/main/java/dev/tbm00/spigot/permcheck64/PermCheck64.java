@@ -1,7 +1,6 @@
 package dev.tbm00.spigot.permcheck64;
 
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -22,13 +21,12 @@ public class PermCheck64 extends JavaPlugin {
 
         // Load Config  
         this.saveDefaultConfig();
-        FileConfiguration fileConfig = this.getConfig();
 
         // Register Listener
-        getServer().getPluginManager().registerEvents(new PlayerJoin(fileConfig), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
 
         // Register Command
-        getCommand("permchecker64").setExecutor(new MainCommand(this, fileConfig));
+        getCommand("permcheck").setExecutor(new MainCommand(this));
     }
 
     @Override

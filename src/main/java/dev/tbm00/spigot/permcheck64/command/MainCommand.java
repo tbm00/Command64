@@ -7,21 +7,20 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class MainCommand implements TabExecutor {
-    private final JavaPlugin javaPlugin;
-    private final String prefix;
+    private JavaPlugin javaPlugin;
     private final String[] subCommands = new String[]{"reload"};
 
-    public MainCommand(JavaPlugin javaPlugin, FileConfiguration fileConfig) {
-        this.prefix = ChatColor.DARK_GRAY + "[" + ChatColor.WHITE + fileConfig.getString("prefix") + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
+    public MainCommand(JavaPlugin javaPlugin ) {
         this.javaPlugin = javaPlugin;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        String prefix = javaPlugin.getConfig().getString("prefix").replace("&", "§");
+
         if (!sender.hasPermission("permcheck64.reload")) {
             sender.sendMessage(prefix + ChatColor.RED + "No permission!");
             return false;
@@ -33,6 +32,8 @@ public class MainCommand implements TabExecutor {
         }
 
         javaPlugin.reloadConfig();
+        prefix = javaPlugin.getConfig().getString("prefix").replace("&", "§");
+        
         sender.sendMessage(prefix + ChatColor.GREEN + "Configuration reloaded!");
         return true;
     }

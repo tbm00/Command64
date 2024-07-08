@@ -1,11 +1,11 @@
 enabled: true
-prefix: "PermCheck64"
+prefix: "&8[&fPermCheck&8]&r "
 '1':
-  perm: "group.particlebase"
+  perm: "pluginname.exampleperm1"
   perm-value: true
-  command: "pp reset <player>"
+  command: "say <player> has permission pluginname.exampleperm1!"
 '2':
-  perm: "group.particlebase"
-  perm-value: true
-  command: "say <player> has group.particlebase!"
+  perm: "pluginname.exampleperm2"
+  perm-value: false
+  command: "say <player> doesn't have permission pluginname.exampleperm2!"
 # Add more entries as needed
