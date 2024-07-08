@@ -1,4 +1,4 @@
-package dev.tbm00.spigot.blankplugin;
+package dev.tbm00.spigot.permcheck64;
 
 public class BlankTest {
 

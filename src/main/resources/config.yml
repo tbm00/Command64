@@ -1,2 +1,11 @@
-lang:
-  prefix: "Blank"
+enabled: true
+prefix: "PermCheck64"
+'1':
+  perm: "group.particlebase"
+  perm-value: true
+  command: "pp reset <player>"
+'2':
+  perm: "group.particlebase"
+  perm-value: true
+  command: "say <player> has group.particlebase!"
+# Add more entries as needed

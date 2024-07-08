@@ -1,14 +1,14 @@
-package dev.tbm00.spigot.blankplugin;
+package dev.tbm00.spigot.permcheck64;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import dev.tbm00.spigot.blankplugin.command.BlankCommand;
-import dev.tbm00.spigot.blankplugin.listener.PlayerJoinLeave;
+import dev.tbm00.spigot.permcheck64.command.MainCommand;
+import dev.tbm00.spigot.permcheck64.listener.PlayerJoin;
 
-public class BlankPlugin extends JavaPlugin {
+public class PermCheck64 extends JavaPlugin {
 
     @Override
     public void onEnable() {
@@ -25,10 +25,10 @@ public class BlankPlugin extends JavaPlugin {
         FileConfiguration fileConfig = this.getConfig();
 
         // Register Listener
-        getServer().getPluginManager().registerEvents(new PlayerJoinLeave(fileConfig), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoin(fileConfig), this);
 
-        // Register Commands
-        getCommand("blankplugin").setExecutor(new BlankCommand(fileConfig));
+        // Register Command
+        getCommand("permchecker64").setExecutor(new MainCommand(this, fileConfig));
     }
 
     @Override
@@ -39,5 +39,4 @@ public class BlankPlugin extends JavaPlugin {
 		for (String s : strings)
             getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + s);
 	}
-
 }

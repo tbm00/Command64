@@ -1,5 +1,13 @@
-main: dev.tbm00.spigot.blankplugin.BlankPlugin
+name: PermCheck64
+version: ${project.version}
+description: This plugin runs commands when a player joins, based on the player's permissions
 author: tbm00
-name: BlankPlugin
-version: 0.0-SNAPSHOT-1
+main: dev.tbm00.spigot.permcheck64.PermCheck64
 api-version: 1.17
+commands:
+  permcheck64:
+    description: Has reload subcommand
+permissions:
+  permcheck64.reload:
+    description: Ability to use reload the config
+    default: op
