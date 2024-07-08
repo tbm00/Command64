@@ -1,0 +1,5 @@
+main: dev.tbm00.spigot.blankplugin.BlankPlugin
+author: tbm00
+name: BlankPlugin
+version: 0.0-SNAPSHOT-1
+api-version: 1.17
