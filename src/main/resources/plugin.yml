@@ -4,10 +4,3 @@ description: This plugin runs commands when a player joins, based on the player'
 author: tbm00
 main: dev.tbm00.spigot.permcheck64.PermCheck64
 api-version: 1.17
-commands:
-  permcheck:
-    description: Has reload subcommand
-permissions:
-  permcheck64.reload:
-    description: Ability to use reload the config
-    default: op

@@ -4,13 +4,18 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import dev.tbm00.spigot.permcheck64.command.MainCommand;
 import dev.tbm00.spigot.permcheck64.listener.PlayerJoin;
 
 public class PermCheck64 extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // Load Config  
+        this.saveDefaultConfig();
+
+        // Check if enabled
+        if (this.getConfig().getBoolean("enabled") == false) return;
+
         // Startup Message
         final PluginDescriptionFile pdf = this.getDescription();
 		log(
@@ -19,18 +24,8 @@ public class PermCheck64 extends JavaPlugin {
             ChatColor.DARK_PURPLE + "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 		);
 
-        // Load Config  
-        this.saveDefaultConfig();
-
         // Register Listener
         getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
-
-        // Register Command
-        getCommand("permcheck").setExecutor(new MainCommand(this));
-    }
-
-    @Override
-    public void onDisable() {
     }
 
     private void log(String... strings) {
