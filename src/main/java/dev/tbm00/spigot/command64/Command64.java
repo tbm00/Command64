@@ -15,9 +15,6 @@ public class Command64 extends JavaPlugin {
         // Load Config  
         this.saveDefaultConfig();
 
-        // Check if enabled
-        if (this.getConfig().getBoolean("enabled") == false) return;
-
         // Startup Message
         final PluginDescriptionFile pdf = this.getDescription();
 		log(
@@ -27,8 +24,9 @@ public class Command64 extends JavaPlugin {
 		);
 
         // Register Listener
-        getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
-
+        if (this.getConfig().getBoolean("joinCommandEntries.enabled")) {
+            getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
+        }
         // Register Command
         getCommand("cmd").setExecutor(new CmdCommand(this));
     }

@@ -11,6 +11,7 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.ChatColor;
 
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 // import dev.tbm00.spigot.command64.model.ItemCmdEntry;
@@ -39,17 +40,17 @@ public class CmdCommand implements TabExecutor {
                 ConfigurationSection joinCmdEntry = customCmdSection.getConfigurationSection(key);
                 
                 if (joinCmdEntry != null && joinCmdEntry.getBoolean("enabled")) {
-                    String checkPerm = joinCmdEntry.getString("checkPerm");
-                    boolean checkPermValue = joinCmdEntry.getBoolean("checkPermValue");
+                    String usePerm = joinCmdEntry.getString("usePerm");
+                    boolean usePermValue = joinCmdEntry.getBoolean("usePermValue");
                     String playerCommand = joinCmdEntry.getString("customCommand");
                     List<String> consoleCommands = joinCmdEntry.getStringList("consoleCommands");
-                    if (checkPerm != null && consoleCommands != null && playerCommand != null && !consoleCommands.isEmpty()) {
-                        CustomCmdEntry entry = new CustomCmdEntry(checkPerm, checkPermValue, playerCommand, consoleCommands);
+                    if (usePerm != null && consoleCommands != null && playerCommand != null && !consoleCommands.isEmpty()) {
+                        CustomCmdEntry entry = new CustomCmdEntry(usePerm, usePermValue, playerCommand, consoleCommands);
                         this.customCmdEntries.add(entry);
                         tempSubCommands.add(playerCommand);
-                        System.out.println("Loaded customCmdEntry: "+ checkPerm + " " + checkPermValue + " " + playerCommand);
+                        System.out.println("Loaded customCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand);
                     } else {
-                        System.out.println("Error: Poorly defined customCmdEntry: " + checkPerm + " " + checkPermValue+ " " + playerCommand);
+                        System.out.println("Error: Poorly defined customCmdEntry: " + usePerm + " " + usePermValue+ " " + playerCommand);
                     }
                 }
             }
@@ -67,8 +68,8 @@ public class CmdCommand implements TabExecutor {
         if (customEnabled) {
             for (CustomCmdEntry entry : customCmdEntries) {
                 if (subCommand.equals(entry.getPlayerCommand())) {
-                    String checkPerm = entry.getPerm();
-                    Boolean checkPermValue = entry.getPermValue();
+                    String usePerm = entry.getPerm();
+                    Boolean usePermValue = entry.getPermValue();
                     List<String> consoleCommands = entry.getConsoleCommands();
                     String argument = null;
         
@@ -76,17 +77,18 @@ public class CmdCommand implements TabExecutor {
                         if (args.length == 2) {
                             argument = args[1];
                         }
-                        for (String runningConsoleCommand : consoleCommands) {
-                            runningConsoleCommand = runningConsoleCommand.replace("<player>", sender.getName())
-                                                                        .replace("<argument>", argument);
-                            if (sender.hasPermission(checkPerm) == checkPermValue) {
-                                System.out.println("Running customCmdEntry: " + runningConsoleCommand);
-                                Bukkit.dispatchCommand(console, runningConsoleCommand);
-                                return true;
+                        for (String consoleCmd : consoleCommands) {
+                            consoleCmd = consoleCmd.replace("<player>", sender.getName());
+                            if (args.length == 2) consoleCmd = consoleCmd.replace("<argument>", argument);
+                            if (sender.hasPermission(usePerm) == usePermValue) {
+                                System.out.println("Running customCmdEntry: " + consoleCmd);
+                                Bukkit.dispatchCommand(console, consoleCmd);
+                                sender.sendMessage(ChatColor.GREEN + "Ran command: " + consoleCmd);
                             }
                         }
+                        return true;
                     } else {
-                        System.out.println("Error: 'consoleCommands' is null or empty for customCmdEntry: " + checkPerm + " " + checkPermValue);
+                        System.out.println("Error: 'consoleCommands' is null or empty for customCmdEntry: " + usePerm + " " + usePermValue);
                         return false;
                     }
                 }
