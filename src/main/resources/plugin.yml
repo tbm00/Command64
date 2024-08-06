@@ -4,3 +4,6 @@ description: ${project.description}
 author: tbm00
 main: dev.tbm00.spigot.command64.Command64
 api-version: 1.17
+commands:
+  cmd:
+    description: Base command for Command64

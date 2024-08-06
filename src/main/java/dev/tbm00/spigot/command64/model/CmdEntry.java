@@ -1,14 +1,16 @@
 package dev.tbm00.spigot.command64.model;
 
-public class CommandEntry {
+import java.util.List;
+
+public class CmdEntry {
     private String perm;
     private Boolean permValue;
-    private String command;
+    private List<String> commands;
 
-    public CommandEntry(String perm, Boolean permValue, String command) {
+    public CmdEntry(String perm, Boolean permValue, List<String> commands) {
         this.perm = perm;
         this.permValue = permValue;
-        this.command = command;
+        this.commands = commands;
     }
 
     public Boolean getPermValue() {
@@ -18,7 +20,7 @@ public class CommandEntry {
     public void setPermValue(Boolean permValue) {
         this.permValue = permValue;
     }
-    
+
     public String getPerm() {
         return perm;
     }
@@ -27,11 +29,11 @@ public class CommandEntry {
         this.perm = perm;
     }
 
-    public String getCommand() {
-        return command;
+    public List<String> getCommands() {
+        return commands;
     }
 
-    public void setCommand(String command) {
-        this.command = command;
+    public void setCommands(List<String> commands) {
+        this.commands = commands;
     }
 }

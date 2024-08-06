@@ -12,55 +12,63 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import dev.tbm00.spigot.command64.model.CommandEntry;
+import dev.tbm00.spigot.command64.model.CmdEntry;
 
 public class PlayerJoin implements Listener {
     private final ConsoleCommandSender console;
-    private final List<CommandEntry> commandEntries;
+    private final List<CmdEntry> joinCmdEntries;
+    private final Boolean enabled;
 
     public PlayerJoin(JavaPlugin javaPlugin) {
         this.console = Bukkit.getServer().getConsoleSender();
-        this.commandEntries = new ArrayList<>();
+        this.joinCmdEntries = new ArrayList<>();
 
-        ConfigurationSection permissionCommands = javaPlugin.getConfig().getConfigurationSection("permCommandEntries");
-        if (permissionCommands != null) {
-            for (String key : permissionCommands.getKeys(false)) {
-                ConfigurationSection commandSection = permissionCommands.getConfigurationSection(key);
+        ConfigurationSection joinCmdSection = javaPlugin.getConfig().getConfigurationSection("joinCommandEntries");
+        if (joinCmdSection != null) {
+            if (!joinCmdSection.getBoolean("enabled")) {
+                enabled = false;
+                return;
+            } else enabled = true;
+            for (String key : joinCmdSection.getKeys(false)) {
+                ConfigurationSection joinCmdEntry = joinCmdSection.getConfigurationSection(key);
                 
-                if (commandSection != null && commandSection.getBoolean("enabled")) {
-                    String perm = commandSection.getString("perm");
-                    boolean permValue = commandSection.getBoolean("permValue");
-                    String command = commandSection.getString("command");
+                if (joinCmdEntry != null && joinCmdEntry.getBoolean("enabled")) {
+                    String checkPerm = joinCmdEntry.getString("checkPerm");
+                    boolean checkPermValue = joinCmdEntry.getBoolean("checkPermValue");
+                    List<String> commands = joinCmdEntry.getStringList("commands");
 
-                    if (perm != null && command != null ) {
-                        CommandEntry entry = new CommandEntry(perm, permValue, command);
-                        commandEntries.add(entry);
-                        System.out.println("Loaded command entry: "+ perm + " " + permValue + " " + command);
+                    if (checkPerm != null && commands != null && !commands.isEmpty()) {
+                        CmdEntry entry = new CmdEntry(checkPerm, checkPermValue, commands);
+                        joinCmdEntries.add(entry);
+                        System.out.println("Loaded command entry: "+ checkPerm + " " + checkPermValue + " " + commands);
                     } else {
-                        System.out.println("Error: Poorly defined command entry: " + perm + " " + permValue + " " + command);
+                        System.out.println("Error: Poorly defined command entry: " + checkPerm + " " + checkPermValue + " " + commands);
                     }
                 }
             }
-        }
+        } else enabled = true;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        if (!enabled) return;
         Player player = event.getPlayer();
 
-        for (CommandEntry entry : commandEntries) {
-            String perm = entry.getPerm();
-            Boolean permValue = entry.getPermValue();
-            String command = entry.getCommand();
-            if (command != null) {
-                command = command.replace("<player>", player.getName()); 
+        for (CmdEntry entry : joinCmdEntries) {
+            String checkPerm = entry.getPerm();
+            Boolean checkPermValue = entry.getPermValue();
+            List<String> commands = entry.getCommands();
+
+            if (commands != null && !commands.isEmpty()) {
+                for (String command : commands) {
+                    command = command.replace("<player>", player.getName());
+                    if (player.hasPermission(checkPerm) == checkPermValue) {
+                        System.out.println("Running command: " + command);
+                        Bukkit.dispatchCommand(console, command);
+                    }
+                }
             } else {
-                System.out.println("Error: 'command' is null in onPlayerJoin");
-                continue;
-            }
-            if (player.hasPermission(perm) == permValue) {
-                System.out.println("Running command: " + command);
-                Bukkit.dispatchCommand(console, command);
+                System.out.println("Error: 'commands' is null or empty for " + checkPerm + " " + checkPermValue);
             }
         }
     }
