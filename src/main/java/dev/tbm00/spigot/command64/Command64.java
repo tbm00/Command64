@@ -1,12 +1,12 @@
-package dev.tbm00.spigot.permcheck64;
+package dev.tbm00.spigot.command64;
 
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import dev.tbm00.spigot.permcheck64.listener.PlayerJoin;
+import dev.tbm00.spigot.command64.listener.PlayerJoin;
 
-public class PermCheck64 extends JavaPlugin {
+public class Command64 extends JavaPlugin {
 
     @Override
     public void onEnable() {

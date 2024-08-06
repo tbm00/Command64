@@ -1,5 +1,5 @@
-# PermCheck64
-A spigot plugin that runs commands when a player joins, based on the player's permissions.
+# Command64
+A spigot plugin that runs commands with configurable triggers.
 
 Created by tbm00 for play.mc64.wtf.
 

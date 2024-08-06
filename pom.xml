@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.tbm00</groupId>
-    <artifactId>PermCheck64</artifactId>
+    <artifactId>Command64</artifactId>
     <version>1.1</version>
     <packaging>jar</packaging>
 
-    <name>PermCheck64</name>
+    <name>Command64</name>
 
-    <description>This plugin runs commands when a player joins, based on the player's permissions</description>
+    <description>This plugin runs commands with configurable triggers</description>
     <properties>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

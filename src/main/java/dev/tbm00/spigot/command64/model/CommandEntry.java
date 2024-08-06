@@ -1,4 +1,4 @@
-package dev.tbm00.spigot.permcheck64.model;
+package dev.tbm00.spigot.command64.model;
 
 public class CommandEntry {
     private String perm;

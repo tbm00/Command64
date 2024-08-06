@@ -1,6 +1,6 @@
-name: PermCheck64
+name: Command64
 version: ${project.version}
-description: This plugin runs commands when a player joins, based on the player's permissions
+description: ${project.description}
 author: tbm00
-main: dev.tbm00.spigot.permcheck64.PermCheck64
+main: dev.tbm00.spigot.command64.Command64
 api-version: 1.17

@@ -1,4 +1,4 @@
-package dev.tbm00.spigot.permcheck64.listener;
+package dev.tbm00.spigot.command64.listener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import dev.tbm00.spigot.permcheck64.model.CommandEntry;
+import dev.tbm00.spigot.command64.model.CommandEntry;
 
 public class PlayerJoin implements Listener {
     private final ConsoleCommandSender console;
