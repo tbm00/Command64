@@ -13,19 +13,19 @@ joinCommandEntries:
     enabled: false
     checkPerm: "group.particlebase"
     checkPermValue: false
-    commands:
+    consoleCommands:
       - "pp reset <player>"
   '2':
     enabled: false
     checkPerm: "group.donor1"
     checkPermValue: true
-    commands: 
+    consoleCommands:
       - "say Welcome back to the server <player>!"
   '3':
     enabled: false
     checkPerm: "group.donor1"
     checkPermValue: false
-    commands: 
+    consoleCommands:
       - "say <player>, why haven't you donated?"
       - "say Gimme yo money!"
   # Add more entries as needed
@@ -64,7 +64,7 @@ itemCommandEntries:
     givePermValue: true
     usePerm: "essentials.spawn"
     usePermValue: true
-    commands:
+    consoleCommands:
       - "sudo <player> spawn"
     key: "SPAWNCOMPASS"
     name: "&dSpawn Teleporter"
@@ -78,7 +78,7 @@ itemCommandEntries:
     givePermValue: true
     usePerm: "essentials.break"
     usePermValue: true
-    commands:
+    consoleCommands:
       - "sudo <player> break"
     key: "STAFFPICK"
     name: "&8Staffpickaxe"

@@ -6,6 +6,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import dev.tbm00.spigot.command64.listener.PlayerJoin;
 
+
+
 public class Command64 extends JavaPlugin {
 
     @Override
@@ -26,6 +28,9 @@ public class Command64 extends JavaPlugin {
 
         // Register Listener
         getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
+
+        // Register Command
+        getCommand("cmd").setExecutor(new CmdCommand(this));
     }
 
     private void log(String... strings) {
