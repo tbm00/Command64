@@ -46,7 +46,7 @@ public class PlayerJoin implements Listener {
                     }
                 }
             }
-        } else this.enabled = true;
+        } else this.enabled = false;
     }
 
     @EventHandler

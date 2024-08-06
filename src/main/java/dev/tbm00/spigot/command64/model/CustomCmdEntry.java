@@ -39,7 +39,7 @@ public class CustomCmdEntry {
         this.playerCommand = playerCommand;
     }
 
-    public List<String> getCommands() {
+    public List<String> getConsoleCommands() {
         return consoleCommands;
     }
 
