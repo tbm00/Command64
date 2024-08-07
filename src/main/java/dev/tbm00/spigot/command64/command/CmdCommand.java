@@ -1,4 +1,4 @@
-package dev.tbm00.spigot.command64;
+package dev.tbm00.spigot.command64.command;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,14 +10,21 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
+import dev.tbm00.spigot.command64.ItemManager;
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.ItemCmdEntry;
 
 public class CmdCommand implements TabExecutor {
+    private final JavaPlugin javaPlugin;
     private final ConsoleCommandSender console;
     private final ItemManager itemManager;
     private final List<CustomCmdEntry> customCmdEntries;
@@ -25,10 +32,11 @@ public class CmdCommand implements TabExecutor {
     private final Boolean customEnabled;
 
     public CmdCommand(JavaPlugin javaPlugin, ItemManager itemManager) {
+        this.javaPlugin = javaPlugin;
         this.console = Bukkit.getServer().getConsoleSender();
         this.itemManager = itemManager;
         this.customCmdEntries = new ArrayList<>();
-        this.itemCmdEntries = new ArrayList<>();
+        this.itemCmdEntries = itemManager.getItemCmdEntries();
 
         // Load Custom Commands from config.yml
         ConfigurationSection customCmdSection = javaPlugin.getConfig().getConfigurationSection("customCommandEntries");
@@ -56,14 +64,20 @@ public class CmdCommand implements TabExecutor {
     }
 
     public boolean onCommand(CommandSender sender, Command consoleCommand, String label, String[] args) {
-        // /cmd
-        if (args.length != 1 && args.length != 2) {
-            return false;
+        if (sender.hasPermission("command64.help") && args.length == 0) {
+            showHelp(sender);
+            return true;
         }
+
+        if (args.length != 1 && args.length != 2) return false;
+
         String subCommand = args[0].toLowerCase();
         String argument = null;
-        if (args.length == 2) {
-            argument = args[1];
+        if (args.length == 2) argument = args[1];
+
+        if (sender.hasPermission("command64.help") && subCommand.equals("help")) {
+            showHelp(sender);
+            return true;
         }
 
         // Run a Custom Command
@@ -92,12 +106,35 @@ public class CmdCommand implements TabExecutor {
 
         // Run a give Item Command
         if (itemManager.isEnabled() && subCommand.equals("give") && argument != null) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(ChatColor.RED + "This command can only be run by a player!");
+                return false;
+            }
             for (ItemCmdEntry entry : itemCmdEntries) {
                 if (argument.equals(entry.getKeyString())) {
-                    // Spawn in a new item into sender's inventory
+                    Player player = (Player) sender;
+                    if (player.hasPermission(entry.getGivePerm()) == entry.getGivePermValue()) {
+                        // Create the item
+                        ItemStack item = new ItemStack(Material.valueOf(entry.getItem()));
+                        ItemMeta meta = item.getItemMeta();
+                        if (meta != null) {
+                            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', entry.getName()));
+                            meta.setLore(entry.getLore().stream().map(l -> ChatColor.translateAlternateColorCodes('&', l)).toList());
+                            if (entry.getGlowing()) {
+                                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                                meta.addEnchant(org.bukkit.enchantments.Enchantment.ARROW_DAMAGE, 1, true);
+                            }
+                            meta.getPersistentDataContainer().set(new NamespacedKey(javaPlugin, entry.getKeyString()), PersistentDataType.STRING, "true");
+                            item.setItemMeta(meta);
+                        }
+                        player.getInventory().addItem(item);
+                        player.sendMessage(ChatColor.GREEN + "You have been given the " + entry.getKeyString());
+                        return true;
+                    }
                 }
             }
         }
+
         return false;
     }
 
@@ -121,17 +158,26 @@ public class CmdCommand implements TabExecutor {
         }
         if (args.length == 2) {
             list.clear();
-            if (args[0].equals("give")) {
+            if (args[0].toString().equals("give")) {
                 for (ItemCmdEntry n : itemCmdEntries) {
-                    if (n!=null && sender.hasPermission(n.getGivePerm()) && n.getKeyString().startsWith(args[0])) {
+                    if (n!=null && sender.hasPermission(n.getGivePerm()) && n.getKeyString().startsWith(args[1])) {
                         list.add(n.getKeyString());
                     }
                 }
-            }
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                list.add(p.getName());
+            } else if (!args[0].toString().equals("help")) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    list.add(p.getName());
+                }
             }
         }
         return list;
+    }
+
+    private void showHelp(CommandSender sender) {
+        sender.sendMessage(ChatColor.DARK_RED + "--- " + ChatColor.RED + "Command64 Admin Commands" + ChatColor.DARK_RED + " ---\n"
+            + ChatColor.WHITE + "/cmd help" + ChatColor.GRAY + " Display this command list\n"
+            + ChatColor.WHITE + "/cmd give <itemKey>" + ChatColor.GRAY + " Spawn in a custom <item>\n"
+            + ChatColor.WHITE + "/cmd <customCommand> [argument]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument\n"
+            );
     }
 }

@@ -3,9 +3,24 @@ A spigot plugin that runs commands with configurable triggers.
 
 Created by tbm00 for play.mc64.wtf.
 
+## Features
+- **JoinCommandEntries** run command(s) as the console when a player joins, if they have the specified permission node.
+- **CustomommandEntries** run command(s) as the console when a player uses a custom command, if they have the specified permission node.
+- **ItemCommandEntries** run command(s) as the console when a player uses a custom item, if they have the specified permission node.
+
 ## Dependencies
 - **Java 17+**: REQUIRED
 - **Spigot 1.18.1+**: UNTESTED ON OLDER VERSIONS
+
+## Commands & Permissions
+#### Commands
+- `/cmd help` Display this command list
+- `/cmd give <itemKey>` Spawn in a custom \<item\>
+- `/cmd <customCommand> [argument]` Run custom command as Console w/ optional argument
+#### Permissions
+Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry have configurable permissions (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission node is for the help command.
+- `command64.help` Ability to display the command list *(Default: OP)*
+
 
 ## Config
 ```
@@ -15,7 +30,6 @@ Created by tbm00 for play.mc64.wtf.
 # when using this plugin with other plugins, like EssentialsX
 # LuckPerms, and PlayerParticles.
 
-
 # joinCommandEntries get ran by the console when a player 
 # (with the correct permission) connects to the server.
 joinCommandEntries:
@@ -24,29 +38,36 @@ joinCommandEntries:
     enabled: false
     checkPerm: "group.particlebase"
     checkPermValue: false
-    commands:
+    consoleCommands:
       - "pp reset <player>"
   '2':
     enabled: false
     checkPerm: "group.donor1"
     checkPermValue: true
-    commands: 
+    consoleCommands:
       - "say Welcome back to the server <player>!"
   '3':
     enabled: false
     checkPerm: "group.donor1"
     checkPermValue: false
-    commands: 
+    consoleCommands:
       - "say <player>, why haven't you donated?"
       - "say Gimme yo money!"
   # Add more entries as needed
-
 
 # customCommandEntries get ran by the console when a player 
 # (with the correct permission) uses the custom command.
 customCommandEntries:
   enabled: false
-  '1': # Usage: "/cmd stop"
+  '1': # Usage: "/cmd save"
+    enabled: false
+    usePerm: "group.admin"
+    usePermValue: true
+    customCommand: "save"
+    consoleCommands:
+      - "say <player> is saving the server!"
+      - "save-all"
+  '2': # Usage: "/cmd stop"
     enabled: false
     usePerm: "group.admin"
     usePermValue: true
@@ -54,7 +75,7 @@ customCommandEntries:
     consoleCommands:
       - "say <player> is stopping the server!"
       - "stop"
-  '2': # Usage: "/cmd promotedonor <argument>" i.e. "/cmd promotedonor Notch"
+  '3': # Usage: "/cmd promotedonor <argument>" i.e. "/cmd promotedonor Notch"
     enabled: false
     usePerm: "group.supermod"
     usePermValue: true
@@ -63,7 +84,6 @@ customCommandEntries:
       - "lp user <argument> promote donor"
       - "say <argument> donated to the server and was promoted by <player>!"
   # Add more entries as needed
-
 
 # itemCommandEntries get ran by the console when a player
 # (with the correct permission) uses a custom item.
@@ -75,7 +95,7 @@ itemCommandEntries:
     givePermValue: true
     usePerm: "essentials.spawn"
     usePermValue: true
-    commands:
+    consoleCommands:
       - "sudo <player> spawn"
     key: "SPAWNCOMPASS"
     name: "&dSpawn Teleporter"
@@ -89,12 +109,13 @@ itemCommandEntries:
     givePermValue: true
     usePerm: "essentials.break"
     usePermValue: true
-    commands:
+    consoleCommands:
       - "sudo <player> break"
     key: "STAFFPICK"
-    name: "&8Staffpickaxe"
+    name: "&0Staffpickaxe"
     item: "GOLDEN_PICKAXE"
     glowing: true
-    lore: []
+    lore:
+      - "&4Be careful!"
   # Add more entries as needed
 ```

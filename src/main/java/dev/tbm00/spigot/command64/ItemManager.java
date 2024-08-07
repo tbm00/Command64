@@ -1,11 +1,10 @@
 package dev.tbm00.spigot.command64;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.NamespacedKey;
 
 import dev.tbm00.spigot.command64.model.ItemCmdEntry;
 
@@ -14,7 +13,7 @@ public class ItemManager {
     private final Boolean enabled;
 
     public ItemManager(JavaPlugin javaPlugin) {
-        this.itemCmdEntries = null;
+        this.itemCmdEntries = new ArrayList<>();
 
         // Load Item Commands from config.yml
         ConfigurationSection itemCmdSection = javaPlugin.getConfig().getConfigurationSection("itemCommandEntries");
@@ -38,9 +37,9 @@ public class ItemManager {
                     if (usePerm != null && givePerm != null && consoleCommands != null && key != null && !consoleCommands.isEmpty()) {
                         ItemCmdEntry entry = new ItemCmdEntry(javaPlugin, givePerm, givePermValue, usePerm, usePermValue, consoleCommands, KEY, name, item, glowing, lore);
                         this.itemCmdEntries.add(entry);
-                        System.out.println("Loaded itemCmdEntry: " + name + " " + key + " " + usePerm + " " + usePermValue + " " + consoleCommands);
+                        System.out.println("Loaded itemCmdEntry: " + KEY + " " + item + " " + usePerm + " " + usePermValue + " " + consoleCommands);
                     } else {
-                        System.out.println("Error: Poorly defined itemCmdEntry: " + name + " " + key + " " + usePerm + " " + usePermValue + " " + consoleCommands);
+                        System.out.println("Error: Poorly defined itemCmdEntry: " + KEY + " " + item + " " + usePerm + " " + usePermValue + " " + consoleCommands);
                     }
                 }
             }
