@@ -138,6 +138,14 @@ public class CmdCommand implements TabExecutor {
         return false;
     }
 
+    private void showHelp(CommandSender sender) {
+        sender.sendMessage(ChatColor.DARK_RED + "--- " + ChatColor.RED + "Command64 Admin Commands" + ChatColor.DARK_RED + " ---\n"
+            + ChatColor.WHITE + "/cmd help" + ChatColor.GRAY + " Display this command list\n"
+            + ChatColor.WHITE + "/cmd give <itemKey>" + ChatColor.GRAY + " Spawn in a custom <item>\n"
+            + ChatColor.WHITE + "/cmd <customCommand> [argument]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument\n"
+            );
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command consoleCommand, String alias, String[] args) {
         List<String> list = new ArrayList<>();
@@ -155,6 +163,7 @@ public class CmdCommand implements TabExecutor {
                 }
             }
             if (i>=1) list.add("give");
+            if (sender.hasPermission("command64.help")) list.add("help");
         }
         if (args.length == 2) {
             list.clear();
@@ -171,13 +180,5 @@ public class CmdCommand implements TabExecutor {
             }
         }
         return list;
-    }
-
-    private void showHelp(CommandSender sender) {
-        sender.sendMessage(ChatColor.DARK_RED + "--- " + ChatColor.RED + "Command64 Admin Commands" + ChatColor.DARK_RED + " ---\n"
-            + ChatColor.WHITE + "/cmd help" + ChatColor.GRAY + " Display this command list\n"
-            + ChatColor.WHITE + "/cmd give <itemKey>" + ChatColor.GRAY + " Spawn in a custom <item>\n"
-            + ChatColor.WHITE + "/cmd <customCommand> [argument]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument\n"
-            );
     }
 }

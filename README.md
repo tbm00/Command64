@@ -18,7 +18,7 @@ Created by tbm00 for play.mc64.wtf.
 - `/cmd give <itemKey>` Spawn in a custom \<item\>
 - `/cmd <customCommand> [argument]` Run custom command as Console w/ optional argument
 #### Permissions
-Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry have configurable permissions (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission node is for the help command.
+Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry have configurable permissions (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission node is command64.help.
 - `command64.help` Ability to display the command list *(Default: OP)*
 
 
@@ -91,7 +91,7 @@ itemCommandEntries:
   enabled: false
   '1':
     enabled: false
-    givePerm: "commad64.give.spawncompass"
+    givePerm: "command64.give.spawncompass"
     givePermValue: true
     usePerm: "essentials.spawn"
     usePermValue: true

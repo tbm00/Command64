@@ -65,7 +65,7 @@ itemCommandEntries:
   enabled: false
   '1':
     enabled: false
-    givePerm: "commad64.give.spawncompass"
+    givePerm: "command64.give.spawncompass"
     givePermValue: true
     usePerm: "essentials.spawn"
     usePermValue: true

@@ -9,5 +9,5 @@ commands:
     description: Base command for Command64
 permissions:
   command64.help:
-    description: Ability to view help page
+    description: Ability to display the command list
     default: op
