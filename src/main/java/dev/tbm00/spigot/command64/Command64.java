@@ -5,10 +5,11 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import dev.tbm00.spigot.command64.listener.PlayerJoin;
-
+import dev.tbm00.spigot.command64.listener.ItemUse;
 
 
 public class Command64 extends JavaPlugin {
+    private ItemManager itemManager;
 
     @Override
     public void onEnable() {
@@ -23,12 +24,23 @@ public class Command64 extends JavaPlugin {
             ChatColor.DARK_PURPLE + "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 		);
 
-        // Register Listener
+        if (this.getConfig().getBoolean("itemCommandEntries.enabled")
+                        || this.getConfig().getBoolean("customCommandEntries.enabled")) {
+            // Create itemManager and load config
+            itemManager = new ItemManager(this);
+            
+            // Register Commands
+            getServer().getPluginManager().registerEvents(new ItemUse(this, itemManager), this);
+        }
+
+
+        // Register Listeners and load config
         if (this.getConfig().getBoolean("joinCommandEntries.enabled")) {
             getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
         }
-        // Register Command
-        getCommand("cmd").setExecutor(new CmdCommand(this));
+        if (this.getConfig().getBoolean("itemCommandEntries.enabled")) {
+            getServer().getPluginManager().registerEvents(new ItemUse(this, itemManager), this);
+        }
     }
 
     private void log(String... strings) {

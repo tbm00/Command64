@@ -12,42 +12,40 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
 
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
-// import dev.tbm00.spigot.command64.model.ItemCmdEntry;
+import dev.tbm00.spigot.command64.model.ItemCmdEntry;
 
 public class CmdCommand implements TabExecutor {
     private final ConsoleCommandSender console;
+    private final ItemManager itemManager;
     private final List<CustomCmdEntry> customCmdEntries;
-    // private final String[] itemCmdEntries;
+    private final List<ItemCmdEntry> itemCmdEntries;
     private final Boolean customEnabled;
-    // private final Boolean itemEnabled;
 
-    public CmdCommand(JavaPlugin javaPlugin) {
+    public CmdCommand(JavaPlugin javaPlugin, ItemManager itemManager) {
         this.console = Bukkit.getServer().getConsoleSender();
+        this.itemManager = itemManager;
         this.customCmdEntries = new ArrayList<>();
-        
-        // this.itemCmdEntries = new ArrayList<>();
+        this.itemCmdEntries = new ArrayList<>();
 
+        // Load Custom Commands from config.yml
         ConfigurationSection customCmdSection = javaPlugin.getConfig().getConfigurationSection("customCommandEntries");
-        if (customCmdSection != null) {
-            if (!customCmdSection.getBoolean("enabled")) {
-                this.customEnabled = false;
-                return;
-            } else this.customEnabled = true;
-            List<String> tempSubCommands = new ArrayList<>();
+        if (customCmdSection != null && customCmdSection.getBoolean("enabled")) {
+            this.customEnabled = true;
             for (String key : customCmdSection.getKeys(false)) {
-                ConfigurationSection joinCmdEntry = customCmdSection.getConfigurationSection(key);
+                ConfigurationSection customCmdEntry = customCmdSection.getConfigurationSection(key);
                 
-                if (joinCmdEntry != null && joinCmdEntry.getBoolean("enabled")) {
-                    String usePerm = joinCmdEntry.getString("usePerm");
-                    boolean usePermValue = joinCmdEntry.getBoolean("usePermValue");
-                    String playerCommand = joinCmdEntry.getString("customCommand");
-                    List<String> consoleCommands = joinCmdEntry.getStringList("consoleCommands");
+                if (customCmdEntry != null && customCmdEntry.getBoolean("enabled")) {
+                    String usePerm = customCmdEntry.getString("usePerm");
+                    Boolean usePermValue = customCmdEntry.getBoolean("usePermValue");
+                    String playerCommand = customCmdEntry.getString("customCommand");
+                    List<String> consoleCommands = customCmdEntry.getStringList("consoleCommands");
+
                     if (usePerm != null && consoleCommands != null && playerCommand != null && !consoleCommands.isEmpty()) {
                         CustomCmdEntry entry = new CustomCmdEntry(usePerm, usePermValue, playerCommand, consoleCommands);
                         this.customCmdEntries.add(entry);
-                        tempSubCommands.add(playerCommand);
                         System.out.println("Loaded customCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand);
                     } else {
                         System.out.println("Error: Poorly defined customCmdEntry: " + usePerm + " " + usePermValue+ " " + playerCommand);
@@ -63,24 +61,21 @@ public class CmdCommand implements TabExecutor {
             return false;
         }
         String subCommand = args[0].toLowerCase();
+        String argument = null;
+        if (args.length == 2) {
+            argument = args[1];
+        }
 
-
+        // Run a Custom Command
         if (customEnabled) {
             for (CustomCmdEntry entry : customCmdEntries) {
                 if (subCommand.equals(entry.getPlayerCommand())) {
-                    String usePerm = entry.getPerm();
-                    Boolean usePermValue = entry.getPermValue();
                     List<String> consoleCommands = entry.getConsoleCommands();
-                    String argument = null;
-        
                     if (consoleCommands != null && !consoleCommands.isEmpty()) {
-                        if (args.length == 2) {
-                            argument = args[1];
-                        }
                         for (String consoleCmd : consoleCommands) {
                             consoleCmd = consoleCmd.replace("<player>", sender.getName());
                             if (args.length == 2) consoleCmd = consoleCmd.replace("<argument>", argument);
-                            if (sender.hasPermission(usePerm) == usePermValue) {
+                            if (sender.hasPermission(entry.getPerm()) == entry.getPermValue()) {
                                 System.out.println("Running customCmdEntry: " + consoleCmd);
                                 Bukkit.dispatchCommand(console, consoleCmd);
                                 sender.sendMessage(ChatColor.GREEN + "Ran command: " + consoleCmd);
@@ -88,13 +83,21 @@ public class CmdCommand implements TabExecutor {
                         }
                         return true;
                     } else {
-                        System.out.println("Error: 'consoleCommands' is null or empty for customCmdEntry: " + usePerm + " " + usePermValue);
+                        System.out.println("Error: 'consoleCommands' is null or empty for customCmdEntry: " + entry.getPerm() + " " + entry.getPermValue());
                         return false;
                     }
                 }
             }
         }
 
+        // Run a give Item Command
+        if (itemManager.isEnabled() && subCommand.equals("give") && argument != null) {
+            for (ItemCmdEntry entry : itemCmdEntries) {
+                if (argument.equals(entry.getKeyString())) {
+                    // Spawn in a new item into sender's inventory
+                }
+            }
+        }
         return false;
     }
 
@@ -108,9 +111,23 @@ public class CmdCommand implements TabExecutor {
                     list.add(n.getPlayerCommand());
                 }
             }
+            int i = 0;
+            for (ItemCmdEntry n : itemCmdEntries) {
+                if (n!=null && sender.hasPermission(n.getGivePerm()) && n.getKeyString().startsWith(args[0])) {
+                    i = i+1;
+                }
+            }
+            if (i>=1) list.add("give");
         }
         if (args.length == 2) {
             list.clear();
+            if (args[0].equals("give")) {
+                for (ItemCmdEntry n : itemCmdEntries) {
+                    if (n!=null && sender.hasPermission(n.getGivePerm()) && n.getKeyString().startsWith(args[0])) {
+                        list.add(n.getKeyString());
+                    }
+                }
+            }
             for (Player p : Bukkit.getOnlinePlayers()) {
                 list.add(p.getName());
             }

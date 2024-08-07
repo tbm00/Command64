@@ -72,6 +72,7 @@ itemCommandEntries:
     glowing: true
     lore:
       - "&5Teleports you to spawn"
+      - "&5"
   '2':
     enabled: false
     givePerm: "command64.give.staffpick"

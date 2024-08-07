@@ -23,18 +23,16 @@ public class PlayerJoin implements Listener {
         this.console = Bukkit.getServer().getConsoleSender();
         this.joinCmdEntries = new ArrayList<>();
 
+        // Load Join Commands from config.yml
         ConfigurationSection joinCmdSection = javaPlugin.getConfig().getConfigurationSection("joinCommandEntries");
-        if (joinCmdSection != null) {
-            if (!joinCmdSection.getBoolean("enabled")) {
-                this.enabled = false;
-                return;
-            } else this.enabled = true;
+        if (joinCmdSection != null && joinCmdSection.getBoolean("enabled")) {
+            this.enabled = true;
             for (String key : joinCmdSection.getKeys(false)) {
                 ConfigurationSection joinCmdEntry = joinCmdSection.getConfigurationSection(key);
                 
                 if (joinCmdEntry != null && joinCmdEntry.getBoolean("enabled")) {
                     String checkPerm = joinCmdEntry.getString("checkPerm");
-                    boolean checkPermValue = joinCmdEntry.getBoolean("checkPermValue");
+                    Boolean checkPermValue = joinCmdEntry.getBoolean("checkPermValue");
                     List<String> consoleCommands = joinCmdEntry.getStringList("consoleCommands");
 
                     if (checkPerm != null && consoleCommands != null && !consoleCommands.isEmpty()) {

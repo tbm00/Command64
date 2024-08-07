@@ -43,7 +43,7 @@ public class CustomCmdEntry {
         return consoleCommands;
     }
 
-    public void setCommands(List<String> consoleCommands) {
+    public void setConsoleCommands(List<String> consoleCommands) {
         this.consoleCommands = consoleCommands;
     }
 }
