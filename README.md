@@ -5,7 +5,7 @@ Created by tbm00 for play.mc64.wtf.
 
 ## Features
 - **JoinCommandEntries** run command(s) as the console when a player joins, if they have the specified permission node.
-- **CustomommandEntries** run command(s) as the console when a player uses a custom command, if they have the specified permission node.
+- **CustomCommandEntries** run command(s) as the console when a player uses a custom command, if they have the specified permission node.
 - **ItemCommandEntries** run command(s) as the console when a player uses a custom item, if they have the specified permission node.
 
 ## Dependencies
