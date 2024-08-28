@@ -4,9 +4,10 @@ A spigot plugin that runs commands with configurable triggers.
 Created by tbm00 for play.mc64.wtf.
 
 ## Features
-- **JoinCommandEntries** run command(s) as the console when a player joins, if they have the specified permission node.
-- **CustomCommandEntries** run command(s) as the console when a player uses a custom command, if they have the specified permission node.
-- **ItemCommandEntries** run command(s) as the console when a player uses a custom item, if they have the specified permission node.
+- **JoinCommandEntries** run command(s) as the console when a player joins (if player has associated permission node).
+- **CustomCommandEntries** run command(s) as the console when a player/console uses a custom command (if player has associated permission node).
+- **TimerCommandEntries** run command(s) as the console after a delay, initially triggered by a player/console using a custom timer command (if player has associated permission node).
+- **ItemCommandEntries** run command(s) as the console when a player uses a custom item (if player has associated permission node).
 
 ## Dependencies
 - **Java 17+**: REQUIRED
@@ -17,9 +18,10 @@ Created by tbm00 for play.mc64.wtf.
 - `/cmd help` Display this command list
 - `/cmd give <itemKey>` Spawn in a custom \<item\> in your inventory
 - `/cmd give <itemKey> <player>` Spawn in a custom \<item\> in player's inventory
+- `/cmd timer <tickDelay> <timerCommand> [argument]` Run delayed command as Console w/ optional argument
 - `/cmd <customCommand> [argument]` Run custom command as Console w/ optional argument
 #### Permissions
-Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry have configurable permissions (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission node is command64.help.
+Each JoinCommandEntry, CustomCommandEntry, TimerCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission node is command64.help.
 - `command64.help` Ability to display the command list *(Default: OP)*
 
 
@@ -29,10 +31,10 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry have configurabl
 # You should configure each module to your own liking.
 # The predefined config is an example of what you can do
 # when using this plugin with other plugins, like EssentialsX
-# LuckPerms, and PlayerParticles.
+# LuckPerms, PlayerParticles, and VotingPlugin.
 
 # joinCommandEntries get ran by the console when a player 
-# (with the correct permission) connects to the server.
+# (with the assocated permission) connects to the server.
 joinCommandEntries:
   enabled: false
   '1':
@@ -57,7 +59,7 @@ joinCommandEntries:
   # Add more entries as needed
 
 # customCommandEntries get ran by the console when the console, or
-# a player (with the correct permission), uses the custom command.
+# a player (with the associated permission), uses the associated custom command.
 customCommandEntries:
   enabled: false
   '1': # Usage: "/cmd save"
@@ -86,8 +88,29 @@ customCommandEntries:
       - "say <argument> donated to the server and was promoted by <player>!"
   # Add more entries as needed
 
+# timerCommandEntries get ran by the console after a delay.
+# Initially triggered by the console, or a player
+# (with the associated permission), using the associated timer command.
+timerCommandEntries:
+  enabled: false
+  '1': # Usage: "/cmd timer <tickDelay> voteparty"
+    enabled: false
+    usePerm: "group.supermod"
+    usePermValue: true
+    timerCommand: "voteparty"
+    consoleCommands:
+      - "av voteparty force"
+  '2': # Usage: "/cmd timer <tickDelay> unban <argument>" i.e. "/cmd timer 12000 unban Notch"
+    enabled: false
+    usePerm: "group.supermod"
+    usePermValue: true
+    timerCommand: "unban"
+    consoleCommands:
+      - "unban <argument>"
+  # Add more entries as needed
+
 # itemCommandEntries get ran by the console when a player
-# (with the correct permission) uses a custom item.
+# (with the associated permission) uses a custom item.
 itemCommandEntries:
   enabled: false
   '1':

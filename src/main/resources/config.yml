@@ -2,7 +2,7 @@
 # You should configure each module to your own liking.
 # The predefined config is an example of what you can do
 # when using this plugin with other plugins, like EssentialsX
-# LuckPerms, and PlayerParticles.
+# LuckPerms, PlayerParticles, and VotingPlugin.
 
 # joinCommandEntries get ran by the console when a player 
 # (with the correct permission) connects to the server.
@@ -30,7 +30,7 @@ joinCommandEntries:
   # Add more entries as needed
 
 # customCommandEntries get ran by the console when the console, or
-# a player (with the correct permission), uses the custom command.
+# a player (with the correct permission), uses the associated custom command.
 customCommandEntries:
   enabled: false
   '1': # Usage: "/cmd save"
@@ -57,6 +57,27 @@ customCommandEntries:
     consoleCommands:
       - "lp user <argument> promote donor"
       - "say <argument> donated to the server and was promoted by <player>!"
+  # Add more entries as needed
+
+# timerCommandEntries get ran by the console after a delay.
+# Initially triggered by the console, or a player
+# (with the correct permission), using the associated timer command.
+timerCommandEntries:
+  enabled: false
+  '1': # Usage: "/cmd timer <tickDelay> voteparty"
+    enabled: false
+    usePerm: "group.supermod"
+    usePermValue: true
+    timerCommand: "voteparty"
+    consoleCommands:
+      - "av voteparty force"
+  '2': # Usage: "/cmd timer <tickDelay> unban <argument>" i.e. "/cmd timer 12000 unban Notch"
+    enabled: false
+    usePerm: "group.supermod"
+    usePermValue: true
+    timerCommand: "unban"
+    consoleCommands:
+      - "unban <argument>"
   # Add more entries as needed
 
 # itemCommandEntries get ran by the console when a player
