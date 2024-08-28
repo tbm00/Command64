@@ -220,8 +220,7 @@ public class CmdCommand implements TabExecutor {
     private void showHelp(CommandSender sender) {
         sender.sendMessage(ChatColor.DARK_RED + "--- " + ChatColor.RED + "Command64 Admin Commands" + ChatColor.DARK_RED + " ---\n"
             + ChatColor.WHITE + "/cmd help" + ChatColor.GRAY + " Display this command list\n"
-            + ChatColor.WHITE + "/cmd give <itemKey>" + ChatColor.GRAY + " Spawn in a custom <item> in your inventory\n"
-            + ChatColor.WHITE + "/cmd give <itemKey> <player>" + ChatColor.GRAY + " Spawn in a custom <item> in player's inventory\n"
+            + ChatColor.WHITE + "/cmd give <itemKey> [player]" + ChatColor.GRAY + " Spawn a custom item\n"
             + ChatColor.WHITE + "/cmd timer <tickDelay> <timerCommand> [argument]" + ChatColor.GRAY + " Run delayed command as Console w/ optional argument\n"
             + ChatColor.WHITE + "/cmd <customCommand> [argument]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument\n"
             );

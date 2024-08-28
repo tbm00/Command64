@@ -16,8 +16,7 @@ Created by tbm00 for play.mc64.wtf.
 ## Commands & Permissions
 #### Commands
 - `/cmd help` Display this command list
-- `/cmd give <itemKey>` Spawn in a custom \<item\> in your inventory
-- `/cmd give <itemKey> <player>` Spawn in a custom \<item\> in player's inventory
+- `/cmd give <itemKey> [player]` Spawn a custom item
 - `/cmd timer <tickDelay> <timerCommand> [argument]` Run delayed command as Console w/ optional argument
 - `/cmd <customCommand> [argument]` Run custom command as Console w/ optional argument
 #### Permissions
