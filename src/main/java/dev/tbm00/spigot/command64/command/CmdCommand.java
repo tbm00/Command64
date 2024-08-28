@@ -69,12 +69,13 @@ public class CmdCommand implements TabExecutor {
             return true;
         }
 
-        if (args.length != 1 && args.length != 2) return false;
+        if (args.length < 1 || args.length > 3) return false;
 
-        String subCommand = args[0].toLowerCase();
-        String argument = null;
-        if (args.length == 2) argument = args[1];
+        String subCommand = args[0].toLowerCase(), argument = null, argument2 = null;
+        if (args.length >= 2) argument = args[1];
+        if (args.length >= 3) argument2 = args[2];
 
+        // Run HELP cmd
         if (sender.hasPermission("command64.help") && subCommand.equals("help")) {
             showHelp(sender);
             return true;
@@ -104,16 +105,26 @@ public class CmdCommand implements TabExecutor {
             }
         }
 
+
         // Run a give Item Command
         if (itemManager.isEnabled() && subCommand.equals("give") && argument != null) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.RED + "This command can only be run by a player!");
-                return false;
+            Player player;
+            if (argument2 == null) {
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(ChatColor.RED + "This command can only be run by a player!");
+                    return false;
+                }
+                player = (Player) sender;
+            } else {
+                player = javaPlugin.getServer().getPlayer(argument2);
+                if (player == null) {
+                    sender.sendMessage(ChatColor.RED + "Could not find target player!");
+                    return false;
+                }
             }
             for (ItemCmdEntry entry : itemCmdEntries) {
                 if (argument.equals(entry.getKeyString())) {
-                    Player player = (Player) sender;
-                    if (player.hasPermission(entry.getGivePerm()) == entry.getGivePermValue()) {
+                    if ((sender.hasPermission(entry.getGivePerm()) == entry.getGivePermValue()) || sender instanceof ConsoleCommandSender) {
                         // Create the item
                         ItemStack item = new ItemStack(Material.valueOf(entry.getItem()));
                         ItemMeta meta = item.getItemMeta();
@@ -129,19 +140,20 @@ public class CmdCommand implements TabExecutor {
                         }
                         player.getInventory().addItem(item);
                         player.sendMessage(ChatColor.GREEN + "You have been given the " + entry.getKeyString());
+                        javaPlugin.getLogger().info(player.getDisplayName() + " has been given the " + entry.getKeyString() );
                         return true;
                     }
                 }
             }
         }
-
         return false;
     }
 
     private void showHelp(CommandSender sender) {
         sender.sendMessage(ChatColor.DARK_RED + "--- " + ChatColor.RED + "Command64 Admin Commands" + ChatColor.DARK_RED + " ---\n"
             + ChatColor.WHITE + "/cmd help" + ChatColor.GRAY + " Display this command list\n"
-            + ChatColor.WHITE + "/cmd give <itemKey>" + ChatColor.GRAY + " Spawn in a custom <item>\n"
+            + ChatColor.WHITE + "/cmd give <itemKey>" + ChatColor.GRAY + " Spawn in a custom <item> in your inventory\n"
+            + ChatColor.WHITE + "/cmd give <itemKey> <player>" + ChatColor.GRAY + " Spawn in a custom <item> in player's inventory\n"
             + ChatColor.WHITE + "/cmd <customCommand> [argument]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument\n"
             );
     }

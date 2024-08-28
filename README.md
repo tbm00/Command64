@@ -15,7 +15,8 @@ Created by tbm00 for play.mc64.wtf.
 ## Commands & Permissions
 #### Commands
 - `/cmd help` Display this command list
-- `/cmd give <itemKey>` Spawn in a custom \<item\>
+- `/cmd give <itemKey>` Spawn in a custom \<item\> in your inventory
+- `/cmd give <itemKey> <player>` Spawn in a custom \<item\> in player's inventory
 - `/cmd <customCommand> [argument]` Run custom command as Console w/ optional argument
 #### Permissions
 Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry have configurable permissions (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission node is command64.help.
@@ -55,8 +56,8 @@ joinCommandEntries:
       - "say Gimme yo money!"
   # Add more entries as needed
 
-# customCommandEntries get ran by the console when a player 
-# (with the correct permission) uses the custom command.
+# customCommandEntries get ran by the console when the console, or
+# a player (with the correct permission), uses the custom command.
 customCommandEntries:
   enabled: false
   '1': # Usage: "/cmd save"

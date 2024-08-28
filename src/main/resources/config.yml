@@ -29,8 +29,8 @@ joinCommandEntries:
       - "say Gimme yo money!"
   # Add more entries as needed
 
-# customCommandEntries get ran by the console when a player 
-# (with the correct permission) uses the custom command.
+# customCommandEntries get ran by the console when the console, or
+# a player (with the correct permission), uses the custom command.
 customCommandEntries:
   enabled: false
   '1': # Usage: "/cmd save"
