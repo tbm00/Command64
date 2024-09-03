@@ -8,16 +8,14 @@ import dev.tbm00.spigot.command64.listener.PlayerJoin;
 import dev.tbm00.spigot.command64.command.CmdCommand;
 import dev.tbm00.spigot.command64.listener.ItemUse;
 
-
 public class Command64 extends JavaPlugin {
-    private ItemManager itemManager;
+    private static ItemManager itemManager;
+    private static CommandRunner cmdRunner;
 
     @Override
     public void onEnable() {
-        // Load Config  
         this.saveDefaultConfig();
 
-        // Startup Message
         final PluginDescriptionFile pdf = this.getDescription();
 		log(
             ChatColor.DARK_PURPLE + "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-",
@@ -25,26 +23,18 @@ public class Command64 extends JavaPlugin {
             ChatColor.DARK_PURPLE + "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 		);
 
-        if (this.getConfig().getBoolean("itemCommandEntries.enabled")
-                || this.getConfig().getBoolean("customCommandEntries.enabled")) {
-            // Create itemManager and load config
-            itemManager = new ItemManager(this);
+        // initialize managers
+        cmdRunner = new CommandRunner(this);
+        itemManager = new ItemManager(this);
 
-            // Register Commands
-            getCommand("cmd").setExecutor(new CmdCommand(this, itemManager));
-            
-            // Register ItemUse listener
-            if (this.getConfig().getBoolean("itemCommandEntries.enabled")) {
-                getServer().getPluginManager().registerEvents(new ItemUse(this, itemManager), this);
-            }
-        }
+        // load command
+        getCommand("cmd").setExecutor(new CmdCommand(this, cmdRunner, itemManager));
 
-
-        // Register PlayerJoin listener
-        if (this.getConfig().getBoolean("joinCommandEntries.enabled")) {
-            getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
-        }
-        
+        // register listeners
+        if (this.getConfig().getBoolean("itemCommandEntries.enabled"))
+            getServer().getPluginManager().registerEvents(new ItemUse(this, cmdRunner, itemManager), this);
+        if (this.getConfig().getBoolean("joinCommandEntries.enabled")) 
+            getServer().getPluginManager().registerEvents(new PlayerJoin(this, cmdRunner), this);
     }
 
     private void log(String... strings) {

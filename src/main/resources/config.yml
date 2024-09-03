@@ -39,7 +39,7 @@ customCommandEntries:
     usePermValue: true
     customCommand: "save"
     consoleCommands:
-      - "say <player> is saving the server!"
+      - "say <sender> is saving the server!"
       - "save-all"
   '2': # Usage: "/cmd stop"
     enabled: false
@@ -47,7 +47,7 @@ customCommandEntries:
     usePermValue: true
     customCommand: "stop"
     consoleCommands:
-      - "say <player> is stopping the server!"
+      - "say <sender> is stopping the server!"
       - "stop"
   '3': # Usage: "/cmd promotedonor <argument>" i.e. "/cmd promotedonor Notch"
     enabled: false
@@ -91,7 +91,7 @@ itemCommandEntries:
     usePerm: "essentials.spawn"
     usePermValue: true
     consoleCommands:
-      - "sudo <player> spawn"
+      - "sudo <sender> spawn"
     key: "SPAWNCOMPASS"
     name: "&dSpawn Teleporter"
     item: "COMPASS"
@@ -105,7 +105,7 @@ itemCommandEntries:
     usePerm: "essentials.break"
     usePermValue: true
     consoleCommands:
-      - "sudo <player> break"
+      - "sudo <sender> break"
     key: "STAFFPICK"
     name: "&0Staffpickaxe"
     item: "GOLDEN_PICKAXE"
