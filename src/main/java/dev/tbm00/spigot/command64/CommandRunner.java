@@ -1,5 +1,6 @@
 package dev.tbm00.spigot.command64;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,18 +28,30 @@ public class CommandRunner {
         this.pendingTasks = new HashMap<>();
     }
 
-    public boolean runJoinCommand(List<String> consoleCmds, Player player) {
+    public boolean runJoinCommand(List<String> consoleCmds, Player player, long tickDelay) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = player.getName();
-        System.out.println(name + " used a joinCmdEntry...");
+        javaPlugin.getLogger().info(name + " triggered a joinCmdEntry...");
 
-        for (String consoleCmd : consoleCmds) {
-            consoleCmd = consoleCmd.replace("<player>", name);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(javaPlugin, () -> {
+            if (!player.isOnline()) {
+                javaPlugin.getLogger().warning(name + " disconnected before joinCmdEntry operated!");
+                return;
+            }
 
-            Bukkit.dispatchCommand(console, consoleCmd);
-            System.out.println(name + " ran join command: " + consoleCmd);
-        }
+            List<String> processedCmds = new ArrayList<>();
+            for (String consoleCmd : consoleCmds)
+                processedCmds.add(consoleCmd.replace("<player>", name));
+
+            Bukkit.getScheduler().runTask(javaPlugin, () -> {
+                for (String processedCmd : processedCmds) {
+                    Bukkit.dispatchCommand(console, processedCmd);
+                    javaPlugin.getLogger().info(name + " triggered join command: " + processedCmd);
+                }
+            });
+        }, tickDelay);
+        
         return true;
     }
 
@@ -46,13 +59,13 @@ public class CommandRunner {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = player.getName();
-        System.out.println(name + " used an itemCmdEntry...");
+        javaPlugin.getLogger().info(name + " used an itemCmdEntry...");
 
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", name);
 
             Bukkit.dispatchCommand(console, consoleCmd);
-            System.out.println(name + " ran item command: " + consoleCmd);
+            javaPlugin.getLogger().info(name + " ran item command: " + consoleCmd);
         }
         return true;
     }
@@ -61,7 +74,7 @@ public class CommandRunner {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = sender.getName();
-        System.out.println(name + " used a customCmdEntry...");
+        javaPlugin.getLogger().info(name + " used a customCmdEntry...");
         sender.sendMessage(ChatColor.YELLOW + "Running custom command...");
 
         for (String consoleCmd : consoleCmds) {
@@ -70,7 +83,7 @@ public class CommandRunner {
                 consoleCmd = consoleCmd.replace("<argument>", argument);
 
             Bukkit.dispatchCommand(console, consoleCmd);
-            System.out.println(name + " ran custom command: " + consoleCmd);
+            javaPlugin.getLogger().info(name + " ran custom command: " + consoleCmd);
             sender.sendMessage(ChatColor.GREEN + "Ran custom command: " + consoleCmd);
         }
         return true;
@@ -84,13 +97,13 @@ public class CommandRunner {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = sender.getName();
-        int tickWait = Integer.parseInt(args[1]);
+        int tickDelay = Integer.parseInt(args[1]);
         TimerTask timerTask = new TimerTask(entry, args);
         
         BukkitTask bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
-                System.out.println(name + " used a timerCmdEntry...");
+                javaPlugin.getLogger().info(name + " used a timerCmdEntry...");
                 sender.sendMessage(ChatColor.YELLOW + "Running timer command...");
 
                 //List<String> consoleCmds = timerTask.getTimerCmdEntry().getConsoleCommands(); // not really needed
@@ -100,15 +113,15 @@ public class CommandRunner {
                         consoleCmd = consoleCmd.replace("<argument>", args[3]);
 
                     Bukkit.dispatchCommand(console, consoleCmd);
-                    System.out.println(name + " ran timer command: " + consoleCmd);
+                    javaPlugin.getLogger().info(name + " ran timer command: " + consoleCmd);
                     sender.sendMessage(ChatColor.GREEN + "Ran timer command: " + consoleCmd);
                 } pendingTasks.remove(timerTask);
             }
-        }.runTaskLater(javaPlugin, tickWait);
+        }.runTaskLater(javaPlugin, tickDelay);
 
         pendingTasks.put(timerTask, bukkitTask);
-        System.out.println(name + " is running timer commands in " + tickWait + " ticks...");
-        sender.sendMessage(ChatColor.GREEN + "Running timer commands in " + tickWait + " ticks...");
+        javaPlugin.getLogger().info(name + " is running timer commands in " + tickDelay + " ticks...");
+        sender.sendMessage(ChatColor.YELLOW + "Running timer commands in " + tickDelay + " ticks...");
         return true;
     }
 }

@@ -12,18 +12,21 @@ joinCommandEntries:
     enabled: false
     checkPerm: "group.particlebase"
     checkPermValue: false
+    tickDelay: 10
     consoleCommands:
       - "pp reset <player>"
   '2':
     enabled: false
     checkPerm: "group.donor1"
     checkPermValue: true
+    tickDelay: 10
     consoleCommands:
       - "say Welcome back to the server <player>!"
   '3':
     enabled: false
     checkPerm: "group.donor1"
     checkPermValue: false
+    tickDelay: 10
     consoleCommands:
       - "say <player>, why haven't you donated?"
       - "say Gimme yo money!"

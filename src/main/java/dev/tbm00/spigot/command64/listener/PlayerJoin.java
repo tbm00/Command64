@@ -40,13 +40,14 @@ public class PlayerJoin implements Listener {
             String checkPerm = joinCmdEntry.getString("checkPerm");
             Boolean checkPermValue = joinCmdEntry.getBoolean("checkPermValue");
             List<String> consoleCommands = joinCmdEntry.getStringList("consoleCommands");
+            Long tickDelay = joinCmdEntry.getLong("tickDelay");
 
-            if (checkPerm != null && consoleCommands != null && !consoleCommands.isEmpty()) {
-                JoinCmdEntry entry = new JoinCmdEntry(checkPerm, checkPermValue, consoleCommands);
+            if (checkPerm != null && consoleCommands != null && !consoleCommands.isEmpty() && tickDelay != null) {
+                JoinCmdEntry entry = new JoinCmdEntry(checkPerm, checkPermValue, consoleCommands, tickDelay);
                 joinCmdEntries.add(entry);
-                System.out.println("Loaded joinCmdEntry: "+ checkPerm + " " + checkPermValue + " " + consoleCommands);
+                javaPlugin.getLogger().info("Loaded joinCmdEntry: " + checkPerm + " " + checkPermValue + " " + consoleCommands + " " + tickDelay);
             } else
-                System.out.println("Error: Poorly defined joinCmdEntry: " + checkPerm + " " + checkPermValue);
+                javaPlugin.getLogger().warning("Error: Poorly defined joinCmdEntry: " + checkPerm + " " + checkPermValue + " " + tickDelay);
         } return true;
     }
 
@@ -58,8 +59,8 @@ public class PlayerJoin implements Listener {
         for (JoinCmdEntry entry : joinCmdEntries) {
             if (player.hasPermission(entry.getPerm()) != entry.getPermValue())
                 continue;
-            if (!cmdRunner.runJoinCommand(entry.getConsoleCommands(), player))
-                System.out.println("Error: 'consoleCommands' is null or empty for joinCmdEntry: " + entry.toString());
+            if (!cmdRunner.runJoinCommand(entry.getConsoleCommands(), player, entry.getTickDelay()))
+                javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for joinCmdEntry: " + entry.toString());
         }
     }
 }

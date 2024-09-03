@@ -66,9 +66,9 @@ public class CmdCommand implements TabExecutor {
             if (usePerm != null && consoleCommands != null && playerCommand != null && !consoleCommands.isEmpty()) {
                 CustomCmdEntry entry = new CustomCmdEntry(usePerm, usePermValue, playerCommand, consoleCommands);
                 customCmdEntries.add(entry);
-                System.out.println("Loaded customCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand);
+                javaPlugin.getLogger().info("Loaded customCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand);
             } else 
-                System.out.println("Error: Poorly defined customCmdEntry: " + usePerm + " " + usePermValue + " " + playerCommand);
+                javaPlugin.getLogger().warning("Error: Poorly defined customCmdEntry: " + usePerm + " " + usePermValue + " " + playerCommand);
         } return true;
     }
 
@@ -88,9 +88,9 @@ public class CmdCommand implements TabExecutor {
             if (usePerm != null && consoleCommands != null && playerCommand != null && !consoleCommands.isEmpty()) {
                 TimerCmdEntry entry = new TimerCmdEntry(usePerm, usePermValue, playerCommand, consoleCommands);
                 timerCmdEntries.add(entry);
-                System.out.println("Loaded timerCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand);
+                javaPlugin.getLogger().info("Loaded timerCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand);
             } else 
-                System.out.println("Error: Poorly defined timerCmdEntry: " + usePerm + " " + usePermValue + " " + playerCommand);
+                javaPlugin.getLogger().warning("Error: Poorly defined timerCmdEntry: " + usePerm + " " + usePermValue + " " + playerCommand);
         } return true;
     }
 
@@ -143,7 +143,7 @@ public class CmdCommand implements TabExecutor {
                 if (cmdRunner.runCustomCommand(entry.getConsoleCommands(), sender, args[1])) 
                     return true;
                 else
-                    System.out.println("Error: 'consoleCommands' is null or empty for customCmdEntry: " + entry.toString());
+                    javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for customCmdEntry: " + entry.toString());
             }
         return false;
     }
@@ -156,7 +156,7 @@ public class CmdCommand implements TabExecutor {
             if (cmdRunner.runTimerCommand(entry.getConsoleCommands(), sender, entry, args))
                 return true;
             else 
-                System.out.println("Error: 'consoleCommands' is null or empty for timerCmdEntry: " + entry.toString());
+                javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for timerCmdEntry: " + entry.toString());
         }
         return false;
     }

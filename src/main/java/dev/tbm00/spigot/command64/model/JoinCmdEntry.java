@@ -6,11 +6,13 @@ public class JoinCmdEntry {
     private String perm;
     private Boolean permValue;
     private List<String> consoleCommands;
+    private long tickDelay;
 
-    public JoinCmdEntry(String perm, Boolean permValue, List<String> consoleCommands) {
+    public JoinCmdEntry(String perm, Boolean permValue, List<String> consoleCommands, Long tickDelay) {
         this.perm = perm;
         this.permValue = permValue;
         this.consoleCommands = consoleCommands;
+        this.tickDelay = tickDelay;
     }
 
     public Boolean getPermValue() {
@@ -35,5 +37,13 @@ public class JoinCmdEntry {
 
     public void setConsoleCommands(List<String> consoleCommands) {
         this.consoleCommands = consoleCommands;
+    }
+
+    public long getTickDelay() {
+        return tickDelay;
+    }
+
+    public void setTickDelay(long tickDelay) {
+        this.tickDelay = tickDelay;
     }
 }
