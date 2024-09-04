@@ -78,7 +78,7 @@ public class CommandRunner {
         sender.sendMessage(ChatColor.YELLOW + "Running custom command...");
 
         for (String consoleCmd : consoleCmds) {
-            consoleCmd = consoleCmd.replace("<player>", name);
+            consoleCmd = consoleCmd.replace("<sender>", name);
             if (argument != null)
                 consoleCmd = consoleCmd.replace("<argument>", argument);
 
@@ -109,6 +109,7 @@ public class CommandRunner {
                 //List<String> consoleCmds = timerTask.getTimerCmdEntry().getConsoleCommands(); // not really needed
                 //String[] args = timerTask.getArgs();
                 for (String consoleCmd : consoleCmds) {
+                    consoleCmd = consoleCmd.replace("<sender>", name);
                     if (args.length == 4)
                         consoleCmd = consoleCmd.replace("<argument>", args[3]);
 
