@@ -140,7 +140,8 @@ public class CmdCommand implements TabExecutor {
             if (args[0].toLowerCase().equals(entry.getPlayerCommand())) {
                 if (sender.hasPermission(entry.getPerm()) != entry.getPermValue()) 
                     continue;
-                if (cmdRunner.runCustomCommand(entry.getConsoleCommands(), sender, args[1])) 
+                String argument = args.length > 1 ? args[1] : null;
+                if (cmdRunner.runCustomCommand(entry.getConsoleCommands(), sender, argument))
                     return true;
                 else
                     javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for customCmdEntry: " + entry.toString());
