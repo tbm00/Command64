@@ -88,12 +88,12 @@ public class CmdCommand implements TabExecutor {
             String checkPlayer = timerCmdEntry.getString("invCheck.checkPlayer");
             List<String> bkupConsoleCommands = timerCmdEntry.getStringList("invCheck.ifNoSpaceConsoleCommands");
 
-            if (usePerm != null && consoleCommands != null && playerCommand != null && !consoleCommands.isEmpty()) {
+            if (usePerm != null && playerCommand != null && (consoleCommands != null && !consoleCommands.isEmpty()) || (bkupConsoleCommands != null && !bkupConsoleCommands.isEmpty())) {
                 TimerCmdEntry entry = new TimerCmdEntry(usePerm, usePermValue, playerCommand, consoleCommands, checkInv, checkPlayer, bkupConsoleCommands);
                 timerCmdEntries.add(entry);
-                javaPlugin.getLogger().info("Loaded timerCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand);
+                javaPlugin.getLogger().info("Loaded timerCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand + " " + consoleCommands + " " + bkupConsoleCommands);
             } else 
-                javaPlugin.getLogger().warning("Error: Poorly defined timerCmdEntry: " + usePerm + " " + usePermValue + " " + playerCommand);
+                javaPlugin.getLogger().warning("Loaded timerCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand + " " + consoleCommands + " " + bkupConsoleCommands);
         } return true;
     }
 
@@ -154,8 +154,8 @@ public class CmdCommand implements TabExecutor {
 
     private boolean handleTimerCommand(CommandSender sender, String[] args) {
         for (TimerCmdEntry entry : timerCmdEntries) {
-            if ((!sender.hasPermission(entry.getPerm()) != entry.getPermValue()) 
-                || !args[2].equals(entry.getPlayerCommand())) 
+            if ( (sender.hasPermission(entry.getPerm()) != entry.getPermValue()) 
+                || !args[2].equalsIgnoreCase(entry.getPlayerCommand()) ) 
                 continue;
             if (cmdRunner.runTimerCommand(entry.getConsoleCommands(), sender, entry, args))
                 return true;
