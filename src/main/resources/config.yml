@@ -1,8 +1,11 @@
+# Command64 v0.2.4-beta by @tbm00
+
 # By default, everything is disabled.
 # You should configure each module to your own liking.
-# The predefined config is an example of what you can do
-# when using this plugin with other plugins, like EssentialsX
-# LuckPerms, PlayerParticles, and VotingPlugin.
+# ...
+# The predefined config is an example to give you and idea of what
+# you can do when using this plugin with other plugins,like EssentialsX
+# LuckPerms, PlayerParticles, SpecializedCrates, and VotingPlugin.
 
 # joinCommandEntries get ran by the console when a player 
 # (with the correct permission) connects to the server.
@@ -70,6 +73,9 @@ customCommandEntries:
 # (with the correct permission), using the associated timer command.
 # <sender> = player who used the command
 # <argument> = string included as command's argument
+# invCheck.checkIfSpaceBeforeRun should be true or false.
+# invCheck.checkPlayer should be "ARGUMENT", "SENDER", or "" for disabled.
+# invCheck.ifNoSpaceConsoleCommands should be a list of strings, or "" for disabled.
 timerCommandEntries:
   enabled: false
   '1': # Usage: "/cmd timer <tickDelay> voteparty"
@@ -79,6 +85,10 @@ timerCommandEntries:
     timerCommand: "voteparty"
     consoleCommands:
       - "av voteparty force"
+    invCheck:
+      checkIfSpaceBeforeRun: false
+      checkPlayer: ""
+      ifNoSpaceConsoleCommands: []
   '2': # Usage: "/cmd timer <tickDelay> unban <argument>" i.e. "/cmd timer 12000 unban Notch"
     enabled: false
     usePerm: "group.supermod"
@@ -86,6 +96,34 @@ timerCommandEntries:
     timerCommand: "unban"
     consoleCommands:
       - "unban <argument>"
+    invCheck:
+      checkIfSpaceBeforeRun: false
+      checkPlayer: ""
+      ifNoSpaceConsoleCommands: []
+  '3': # Usage: "/cmd timer <tickDelay> givekey <argument>" i.e. "/cmd timer 1 givekey Notch"
+    enabled: false
+    usePerm: "group.supermod"
+    usePermValue: true
+    timerCommand: "givekey"
+    consoleCommands:
+      - "scrates forceopen Crate32 <argument>"
+    invCheck:
+      checkIfSpaceBeforeRun: true
+      ifNoSpaceConsoleCommands:
+        - "msg <argument> &4You do not have enough space in your inventory... &cYou have two minutes to make room for your reward!"
+        - "cmd timer 2400 givekey-try2 <argument>"
+  '4': # Usage: "/cmd timer <tickDelay> givekey-try2 <argument>" i.e. "/cmd timer 2400 givekey-try2 Notch"
+    enabled: false
+    usePerm: "group.admin"
+    usePermValue: true
+    timerCommand: "givekey-try2"
+    consoleCommands:
+      - "scrates forceopen Crate32 <argument>"
+      - "msg <argument> &2Force opening Crate32..! &eHope you have space :)"
+    invCheck:
+      checkIfSpaceBeforeRun: false
+      checkPlayer: ""
+      ifNoSpaceConsoleCommands: []
   # Add more entries as needed
 
 # itemCommandEntries get ran by the console when a player

@@ -105,9 +105,43 @@ public class CommandRunner {
             public void run() {
                 javaPlugin.getLogger().info(name + " used a timerCmdEntry...");
                 sender.sendMessage(ChatColor.YELLOW + "Running timer command...");
+                if (entry.getCheckInv()) {
+                    String checkPlayer = entry.getCheckPlayer();
+                    Player target = null;
+                    if (checkPlayer.equalsIgnoreCase("SENDER"))
+                        target = (Player) sender;
+                    else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
+                        target = javaPlugin.getServer().getPlayer(args[3]);
+                    else {
+                        javaPlugin.getLogger().info(name + "'s ran timer command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                        sender.sendMessage(ChatColor.GREEN + "Timer command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                        return;
+                    }
 
-                //List<String> consoleCmds = timerTask.getTimerCmdEntry().getConsoleCommands(); // not really needed
-                //String[] args = timerTask.getArgs();
+                    if (target==null) {
+                        javaPlugin.getLogger().info(name + "'s ran timer command failed because " + target + " is null... Aborting!");
+                        sender.sendMessage(ChatColor.GREEN + "Timer command failed because " + target + " is null... Aborting!");
+                        return;
+                    }
+
+                    List<String> bkupConsoleCommands = entry.getBkupConsoleCommands();
+
+                    // check for space
+                    if ((target.getInventory().firstEmpty() == -1)) {
+                        for (String consoleCmd : bkupConsoleCommands) {
+                            consoleCmd = consoleCmd.replace("<sender>", name);
+                            if (args.length == 4)
+                                consoleCmd = consoleCmd.replace("<argument>", args[3]);
+        
+                            Bukkit.dispatchCommand(console, consoleCmd);
+                            javaPlugin.getLogger().info(name + " ran timer command: " + consoleCmd);
+                            sender.sendMessage(ChatColor.GREEN + "Ran timer command: " + consoleCmd);
+                        } pendingTasks.remove(timerTask);
+                        javaPlugin.getLogger().info(name + "'s ran timer command failed because " + target.getName() + " is has no inv space... Running backup command(s): " + bkupConsoleCommands);
+                        sender.sendMessage(ChatColor.GREEN + "Timer command failed because " + target.getName() + " is has no inv space... Running backup command(s): " + bkupConsoleCommands);
+                        return;
+                    }
+                }
                 for (String consoleCmd : consoleCmds) {
                     consoleCmd = consoleCmd.replace("<sender>", name);
                     if (args.length == 4)

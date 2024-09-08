@@ -84,9 +84,12 @@ public class CmdCommand implements TabExecutor {
             Boolean usePermValue = timerCmdEntry.getBoolean("usePermValue");
             String playerCommand = timerCmdEntry.getString("timerCommand");
             List<String> consoleCommands = timerCmdEntry.getStringList("consoleCommands");
+            Boolean checkInv = timerCmdEntry.getBoolean("invCheck.checkIfSpaceBeforeRun");
+            String checkPlayer = timerCmdEntry.getString("invCheck.checkPlayer");
+            List<String> bkupConsoleCommands = timerCmdEntry.getStringList("invCheck.ifNoSpaceConsoleCommands");
 
             if (usePerm != null && consoleCommands != null && playerCommand != null && !consoleCommands.isEmpty()) {
-                TimerCmdEntry entry = new TimerCmdEntry(usePerm, usePermValue, playerCommand, consoleCommands);
+                TimerCmdEntry entry = new TimerCmdEntry(usePerm, usePermValue, playerCommand, consoleCommands, checkInv, checkPlayer, bkupConsoleCommands);
                 timerCmdEntries.add(entry);
                 javaPlugin.getLogger().info("Loaded timerCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand);
             } else 
