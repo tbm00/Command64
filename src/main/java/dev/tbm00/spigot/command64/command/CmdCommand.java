@@ -213,54 +213,75 @@ public class CmdCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command consoleCommand, String alias, String[] args) {
         List<String> list = new ArrayList<>();
+        
         if (args.length == 1) {
             list.clear();
             for (CustomCmdEntry n : customCmdEntries) {
-                if (n!=null && sender.hasPermission(n.getPerm()) && n.getPlayerCommand().startsWith(args[0]))
+                if (n != null && sender.hasPermission(n.getPerm()) && n.getPlayerCommand().startsWith(args[0])) {
                     list.add(n.getPlayerCommand());
+                }
             }
+            
             int i = 0;
             for (ItemCmdEntry n : itemCmdEntries) {
-                if (n!=null && sender.hasPermission(n.getGivePerm()) && "give".startsWith(args[0]))
-                    i = i+1;
-            }
-            if (i>=1) list.add("give");
+                if (n != null && sender.hasPermission(n.getGivePerm()) && "give".startsWith(args[0])) {
+                    i = i + 1;
+                }
+            } if (i >= 1) list.add("give");
+            
             int j = 0;
             for (TimerCmdEntry m : timerCmdEntries) {
-                if (m!=null && sender.hasPermission(m.getPerm()) && "timer".startsWith(args[0]))
-                    j = j+1;
+                if (m != null && sender.hasPermission(m.getPerm()) && "timer".startsWith(args[0])) {
+                    j = j + 1;
+                }
+            } if (j >= 1) list.add("timer");
+            
+            if (sender.hasPermission("command64.help")) {
+                list.add("help");
             }
-            if (j>=1) list.add("timer");
-            if (sender.hasPermission("command64.help")) list.add("help");
         }
+        
         if (args.length == 2) {
             list.clear();
-            if (args[0].toString().equals("give"))
-                for (ItemCmdEntry n : itemCmdEntries)
-                    if (n!=null && sender.hasPermission(n.getGivePerm()) && n.getKeyString().startsWith(args[1]))
+            if (args[0].toString().equals("give")) {
+                for (ItemCmdEntry n : itemCmdEntries) {
+                    if (n != null && sender.hasPermission(n.getGivePerm()) && n.getKeyString().startsWith(args[1])) {
                         list.add(n.getKeyString());
-            else if (args[0].toString().equals("timer"))
+                    }
+                }
+            } else if (args[0].toString().equals("timer")) {
                 list.add("<#>");
-            else if (!args[0].toString().equals("help"))
-                for (Player p : Bukkit.getOnlinePlayers())
+            } else if (!args[0].toString().equals("help")) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
                     list.add(p.getName());
+                }
+            }
         }
+        
         if (args.length == 3) {
             list.clear();
-            if (args[0].toString().equals("timer")) 
-                for (TimerCmdEntry n : timerCmdEntries) 
-                    if (n!=null && sender.hasPermission(n.getPerm()) && n.getPlayerCommand().startsWith(args[2]))
+            if (args[0].toString().equals("timer")) {
+                for (TimerCmdEntry n : timerCmdEntries) {
+                    if (n != null && sender.hasPermission(n.getPerm()) && n.getPlayerCommand().startsWith(args[2])) {
                         list.add(n.getPlayerCommand());
-             else if (args[0].toString().equals("give"))
-                for (Player p : Bukkit.getOnlinePlayers())
+                    }
+                }
+            } else if (args[0].toString().equals("give")) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
                     list.add(p.getName());
+                }
+            }
         }
+        
         if (args.length == 4) {
             list.clear();
-            if (args[0].toString().equals("timer")) 
-                for (Player p : Bukkit.getOnlinePlayers()) 
+            if (args[0].toString().equals("timer")) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
                     list.add(p.getName());
+                }
+            }
         }
+        
         return list;
     }
 }
