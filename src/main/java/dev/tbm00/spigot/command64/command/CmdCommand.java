@@ -34,6 +34,7 @@ public class CmdCommand implements TabExecutor {
     private final List<ItemCmdEntry> itemCmdEntries;
     private final Boolean customEnabled;
     private final Boolean timerEnabled;
+    private final String prefix = ChatColor.DARK_GRAY + "[" + ChatColor.WHITE + "cmd" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
 
     public CmdCommand(JavaPlugin javaPlugin, CommandRunner cmdRunner, ItemManager itemManager) {
         this.javaPlugin = javaPlugin;
@@ -170,14 +171,14 @@ public class CmdCommand implements TabExecutor {
     
         if (args.length < 3) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.RED + "This command can only be run by a player!");
+                sender.sendMessage(prefix + ChatColor.RED + "This command can only be run by a player!");
                 return false;
             }
             player = (Player) sender;
         } else {
             player = javaPlugin.getServer().getPlayer(args[2]);
             if (player == null) {
-                sender.sendMessage(ChatColor.RED + "Could not find target player!");
+                sender.sendMessage(prefix + ChatColor.RED + "Could not find target player!");
                 return false;
             }
         }
@@ -206,7 +207,7 @@ public class CmdCommand implements TabExecutor {
             item.setItemMeta(meta);
         }
         player.getInventory().addItem(item);
-        player.sendMessage(ChatColor.GREEN + "You have been given the " + entry.getKeyString());
+        player.sendMessage(prefix + ChatColor.GREEN + "You have been given the " + entry.getKeyString());
         javaPlugin.getLogger().info(player.getDisplayName() + " has been given the " + entry.getKeyString());
     }
 

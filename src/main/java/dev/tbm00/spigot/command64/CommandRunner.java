@@ -21,6 +21,7 @@ public class CommandRunner {
     private final JavaPlugin javaPlugin;
     private final ConsoleCommandSender console;
     private final Map<TimerTask, BukkitTask> pendingTasks;
+    private final String prefix = ChatColor.DARK_GRAY + "[" + ChatColor.WHITE + "cmd" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
 
     public CommandRunner(JavaPlugin javaPlugin) {
         this.javaPlugin = javaPlugin;
@@ -32,9 +33,11 @@ public class CommandRunner {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = player.getName();
-        javaPlugin.getLogger().info(name + " triggered a joinCmdEntry...");
+        javaPlugin.getLogger().info("Starting " + name + "'s joinCmdEntry...");
 
         Bukkit.getScheduler().runTaskLaterAsynchronously(javaPlugin, () -> {
+            javaPlugin.getLogger().info("Running " + name + "'s joinCmdEntry...");
+
             if (!player.isOnline()) {
                 javaPlugin.getLogger().warning(name + " disconnected before joinCmdEntry operated!");
                 return;
@@ -59,13 +62,13 @@ public class CommandRunner {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = player.getName();
-        javaPlugin.getLogger().info(name + " used an itemCmdEntry...");
+        javaPlugin.getLogger().info("Running " + name + "'s itemCmdEntry...");
 
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", name);
 
             Bukkit.dispatchCommand(console, consoleCmd);
-            javaPlugin.getLogger().info(name + " ran item command: " + consoleCmd);
+            javaPlugin.getLogger().info(name + " triggered item command: " + consoleCmd);
         }
         return true;
     }
@@ -74,8 +77,8 @@ public class CommandRunner {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = sender.getName();
-        javaPlugin.getLogger().info(name + " used a customCmdEntry...");
-        sender.sendMessage(ChatColor.YELLOW + "Running custom command...");
+        javaPlugin.getLogger().info("Running " + name + "'s customCmdEntry...");
+        sender.sendMessage(prefix + ChatColor.YELLOW + "Running custom command...");
 
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<sender>", name);
@@ -84,7 +87,7 @@ public class CommandRunner {
 
             Bukkit.dispatchCommand(console, consoleCmd);
             javaPlugin.getLogger().info(name + " ran custom command: " + consoleCmd);
-            sender.sendMessage(ChatColor.GREEN + "Ran custom command: " + consoleCmd);
+            sender.sendMessage(prefix + ChatColor.GREEN + "Ran custom command: " + ChatColor.DARK_GREEN + consoleCmd);
         }
         return true;
     }
@@ -99,12 +102,15 @@ public class CommandRunner {
         String name = sender.getName();
         int tickDelay = Integer.parseInt(args[1]);
         TimerTask timerTask = new TimerTask(entry, args);
+
+        javaPlugin.getLogger().info("Starting " + name + "'s timerCmdEntry...");
+        sender.sendMessage(prefix + ChatColor.YELLOW + "Starting timer command...");
         
         BukkitTask bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
-                javaPlugin.getLogger().info(name + " used a timerCmdEntry...");
-                sender.sendMessage(ChatColor.YELLOW + "Running timer command...");
+                javaPlugin.getLogger().info("Running " + name + "'s timerCmdEntry...");
+                sender.sendMessage(prefix + ChatColor.YELLOW + "Running timer command...");
                 if (entry.getCheckInv()) {
                     String checkPlayer = entry.getCheckPlayer();
                     Player target = null;
@@ -113,14 +119,14 @@ public class CommandRunner {
                     else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
                         target = javaPlugin.getServer().getPlayer(args[3]);
                     else {
-                        javaPlugin.getLogger().info(name + "'s ran timer command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
-                        sender.sendMessage(ChatColor.GREEN + "Timer command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                        javaPlugin.getLogger().info(name + "'s timer command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                        sender.sendMessage(prefix + ChatColor.GREEN + "Timer command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
                         return;
                     }
 
                     if (target==null) {
-                        javaPlugin.getLogger().info(name + "'s ran timer command failed because " + target + " is null... Aborting!");
-                        sender.sendMessage(ChatColor.GREEN + "Timer command failed because " + target + " is null... Aborting!");
+                        javaPlugin.getLogger().info(name + "'s timer command failed because " + target + " is null... Aborting!");
+                        sender.sendMessage(prefix + ChatColor.GREEN + "Timer command failed because " + target + " is null... Aborting!");
                         return;
                     }
 
@@ -135,10 +141,10 @@ public class CommandRunner {
         
                             Bukkit.dispatchCommand(console, consoleCmd);
                             javaPlugin.getLogger().info(name + " ran timer command: " + consoleCmd);
-                            sender.sendMessage(ChatColor.GREEN + "Ran timer command: " + consoleCmd);
+                            sender.sendMessage(prefix + ChatColor.GREEN + "Ran timer command: " + ChatColor.DARK_GREEN + consoleCmd);
                         } pendingTasks.remove(timerTask);
-                        javaPlugin.getLogger().info(name + "'s ran timer command failed because " + target.getName() + " is has no inv space... Running backup command(s): " + bkupConsoleCommands);
-                        sender.sendMessage(ChatColor.GREEN + "Timer command failed because " + target.getName() + " is has no inv space... Running backup command(s): " + bkupConsoleCommands);
+                        javaPlugin.getLogger().info(name + "'s timer command failed because " + target.getName() + " has no inv space... Running backup command(s) if applicable...");
+                        sender.sendMessage(prefix + ChatColor.GREEN + "Timer command failed because " + target.getName() + " has no inv space... Running backup command(s) if applicable...");
                         return;
                     }
                 }
@@ -149,14 +155,14 @@ public class CommandRunner {
 
                     Bukkit.dispatchCommand(console, consoleCmd);
                     javaPlugin.getLogger().info(name + " ran timer command: " + consoleCmd);
-                    sender.sendMessage(ChatColor.GREEN + "Ran timer command: " + consoleCmd);
+                    sender.sendMessage(prefix + ChatColor.GREEN + "Ran timer command: " + ChatColor.DARK_GREEN + consoleCmd);
                 } pendingTasks.remove(timerTask);
             }
         }.runTaskLater(javaPlugin, tickDelay);
 
         pendingTasks.put(timerTask, bukkitTask);
         javaPlugin.getLogger().info(name + " is running timer commands in " + tickDelay + " ticks...");
-        sender.sendMessage(ChatColor.YELLOW + "Running timer commands in " + tickDelay + " ticks...");
+        sender.sendMessage(prefix + ChatColor.YELLOW + "Running timer commands in " + tickDelay + " ticks...");
         return true;
     }
 }

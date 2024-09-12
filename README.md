@@ -23,7 +23,7 @@ Created by tbm00 for play.mc64.wtf.
 Each JoinCommandEntry, CustomCommandEntry, TimerCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission node is command64.help.
 - `command64.help` Ability to display the command list *(Default: OP)*
 
-## Config
+## Default Config
 ```
 # Command64 v0.2.4-beta by @tbm00
 
@@ -71,7 +71,7 @@ customCommandEntries:
   enabled: false
   '1': # Usage: "/cmd save"
     enabled: false
-    usePerm: "group.admin"
+    usePerm: "command64.admin"
     usePermValue: true
     customCommand: "save"
     consoleCommands:
@@ -79,7 +79,7 @@ customCommandEntries:
       - "save-all"
   '2': # Usage: "/cmd stop"
     enabled: false
-    usePerm: "group.admin"
+    usePerm: "command64.admin"
     usePermValue: true
     customCommand: "stop"
     consoleCommands:
@@ -87,12 +87,12 @@ customCommandEntries:
       - "stop"
   '3': # Usage: "/cmd promotedonor <argument>" i.e. "/cmd promotedonor Notch"
     enabled: false
-    usePerm: "group.supermod"
+    usePerm: "command64.supermod"
     usePermValue: true
     customCommand: "promotedonor"
     consoleCommands:
       - "lp user <argument> promote donor"
-      - "say <argument> donated to the server and was promoted by <player>!"
+      - "say <argument> donated to the server and was promoted by <sender>!"
   # Add more entries as needed
 
 # timerCommandEntries get ran by the console after a delay.
@@ -107,7 +107,7 @@ timerCommandEntries:
   enabled: false
   '1': # Usage: "/cmd timer <tickDelay> voteparty"
     enabled: false
-    usePerm: "group.supermod"
+    usePerm: "command64.supermod"
     usePermValue: true
     timerCommand: "voteparty"
     consoleCommands:
@@ -116,32 +116,22 @@ timerCommandEntries:
       checkIfSpaceBeforeRun: false
       checkPlayer: ""
       ifNoSpaceConsoleCommands: []
-  '2': # Usage: "/cmd timer <tickDelay> unban <argument>" i.e. "/cmd timer 12000 unban Notch"
+  '2': # Usage: "/cmd timer <tickDelay> givekey <argument>" i.e. "/cmd timer 1 givekey Notch"
     enabled: false
-    usePerm: "group.supermod"
-    usePermValue: true
-    timerCommand: "unban"
-    consoleCommands:
-      - "unban <argument>"
-    invCheck:
-      checkIfSpaceBeforeRun: false
-      checkPlayer: ""
-      ifNoSpaceConsoleCommands: []
-  '3': # Usage: "/cmd timer <tickDelay> givekey <argument>" i.e. "/cmd timer 1 givekey Notch"
-    enabled: false
-    usePerm: "group.supermod"
+    usePerm: "command64.supermod"
     usePermValue: true
     timerCommand: "givekey"
     consoleCommands:
       - "scrates forceopen Crate32 <argument>"
     invCheck:
       checkIfSpaceBeforeRun: true
+      checkPlayer: "ARGUMENT"
       ifNoSpaceConsoleCommands:
         - "msg <argument> &4You do not have enough space in your inventory... &cYou have two minutes to make room for your reward!"
         - "cmd timer 2400 givekey-try2 <argument>"
-  '4': # Usage: "/cmd timer <tickDelay> givekey-try2 <argument>" i.e. "/cmd timer 2400 givekey-try2 Notch"
+  '3': # Usage: "/cmd timer <tickDelay> givekey-try2 <argument>" i.e. "/cmd timer 2400 givekey-try2 Notch"
     enabled: false
-    usePerm: "group.admin"
+    usePerm: "command64.admin"
     usePermValue: true
     timerCommand: "givekey-try2"
     consoleCommands:
@@ -181,7 +171,7 @@ itemCommandEntries:
     consoleCommands:
       - "sudo <sender> break"
     key: "STAFFPICK"
-    name: "&0Staffpickaxe"
+    name: "&0Staff Pickaxe"
     item: "GOLDEN_PICKAXE"
     glowing: true
     lore:
