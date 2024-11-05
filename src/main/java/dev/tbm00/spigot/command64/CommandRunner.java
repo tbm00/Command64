@@ -81,7 +81,7 @@ public class CommandRunner {
         sender.sendMessage(prefix + ChatColor.YELLOW + "Running custom command...");
 
         for (String consoleCmd : consoleCmds) {
-            consoleCmd = consoleCmd.replace("<sender>", name);
+            consoleCmd = consoleCmd.replace("<player>", name);
             if (argument != null)
                 consoleCmd = consoleCmd.replace("<argument>", argument);
 
@@ -135,7 +135,7 @@ public class CommandRunner {
                     // check for space
                     if ((target.getInventory().firstEmpty() == -1)) {
                         for (String consoleCmd : bkupConsoleCommands) {
-                            consoleCmd = consoleCmd.replace("<sender>", name);
+                            consoleCmd = consoleCmd.replace("<player>", name);
                             if (args.length == 4)
                                 consoleCmd = consoleCmd.replace("<argument>", args[3]);
         
@@ -149,7 +149,7 @@ public class CommandRunner {
                     }
                 }
                 for (String consoleCmd : consoleCmds) {
-                    consoleCmd = consoleCmd.replace("<sender>", name);
+                    consoleCmd = consoleCmd.replace("<player>", name);
                     if (args.length == 4)
                         consoleCmd = consoleCmd.replace("<argument>", args[3]);
 

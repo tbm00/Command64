@@ -70,7 +70,7 @@ public class ConfigHandler {
             String playerCommand = customCmdEntry.contains("") ? customCmdEntry.getString("customCommand") : null;
             List<String> consoleCommands = customCmdEntry.contains("") ? customCmdEntry.getStringList("consoleCommands") : null;
             Boolean checkInv = customCmdEntry.contains("") ? customCmdEntry.getBoolean("invCheck.checkIfSpaceBeforeRun") : false;
-            String checkPlayer = customCmdEntry.contains("") ? customCmdEntry.getString("invCheck.checkPlayer") : "";
+            String checkPlayer = customCmdEntry.contains("") ? customCmdEntry.getString("invCheck.checkOnPlayer") : "";
             List<String> bkupConsoleCommands = customCmdEntry.contains("") ? customCmdEntry.getStringList("invCheck.ifNoSpaceConsoleCommands") : null;
 
             if (usePerm != null && playerCommand != null && (consoleCommands != null && !consoleCommands.isEmpty()) || (bkupConsoleCommands != null && !bkupConsoleCommands.isEmpty())) {

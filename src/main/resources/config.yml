@@ -1,4 +1,4 @@
-# Command64 v1.0 by @tbm00
+# Command64 v1.0.1 by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, everything is disabled.
@@ -44,7 +44,7 @@ joinCommandEntries:
 # customCommandEntries get ran by the console when the console, or
 # a player (with the correct permission), uses the associated custom subcommand.
 # ---------
-# <sender> == player who used the command
+# <player> == player who used the command
 # <argument> == string included as running command's argument
 # ---------
 # If wanted, you can add an inventory check to any custom command entry.
@@ -61,7 +61,7 @@ customCommandEntries:
     usePermValue: true
     customCommand: "save"
     consoleCommands:
-      - "say <sender> is saving the server!"
+      - "say <player> is saving the server!"
       - "save-all"
   '2': # Usage: "/cmd stop"
     enabled: false
@@ -69,7 +69,7 @@ customCommandEntries:
     usePermValue: true
     customCommand: "stop"
     consoleCommands:
-      - "say <sender> is stopping the server!"
+      - "say <player> is stopping the server!"
       - "stop"
   '3': # Usage: "/cmd promotedonor <argument>" i.e. "/cmd promotedonor Notch"
     enabled: false
@@ -78,7 +78,7 @@ customCommandEntries:
     customCommand: "promotedonor"
     consoleCommands:
       - "lp user <argument> promote donor"
-      - "say <argument> donated to the server and was promoted by <sender>!"
+      - "say <argument> donated to the server and was promoted by <player>!"
   '4': # Usage "/cmd boss-fight-start"
     enabled: false
     usePerm: "command64.supermod"
@@ -115,7 +115,7 @@ customCommandEntries:
       - "crates forceopen Crate32 <argument>"
     invCheck:
       checkIfSpaceBeforeRun: true
-      checkPlayer: "ARGUMENT"
+      checkOnPlayer: "ARGUMENT"
       ifNoSpaceConsoleCommands:
         - "msg <argument> &4You do not have enough space in your inventory... &cYou have two minutes to make room for your reward!"
         - "cmd -d 2400 givekey-try2 <argument>" # 2 minute delay
@@ -146,7 +146,7 @@ itemCommandEntries:
     usePerm: "essentials.spawn"
     usePermValue: true
     consoleCommands:
-      - "sudo <sender> spawn"
+      - "sudo <player> spawn"
     key: "SPAWNCOMPASS"
     name: "&dSpawn Teleporter"
     item: "COMPASS"
@@ -160,7 +160,7 @@ itemCommandEntries:
     usePerm: "essentials.break"
     usePermValue: true
     consoleCommands:
-      - "sudo <sender> break"
+      - "sudo <player> break"
     key: "STAFFPICK"
     name: "&0Staff Pickaxe"
     item: "GOLDEN_PICKAXE"
