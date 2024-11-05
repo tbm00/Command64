@@ -8,7 +8,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -19,83 +18,21 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
-import dev.tbm00.spigot.command64.ItemManager;
+import dev.tbm00.spigot.command64.ConfigHandler;
 import dev.tbm00.spigot.command64.CommandRunner;
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.ItemCmdEntry;
-import dev.tbm00.spigot.command64.model.TimerCmdEntry;
 
 public class CmdCommand implements TabExecutor {
     private final JavaPlugin javaPlugin;
     private final CommandRunner cmdRunner;
-    private final ItemManager itemManager;
-    private final List<CustomCmdEntry> customCmdEntries;
-    private final List<TimerCmdEntry> timerCmdEntries;
-    private final List<ItemCmdEntry> itemCmdEntries;
-    private final Boolean customEnabled;
-    private final Boolean timerEnabled;
+    private final ConfigHandler configHandler;
     private final String prefix = ChatColor.DARK_GRAY + "[" + ChatColor.WHITE + "cmd" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
 
-    public CmdCommand(JavaPlugin javaPlugin, CommandRunner cmdRunner, ItemManager itemManager) {
+    public CmdCommand(JavaPlugin javaPlugin, CommandRunner cmdRunner, ConfigHandler configHandler) {
         this.javaPlugin = javaPlugin;
         this.cmdRunner = cmdRunner;
-        this.itemManager = itemManager;
-        this.customCmdEntries = new ArrayList<>();
-        this.timerCmdEntries = new ArrayList<>();
-        this.itemCmdEntries = itemManager.getItemCmdEntries();
-
-        if (!loadCustomConfig()) customEnabled = false;
-        else customEnabled = true;
-
-        if (!loadTimerConfig()) timerEnabled = false;
-        else timerEnabled = true;
-    }
-
-    private boolean loadCustomConfig() {
-        ConfigurationSection customCmdSection = javaPlugin.getConfig().getConfigurationSection("customCommandEntries");
-        if (customCmdSection == null || !customCmdSection.getBoolean("enabled")) return false;
-
-        for (String key : customCmdSection.getKeys(false)) {
-            ConfigurationSection customCmdEntry = customCmdSection.getConfigurationSection(key);
-            if (customCmdEntry == null || !customCmdEntry.getBoolean("enabled")) continue;
-            
-            String usePerm = customCmdEntry.getString("usePerm");
-            Boolean usePermValue = customCmdEntry.getBoolean("usePermValue");
-            String playerCommand = customCmdEntry.getString("customCommand");
-            List<String> consoleCommands = customCmdEntry.getStringList("consoleCommands");
-
-            if (usePerm != null && consoleCommands != null && playerCommand != null && !consoleCommands.isEmpty()) {
-                CustomCmdEntry entry = new CustomCmdEntry(usePerm, usePermValue, playerCommand, consoleCommands);
-                customCmdEntries.add(entry);
-                javaPlugin.getLogger().info("Loaded customCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand);
-            } else 
-                javaPlugin.getLogger().warning("Error: Poorly defined customCmdEntry: " + usePerm + " " + usePermValue + " " + playerCommand);
-        } return true;
-    }
-
-    private boolean loadTimerConfig() {
-        ConfigurationSection timerCmdSection = javaPlugin.getConfig().getConfigurationSection("timerCommandEntries");
-        if (timerCmdSection == null || !timerCmdSection.getBoolean("enabled")) return false;
-
-        for (String key : timerCmdSection.getKeys(false)) {
-            ConfigurationSection timerCmdEntry = timerCmdSection.getConfigurationSection(key);
-            if (timerCmdEntry == null || !timerCmdEntry.getBoolean("enabled")) continue;
-            
-            String usePerm = timerCmdEntry.getString("usePerm");
-            Boolean usePermValue = timerCmdEntry.getBoolean("usePermValue");
-            String playerCommand = timerCmdEntry.getString("timerCommand");
-            List<String> consoleCommands = timerCmdEntry.getStringList("consoleCommands");
-            Boolean checkInv = timerCmdEntry.getBoolean("invCheck.checkIfSpaceBeforeRun");
-            String checkPlayer = timerCmdEntry.getString("invCheck.checkPlayer");
-            List<String> bkupConsoleCommands = timerCmdEntry.getStringList("invCheck.ifNoSpaceConsoleCommands");
-
-            if (usePerm != null && playerCommand != null && (consoleCommands != null && !consoleCommands.isEmpty()) || (bkupConsoleCommands != null && !bkupConsoleCommands.isEmpty())) {
-                TimerCmdEntry entry = new TimerCmdEntry(usePerm, usePermValue, playerCommand, consoleCommands, checkInv, checkPlayer, bkupConsoleCommands);
-                timerCmdEntries.add(entry);
-                javaPlugin.getLogger().info("Loaded timerCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand + " " + consoleCommands + " " + bkupConsoleCommands);
-            } else 
-                javaPlugin.getLogger().warning("Loaded timerCmdEntry: "+ usePerm + " " + usePermValue + " " + playerCommand + " " + consoleCommands + " " + bkupConsoleCommands);
-        } return true;
+        this.configHandler = configHandler;
     }
 
     public boolean onCommand(CommandSender sender, Command consoleCommand, String label, String[] args) {
@@ -107,22 +44,17 @@ public class CmdCommand implements TabExecutor {
         if (args.length < 1 || args.length > 4) return false;
 
         String subCommand = args[0].toLowerCase();
-
         switch (subCommand) {
             case "help":
                 if (sender.hasPermission("command64.help"))
                     return handleHelpCommand(sender);
                 break;
             case "give":
-                if (itemManager.isEnabled() && args.length >= 2)
+                if (configHandler.isItemEnabled() && args.length >= 2)
                     return handleGiveCommand(sender, args);
                 break;
-            case "timer":
-                if (timerEnabled && args.length >= 3)
-                    return handleTimerCommand(sender, args);
-                break;
             default:
-                if (customEnabled)
+                if (configHandler.isCustomEnabled())
                     return handleCustomCommand(sender, args);
                 break;
         }
@@ -133,39 +65,28 @@ public class CmdCommand implements TabExecutor {
         sender.sendMessage(ChatColor.DARK_RED + "--- " + ChatColor.RED + "Command64 Admin Commands" + ChatColor.DARK_RED + " ---\n"
             + ChatColor.WHITE + "/cmd help" + ChatColor.GRAY + " Display this command list\n"
             + ChatColor.WHITE + "/cmd give <itemKey> [player]" + ChatColor.GRAY + " Spawn a custom item\n"
-            + ChatColor.WHITE + "/cmd timer <tickDelay> <timerCommand> [argument]" + ChatColor.GRAY + " Run delayed command as Console w/ optional argument\n"
             + ChatColor.WHITE + "/cmd <customCommand> [argument]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument\n"
+            + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument]" + ChatColor.GRAY + " Run delayed custom command as Console w/ optional argument\n"
             );
         return true;
     }
     
     private boolean handleCustomCommand(CommandSender sender, String[] args) {
-        for (CustomCmdEntry entry : customCmdEntries)
-            if (args[0].toLowerCase().equals(entry.getPlayerCommand())) {
-                if (sender.hasPermission(entry.getPerm()) != entry.getPermValue()) 
-                    continue;
+        for (CustomCmdEntry entry : configHandler.getCustomCmdEntries()) {
+            if (sender.hasPermission(entry.getPerm()) != entry.getPermValue()) 
+                continue;
+            else if (args[0].equalsIgnoreCase("-d") && args[2].equalsIgnoreCase(entry.getPlayerCommand())) {
+                if (cmdRunner.runDelayedCommand(entry.getConsoleCommands(), sender, entry, args))
+                    return true;
+            } else if (args[0].equalsIgnoreCase(entry.getPlayerCommand())) {
                 String argument = args.length > 1 ? args[1] : null;
                 if (cmdRunner.runCustomCommand(entry.getConsoleCommands(), sender, argument))
                     return true;
-                else
-                    javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for customCmdEntry: " + entry.toString());
             }
-        return false;
-    }
-
-    private boolean handleTimerCommand(CommandSender sender, String[] args) {
-        for (TimerCmdEntry entry : timerCmdEntries) {
-            if ( (sender.hasPermission(entry.getPerm()) != entry.getPermValue()) 
-                || !args[2].equalsIgnoreCase(entry.getPlayerCommand()) ) 
-                continue;
-            if (cmdRunner.runTimerCommand(entry.getConsoleCommands(), sender, entry, args))
-                return true;
-            else 
-                javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for timerCmdEntry: " + entry.toString());
         }
         return false;
     }
-
+    
     private boolean handleGiveCommand(CommandSender sender, String[] args) {
         Player player;
     
@@ -183,7 +104,7 @@ public class CmdCommand implements TabExecutor {
             }
         }
     
-        for (ItemCmdEntry entry : itemCmdEntries) {
+        for (ItemCmdEntry entry : configHandler.getItemCmdEntries()) {
             if (args[1].equals(entry.getKeyString()))
                 if ((sender.hasPermission(entry.getGivePerm()) == entry.getGivePermValue()) || sender instanceof ConsoleCommandSender) {
                     giveItemToPlayer(player, entry);
@@ -217,25 +138,25 @@ public class CmdCommand implements TabExecutor {
         
         if (args.length == 1) {
             list.clear();
-            for (CustomCmdEntry n : customCmdEntries) {
+            for (CustomCmdEntry n : configHandler.getCustomCmdEntries()) {
                 if (n != null && sender.hasPermission(n.getPerm()) && n.getPlayerCommand().startsWith(args[0])) {
                     list.add(n.getPlayerCommand());
                 }
             }
             
             int i = 0;
-            for (ItemCmdEntry n : itemCmdEntries) {
+            for (ItemCmdEntry n : configHandler.getItemCmdEntries()) {
                 if (n != null && sender.hasPermission(n.getGivePerm()) && "give".startsWith(args[0])) {
                     i = i + 1;
                 }
             } if (i >= 1) list.add("give");
             
             int j = 0;
-            for (TimerCmdEntry m : timerCmdEntries) {
-                if (m != null && sender.hasPermission(m.getPerm()) && "timer".startsWith(args[0])) {
+            for (CustomCmdEntry m : configHandler.getCustomCmdEntries()) {
+                if (m != null && sender.hasPermission(m.getPerm()) && "-d".startsWith(args[0])) {
                     j = j + 1;
                 }
-            } if (j >= 1) list.add("timer");
+            } if (j >= 1) list.add("-d");
             
             if (sender.hasPermission("command64.help")) {
                 list.add("help");
@@ -245,12 +166,12 @@ public class CmdCommand implements TabExecutor {
         if (args.length == 2) {
             list.clear();
             if (args[0].toString().equals("give")) {
-                for (ItemCmdEntry n : itemCmdEntries) {
+                for (ItemCmdEntry n : configHandler.getItemCmdEntries()) {
                     if (n != null && sender.hasPermission(n.getGivePerm()) && n.getKeyString().startsWith(args[1])) {
                         list.add(n.getKeyString());
                     }
                 }
-            } else if (args[0].toString().equals("timer")) {
+            } else if (args[0].toString().equals("-d")) {
                 list.add("<#>");
             } else if (!args[0].toString().equals("help")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
@@ -261,8 +182,8 @@ public class CmdCommand implements TabExecutor {
         
         if (args.length == 3) {
             list.clear();
-            if (args[0].toString().equals("timer")) {
-                for (TimerCmdEntry n : timerCmdEntries) {
+            if (args[0].toString().equals("-d")) {
+                for (CustomCmdEntry n : configHandler.getCustomCmdEntries()) {
                     if (n != null && sender.hasPermission(n.getPerm()) && n.getPlayerCommand().startsWith(args[2])) {
                         list.add(n.getPlayerCommand());
                     }
@@ -276,10 +197,11 @@ public class CmdCommand implements TabExecutor {
         
         if (args.length == 4) {
             list.clear();
-            if (args[0].toString().equals("timer")) {
+            if (args[0].toString().equals("-d")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     list.add(p.getName());
                 }
+
             }
         }
         

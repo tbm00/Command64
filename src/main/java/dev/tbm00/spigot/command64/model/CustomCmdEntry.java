@@ -7,12 +7,18 @@ public class CustomCmdEntry {
     private Boolean permValue;
     private String playerCommand;
     private List<String> consoleCommands;
+    private Boolean checkInv;
+    private String checkPlayer;
+    private List<String> bkupConsoleCommands;
 
-    public CustomCmdEntry(String perm, Boolean permValue, String playerCommand, List<String> consoleCommands) {
+    public CustomCmdEntry(String perm, Boolean permValue, String playerCommand, List<String> consoleCommands, Boolean checkInv, String checkPlayer, List<String> bkupConsoleCommands) {
         this.perm = perm;
         this.permValue = permValue;
         this.playerCommand = playerCommand;
         this.consoleCommands = consoleCommands;
+        this.checkInv = checkInv;
+        this.checkPlayer = checkPlayer;
+        this.bkupConsoleCommands = bkupConsoleCommands;
     }
 
     public Boolean getPermValue() {
@@ -45,5 +51,29 @@ public class CustomCmdEntry {
 
     public void setConsoleCommands(List<String> consoleCommands) {
         this.consoleCommands = consoleCommands;
+    }
+
+    public Boolean getCheckInv() {
+        return checkInv;
+    }
+
+    public void setCheckInv(Boolean checkInv) {
+        this.checkInv = checkInv;
+    }
+
+    public String getCheckPlayer() {
+        return checkPlayer;
+    }
+
+    public void getCheckPlayer(String checkPlayer) {
+        this.checkPlayer = checkPlayer;
+    }
+
+    public List<String> getBkupConsoleCommands() {
+        return bkupConsoleCommands;
+    }
+
+    public void setBkupConsoleCommands(List<String> bkupConsoleCommands) {
+        this.bkupConsoleCommands = bkupConsoleCommands;
     }
 }

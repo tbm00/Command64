@@ -1,13 +1,12 @@
-# Command64
+# Command64 <img align="left" src="icon.png" alt="Item64 Icon" width="40"/>
 A spigot plugin that runs commands with configurable triggers.
 
 Created by tbm00 for play.mc64.wtf.
 
 ## Features
-- **JoinCommandEntries** run command(s) as the console when a player joins (if player has associated permission node).
-- **CustomCommandEntries** run command(s) as the console when a player/console uses a custom command (if player has associated permission node).
-- **TimerCommandEntries** run command(s) as the console after a delay, initially triggered by a player/console using a custom timer command (if player has associated permission node). + the ability to check if player has space in inventory before running command(s).
-- **ItemCommandEntries** run command(s) as the console when a player uses a custom item (if player has associated permission node).
+- **CustomCommandEntries** run command(s) as the console when a player/console uses a custom command, with optional delays and inventory checks.
+- **JoinCommandEntries** run command(s) as the console when a player joins.
+- **ItemCommandEntries** run command(s) as the console when a player uses a custom item.
 
 ## Dependencies
 - **Java 17+**: REQUIRED
@@ -17,26 +16,29 @@ Created by tbm00 for play.mc64.wtf.
 #### Commands
 - `/cmd help` Display this command list
 - `/cmd give <itemKey> [player]` Spawn a custom item
-- `/cmd timer <tickDelay> <timerCommand> [argument]` Run delayed command as Console w/ optional argument
+- `/cmd -d <tickDelay> <customCommand> [argument]` Run delayed custom command as Console w/ optional argument
 - `/cmd <customCommand> [argument]` Run custom command as Console w/ optional argument
 #### Permissions
-Each JoinCommandEntry, CustomCommandEntry, TimerCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission node is command64.help.
+Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission node is command64.help.
 - `command64.help` Ability to display the command list *(Default: OP)*
 
 ## Default Config
 ```
-# Command64 v0.2.4-beta by @tbm00
+# Command64 v1.0 by @tbm00
+# https://github.com/tbm00/Command64/
 
 # By default, everything is disabled.
 # You should configure each module to your own liking.
-# ...
 # The predefined config is an example to give you and idea of what
-# you can do when using this plugin with other plugins,like EssentialsX
-# LuckPerms, PlayerParticles, SpecializedCrates, and VotingPlugin.
+# you can do when using this plugin with other plugins, like EssentialsX
+# LuckPerms, PlayerParticles, SpecializedCrates, and MythicMobs.
 
+# -------------------------------------------------------------------------------------- #
 # joinCommandEntries get ran by the console when a player 
 # (with the correct permission) connects to the server.
-# <player> = player who joined
+# ---------
+# <player> == player who joined
+# -------------------------------------------------------------------------------------- #
 joinCommandEntries:
   enabled: false
   '1':
@@ -63,10 +65,20 @@ joinCommandEntries:
       - "say Gimme yo money!"
   # Add more entries as needed
 
+
+# -------------------------------------------------------------------------------------- #
 # customCommandEntries get ran by the console when the console, or
-# a player (with the correct permission), uses the associated custom command.
-# <sender> = player who used the command
-# <argument> = string included as command's argument
+# a player (with the correct permission), uses the associated custom subcommand.
+# ---------
+# <sender> == player who used the command
+# <argument> == string included as running command's argument
+# ---------
+# If wanted, you can add an inventory check to any custom command entry.
+# If so, invCheck.checkOnPlayer should be "ARGUMENT" or "SENDER".
+# ---------
+# If wanted, you can add "-d <X>" when running any custom command to delay the console
+# commands for X ticks.
+# -------------------------------------------------------------------------------------- #
 customCommandEntries:
   enabled: false
   '1': # Usage: "/cmd save"
@@ -93,59 +105,64 @@ customCommandEntries:
     consoleCommands:
       - "lp user <argument> promote donor"
       - "say <argument> donated to the server and was promoted by <sender>!"
-  # Add more entries as needed
-
-# timerCommandEntries get ran by the console after a delay.
-# Initially triggered by the console, or a player
-# (with the correct permission), using the associated timer command.
-# <sender> = player who used the command
-# <argument> = string included as command's argument
-# invCheck.checkIfSpaceBeforeRun should be true or false.
-# invCheck.checkPlayer should be "ARGUMENT", "SENDER", or "" for disabled.
-# invCheck.ifNoSpaceConsoleCommands should be a list of strings, or "" for disabled.
-timerCommandEntries:
-  enabled: false
-  '1': # Usage: "/cmd timer <tickDelay> voteparty"
+  '4': # Usage "/cmd boss-fight-start"
     enabled: false
     usePerm: "command64.supermod"
     usePermValue: true
-    timerCommand: "voteparty"
+    customCommand: "boss-fight-start"
     consoleCommands:
-      - "av voteparty force"
-    invCheck:
-      checkIfSpaceBeforeRun: false
-      checkPlayer: ""
-      ifNoSpaceConsoleCommands: []
-  '2': # Usage: "/cmd timer <tickDelay> givekey <argument>" i.e. "/cmd timer 1 givekey Notch"
+      - "mm mobs spawn BossMinion -t world,-677,46,727"
+      - "mm mobs spawn BossMinion -t world,-667,46,726"
+      - "mm mobs spawn BossMinion -t world,-677,52,727"
+      - "mm mobs spawn BossMinion -t world,-667,52,726"
+      - "mm mobs spawn BossMinion -t world,-672,52,732"
+      - "mm mobs spawn BossMinion -t Tadow,-673,52,722"
+      - "mm mobs spawn BossMob -t world,-672,36,727"
+      - "broadcast &bBoss fight started!"
+      - "cmd -d 1200 boss-fight-round2" # 1 minute delay
+  '5': # Intended Usage "/cmd -d <tickDelay> boss-fight-round2" i.e. "/cmd -d 1200 boss-fight-round2"
     enabled: false
     usePerm: "command64.supermod"
     usePermValue: true
-    timerCommand: "givekey"
+    timerCommand: "boss-fight-round2"
     consoleCommands:
-      - "scrates forceopen Crate32 <argument>"
+      - "mm mobs spawn BossMinion -t Tadow,-677,36,727"
+      - "mm mobs spawn BossMinion -t Tadow,-667,36,726"
+      - "mm mobs spawn BossMinion -t Tadow,-672,46,732"
+      - "mm mobs spawn BossMinion -t Tadow,-673,46,722"
+      - "mm mobs spawn BossMinion -t Tadow,-677,52,727"
+      - "mm mobs spawn BossMinion -t Tadow,-667,52,726"
+  '6': # Usage: "/cmd givekey <argument>" i.e. "/cmd givekey Notch"
+    enabled: false
+    usePerm: "command64.supermod"
+    usePermValue: true
+    customCommand: "givekey"
+    consoleCommands:
+      - "crates forceopen Crate32 <argument>"
     invCheck:
       checkIfSpaceBeforeRun: true
       checkPlayer: "ARGUMENT"
       ifNoSpaceConsoleCommands:
         - "msg <argument> &4You do not have enough space in your inventory... &cYou have two minutes to make room for your reward!"
-        - "cmd timer 2400 givekey-try2 <argument>"
-  '3': # Usage: "/cmd timer <tickDelay> givekey-try2 <argument>" i.e. "/cmd timer 2400 givekey-try2 Notch"
+        - "cmd -d 2400 givekey-try2 <argument>" # 2 minute delay
+  '7': # Intended Usage: "/cmd -d <tickDelay> givekey-try2 <argument>" i.e. "/cmd -d 2400 givekey-try2 Notch"
     enabled: false
     usePerm: "command64.admin"
     usePermValue: true
-    timerCommand: "givekey-try2"
+    customCommand: "givekey-try2"
     consoleCommands:
-      - "scrates forceopen Crate32 <argument>"
+      - "crates forceopen Crate32 <argument>"
       - "msg <argument> &2Force opening Crate32..! &eHope you have space :)"
-    invCheck:
-      checkIfSpaceBeforeRun: false
-      checkPlayer: ""
-      ifNoSpaceConsoleCommands: []
   # Add more entries as needed
 
+
+# -------------------------------------------------------------------------------------- #
 # itemCommandEntries get ran by the console when a player
 # (with the correct permission) uses a custom item.
-# <player> = player who used the item
+# ---------
+# <player> == player who used the item
+# <argument> == string included as running command's argument
+# -------------------------------------------------------------------------------------- #
 itemCommandEntries:
   enabled: false
   '1':

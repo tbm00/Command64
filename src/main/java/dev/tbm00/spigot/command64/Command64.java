@@ -9,7 +9,7 @@ import dev.tbm00.spigot.command64.command.CmdCommand;
 import dev.tbm00.spigot.command64.listener.ItemUse;
 
 public class Command64 extends JavaPlugin {
-    private static ItemManager itemManager;
+    private static ConfigHandler configHandler;
     private static CommandRunner cmdRunner;
 
     @Override
@@ -25,16 +25,16 @@ public class Command64 extends JavaPlugin {
 
         // initialize managers
         cmdRunner = new CommandRunner(this);
-        itemManager = new ItemManager(this);
+        configHandler = new ConfigHandler(this);
 
         // load command
-        getCommand("cmd").setExecutor(new CmdCommand(this, cmdRunner, itemManager));
+        getCommand("cmd").setExecutor(new CmdCommand(this, cmdRunner, configHandler));
 
         // register listeners
         if (this.getConfig().getBoolean("itemCommandEntries.enabled"))
-            getServer().getPluginManager().registerEvents(new ItemUse(this, cmdRunner, itemManager), this);
+            getServer().getPluginManager().registerEvents(new ItemUse(this, cmdRunner, configHandler), this);
         if (this.getConfig().getBoolean("joinCommandEntries.enabled")) 
-            getServer().getPluginManager().registerEvents(new PlayerJoin(this, cmdRunner), this);
+            getServer().getPluginManager().registerEvents(new PlayerJoin(this, cmdRunner, configHandler), this);
     }
 
     private void log(String... strings) {

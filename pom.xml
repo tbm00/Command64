@@ -6,7 +6,7 @@
 
     <groupId>dev.tbm00</groupId>
     <artifactId>Command64</artifactId>
-    <version>0.2.4-beta</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>Command64</name>
