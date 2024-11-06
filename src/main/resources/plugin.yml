@@ -7,7 +7,15 @@ api-version: 1.17
 commands:
   cmd:
     description: Base command for Command64
+  redeemreward:
+    description: Command for players to redeem queued rewards
 permissions:
   command64.help:
     description: Ability to display the command list
     default: op
+  command64.enqueuerewards:
+    description: Ability add rewards to a player's queue
+    default: op
+  command64.redeemrewards:
+    description: Ability redeem queued rewards
+    default: true

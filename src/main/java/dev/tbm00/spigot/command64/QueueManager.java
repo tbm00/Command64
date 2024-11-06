@@ -17,13 +17,13 @@ import org.bukkit.scheduler.BukkitTask;
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.DelayedTask;
 
-public class CommandRunner {
+public class RewardManager {
     private final JavaPlugin javaPlugin;
     private final ConsoleCommandSender console;
     private final Map<DelayedTask, BukkitTask> pendingTasks;
-    private final String prefix = ChatColor.DARK_GRAY + "[" + ChatColor.WHITE + "cmd" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
+    private final String prefix = ChatColor.DARK_GRAY + "[" + ChatColor.WHITE + "Rewards" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
 
-    public CommandRunner(JavaPlugin javaPlugin) {
+    public RewardManager(JavaPlugin javaPlugin) {
         this.javaPlugin = javaPlugin;
         this.console = Bukkit.getServer().getConsoleSender();
         this.pendingTasks = new HashMap<>();
@@ -33,11 +33,15 @@ public class CommandRunner {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = player.getName();
+        javaPlugin.getLogger().info("Starting " + name + "'s joinCmdEntry...");
 
         Bukkit.getScheduler().runTaskLaterAsynchronously(javaPlugin, () -> {
-            if (!player.isOnline()) return;
+            javaPlugin.getLogger().info("Running " + name + "'s joinCmdEntry...");
 
-            javaPlugin.getLogger().info(name + " triggered a joinCmdEntry's consoleCommands...");
+            if (!player.isOnline()) {
+                javaPlugin.getLogger().warning(name + " disconnected before joinCmdEntry operated!");
+                return;
+            }
 
             List<String> processedCmds = new ArrayList<>();
             for (String consoleCmd : consoleCmds)
@@ -58,7 +62,7 @@ public class CommandRunner {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = player.getName();
-        javaPlugin.getLogger().info(name + " triggered an itemCmdEntry's consoleCommands...");
+        javaPlugin.getLogger().info("Running " + name + "'s itemCmdEntry...");
 
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", name);
@@ -69,26 +73,11 @@ public class CommandRunner {
         return true;
     }
 
-    public boolean runRewardCommand(List<String> consoleCmds, String player) {
-        if (consoleCmds == null || consoleCmds.isEmpty()) return false;
-
-        javaPlugin.getLogger().info(player + " triggered a rewardEntry's consoleCommands...");
-
-        for (String consoleCmd : consoleCmds) {
-            if (player != null)
-                consoleCmd = consoleCmd.replace("<player>", player);
-
-            Bukkit.dispatchCommand(console, consoleCmd);
-            javaPlugin.getLogger().info(player + " triggered reward command: " + consoleCmd);
-        }
-        return true;
-    }
-
     public boolean runCustomCommand(List<String> consoleCmds, CommandSender sender, String argument) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = sender.getName();
-        javaPlugin.getLogger().info(name + " triggered a customCmdEntry's consoleCommands...");
+        javaPlugin.getLogger().info("Running " + name + "'s customCmdEntry...");
         sender.sendMessage(prefix + ChatColor.YELLOW + "Running custom command...");
 
         for (String consoleCmd : consoleCmds) {
@@ -97,7 +86,8 @@ public class CommandRunner {
                 consoleCmd = consoleCmd.replace("<argument>", argument);
 
             Bukkit.dispatchCommand(console, consoleCmd);
-            javaPlugin.getLogger().info(name + " triggered custom command: " + consoleCmd);
+            javaPlugin.getLogger().info(name + " ran custom command: " + consoleCmd);
+            sender.sendMessage(prefix + ChatColor.GREEN + "Ran custom command: " + ChatColor.DARK_GREEN + consoleCmd);
         }
         return true;
     }
@@ -113,12 +103,14 @@ public class CommandRunner {
         int tickDelay = Integer.parseInt(args[1]);
         DelayedTask delayedTask = new DelayedTask(entry, args);
 
-        javaPlugin.getLogger().info(name + " triggered a customCmdEntry's consoleCommands... (delayed " + tickDelay + " ticks)");
-        sender.sendMessage(prefix + ChatColor.YELLOW + "Running delayed custom command in " + tickDelay + " ticks...");
+        javaPlugin.getLogger().info("Starting " + name + "'s delayedCmdEntry...");
+        sender.sendMessage(prefix + ChatColor.YELLOW + "Starting delayed command...");
         
         BukkitTask bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
+                javaPlugin.getLogger().info("Running " + name + "'s delayedCmdEntry...");
+                sender.sendMessage(prefix + ChatColor.YELLOW + "Running delayed command...");
                 if (entry.getCheckInv()) {
                     String checkPlayer = entry.getCheckPlayer();
                     Player target = null;
@@ -142,15 +134,17 @@ public class CommandRunner {
 
                     // check for space
                     if ((target.getInventory().firstEmpty() == -1)) {
-                        sender.sendMessage(prefix + ChatColor.GREEN + "Delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if applicable...");
                         for (String consoleCmd : bkupConsoleCommands) {
                             consoleCmd = consoleCmd.replace("<player>", name);
                             if (args.length == 4)
                                 consoleCmd = consoleCmd.replace("<argument>", args[3]);
         
                             Bukkit.dispatchCommand(console, consoleCmd);
-                            javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: " + consoleCmd);
+                            javaPlugin.getLogger().info(name + " ran delayed command: " + consoleCmd);
+                            sender.sendMessage(prefix + ChatColor.GREEN + "Ran delayed command: " + ChatColor.DARK_GREEN + consoleCmd);
                         } pendingTasks.remove(delayedTask);
+                        javaPlugin.getLogger().info(name + "'s delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if applicable...");
+                        sender.sendMessage(prefix + ChatColor.GREEN + "Delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if applicable...");
                         return;
                     }
                 }
@@ -160,12 +154,15 @@ public class CommandRunner {
                         consoleCmd = consoleCmd.replace("<argument>", args[3]);
 
                     Bukkit.dispatchCommand(console, consoleCmd);
-                    javaPlugin.getLogger().info(name + " triggered delayed custom command: " + consoleCmd);
+                    javaPlugin.getLogger().info(name + " ran delayed command: " + consoleCmd);
+                    sender.sendMessage(prefix + ChatColor.GREEN + "Ran delayed command: " + ChatColor.DARK_GREEN + consoleCmd);
                 } pendingTasks.remove(delayedTask);
             }
         }.runTaskLater(javaPlugin, tickDelay);
 
         pendingTasks.put(delayedTask, bukkitTask);
+        javaPlugin.getLogger().info(name + " is running delayed commands in " + tickDelay + " ticks...");
+        sender.sendMessage(prefix + ChatColor.YELLOW + "Running delayed commands in " + tickDelay + " ticks...");
         return true;
     }
 }

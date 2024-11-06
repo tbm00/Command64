@@ -7,6 +7,7 @@ Created by tbm00 for play.mc64.wtf.
 - **CustomCommandEntries** run command(s) as the console when a player/console uses a custom command, with optional delays and inventory checks.
 - **JoinCommandEntries** run command(s) as the console when a player joins.
 - **ItemCommandEntries** run command(s) as the console when a player uses a custom item.
+- **RewardSystem** give players rewards that can be triggered when they're ready and have inventory space.
 
 ## Dependencies
 - **Java 17+**: REQUIRED
@@ -16,15 +17,18 @@ Created by tbm00 for play.mc64.wtf.
 #### Commands
 - `/cmd help` Display this command list
 - `/cmd give <itemKey> [player]` Spawn a custom item
-- `/cmd -d <tickDelay> <customCommand> [argument]` Run delayed custom command as Console w/ optional argument
 - `/cmd <customCommand> [argument]` Run custom command as Console w/ optional argument
+- `/cmd -d <tickDelay> <customCommand> [argument]` Run delayed custom command as Console w/ optional argument
+- `/cmd queue <rewardName> <player>` Add reward to a player's reward queue
 #### Permissions
-Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission node is command64.help.
+Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission nodes are:
 - `command64.help` Ability to display the command list *(Default: OP)*
+- `command64.enqueuerewards` Ability add rewards to a player's queue *(Default: OP)*
+- `command64.redeemrewards` Ability redeem queued rewards *(Default: everyone)*
 
 ## Default Config
 ```
-# Command64 v1.0.1 by @tbm00
+# Command64 v1.1.0-beta by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, everything is disabled.
@@ -32,6 +36,38 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 # The predefined config is an example to give you and idea of what
 # you can do when using this plugin with other plugins, like EssentialsX
 # LuckPerms, PlayerParticles, SpecializedCrates, and MythicMobs.
+
+
+# -------------------------------------------------------------------------------------- #
+# This module gives players the ability redeem pending rewards (commands) by using `/redeemreward`.
+# -- If the player has no pending rewards, they will be sent noPendingRewardMessage.
+# -- Else if the the player has inventory space, the first rewardEntry's consoleCommands 
+#      (in the player's pending queue) will be run.
+# -- Else the first rewardEntry's consoleCommands that doesn't have a invCheck will be run.
+# -- If there is no pending reward without a invCheck, they will be sent noInvSpaceMessage.
+# ---------
+# 1st) Admins/Console add rewardCommandEntries to a player's pending queue
+#       by using `/cmd queue <rewardName> <username>`.
+# 2nd) Players redeem rewards (in-order, unless there are skips due to full invs) by using `/redeemreward`.
+# ---------
+# Currently, there is no database saving players' pending reward queues.
+# So, pending rewards do not persist after restarting/reloading the server/plugin!
+# ---------
+# <player> == player who joined
+# -------------------------------------------------------------------------------------- #
+rewardSystem:
+  enabled: false
+  noRewardMessage: "&cYou don't have any pending rewards!"
+  noInvSpaceMessage: "&cYou don't have enough inventory space for your reward!"
+  rewardedMessage: "&aYou redeemed a reward!"
+  rewardEntries:
+    '1': # Usage: `/cmd queue forcecrateopen <player>`
+      name: "forcecrateopen"
+      consoleCommands:
+        - "crates forceopen Crate32 <player>"
+      invCheck: true
+    # Add more entries as needed
+
 
 # -------------------------------------------------------------------------------------- #
 # joinCommandEntries get ran by the console when a player 
@@ -132,28 +168,6 @@ customCommandEntries:
       - "mm mobs spawn BossMinion -t Tadow,-673,46,722"
       - "mm mobs spawn BossMinion -t Tadow,-677,52,727"
       - "mm mobs spawn BossMinion -t Tadow,-667,52,726"
-  '6': # Usage: "/cmd givekey <argument>" i.e. "/cmd givekey Notch"
-    enabled: false
-    usePerm: "command64.supermod"
-    usePermValue: true
-    customCommand: "givekey"
-    consoleCommands:
-      - "crates forceopen Crate32 <argument>"
-    invCheck:
-      checkIfSpaceBeforeRun: true
-      checkOnPlayer: "ARGUMENT"
-      ifNoSpaceConsoleCommands:
-        - "msg <argument> &4You do not have enough space in your inventory... &cYou have two minutes to make room for your reward!"
-        - "cmd -d 2400 givekey-try2 <argument>" # 2 minute delay
-  '7': # Intended Usage: "/cmd -d <tickDelay> givekey-try2 <argument>" i.e. "/cmd -d 2400 givekey-try2 Notch"
-    enabled: false
-    usePerm: "command64.admin"
-    usePermValue: true
-    customCommand: "givekey-try2"
-    consoleCommands:
-      - "crates forceopen Crate32 <argument>"
-      - "msg <argument> &2Force opening Crate32..! &eHope you have space :)"
-  # Add more entries as needed
 
 
 # -------------------------------------------------------------------------------------- #

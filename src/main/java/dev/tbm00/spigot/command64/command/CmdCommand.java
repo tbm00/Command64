@@ -19,20 +19,24 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
 import dev.tbm00.spigot.command64.ConfigHandler;
+import dev.tbm00.spigot.command64.QueueManager;
 import dev.tbm00.spigot.command64.CommandRunner;
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.ItemCmdEntry;
+import dev.tbm00.spigot.command64.model.RewardCmdEntry;
 
 public class CmdCommand implements TabExecutor {
     private final JavaPlugin javaPlugin;
     private final CommandRunner cmdRunner;
     private final ConfigHandler configHandler;
+    private final QueueManager queueManager;
     private final String prefix = ChatColor.DARK_GRAY + "[" + ChatColor.WHITE + "cmd" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
 
-    public CmdCommand(JavaPlugin javaPlugin, CommandRunner cmdRunner, ConfigHandler configHandler) {
+    public CmdCommand(JavaPlugin javaPlugin, CommandRunner cmdRunner, ConfigHandler configHandler, QueueManager queueManager) {
         this.javaPlugin = javaPlugin;
         this.cmdRunner = cmdRunner;
         this.configHandler = configHandler;
+        this.queueManager = queueManager;
     }
 
     public boolean onCommand(CommandSender sender, Command consoleCommand, String label, String[] args) {
@@ -53,6 +57,10 @@ public class CmdCommand implements TabExecutor {
                 if (configHandler.isItemEnabled() && args.length >= 2)
                     return handleGiveCommand(sender, args);
                 break;
+            case "queue":
+                if (configHandler.isRewardsEnabled() && sender.hasPermission("command64.enqueuerewards") && args.length == 3)
+                    return handleQueueCommand(sender, args);
+                break;
             default:
                 if (configHandler.isCustomEnabled())
                     return handleCustomCommand(sender, args);
@@ -67,10 +75,25 @@ public class CmdCommand implements TabExecutor {
             + ChatColor.WHITE + "/cmd give <itemKey> [player]" + ChatColor.GRAY + " Spawn a custom item\n"
             + ChatColor.WHITE + "/cmd <customCommand> [argument]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument\n"
             + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument]" + ChatColor.GRAY + " Run delayed custom command as Console w/ optional argument\n"
+            + ChatColor.WHITE + "/cmd queue <rewardName> <player>" + ChatColor.GRAY + " Add reward to a player's reward queue\n"
             );
         return true;
     }
     
+    private boolean handleQueueCommand(CommandSender sender, String[] args) {
+        for (RewardCmdEntry entry : configHandler.getRewardCmdEntries()) {
+            if (args[0].equalsIgnoreCase(entry.getName())) {
+                String player = args[2];
+                if (queueManager.enqueueReward(player, entry.getConsoleCommands(), entry.getInvCheck())) {
+                    sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() + " reward for " + player);
+                    javaPlugin.getLogger().info(sender.getName() + " has enqueued the " + entry.getName() + " reward for " + player);
+                    return true;
+                } else return false;
+            }
+        }
+        return false;
+    }
+
     private boolean handleCustomCommand(CommandSender sender, String[] args) {
         for (CustomCmdEntry entry : configHandler.getCustomCmdEntries()) {
             if (sender.hasPermission(entry.getPerm()) != entry.getPermValue()) 
@@ -78,10 +101,12 @@ public class CmdCommand implements TabExecutor {
             else if (args[0].equalsIgnoreCase("-d") && args[2].equalsIgnoreCase(entry.getPlayerCommand())) {
                 if (cmdRunner.runDelayedCommand(entry.getConsoleCommands(), sender, entry, args))
                     return true;
+                else return false;
             } else if (args[0].equalsIgnoreCase(entry.getPlayerCommand())) {
                 String argument = args.length > 1 ? args[1] : null;
                 if (cmdRunner.runCustomCommand(entry.getConsoleCommands(), sender, argument))
                     return true;
+                else return false;
             }
         }
         return false;
@@ -161,6 +186,9 @@ public class CmdCommand implements TabExecutor {
             if (sender.hasPermission("command64.help")) {
                 list.add("help");
             }
+            if (sender.hasPermission("command64.enqueuerewards")) {
+                list.add("queue");
+            }
         }
         
         if (args.length == 2) {
@@ -171,6 +199,12 @@ public class CmdCommand implements TabExecutor {
                         list.add(n.getKeyString());
                     }
                 }
+            } else if (args[0].toString().equals("queue")) {
+                    for (RewardCmdEntry n : configHandler.getRewardCmdEntries()) {
+                        if (n != null && sender.hasPermission("enqueuerewards") && n.getName().startsWith(args[1])) {
+                            list.add(n.getName());
+                        }
+                    }
             } else if (args[0].toString().equals("-d")) {
                 list.add("<#>");
             } else if (!args[0].toString().equals("help")) {
@@ -188,7 +222,7 @@ public class CmdCommand implements TabExecutor {
                         list.add(n.getPlayerCommand());
                     }
                 }
-            } else if (args[0].toString().equals("give")) {
+            } else if (args[0].toString().equals("give") || args[0].toString().equals("queue")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     list.add(p.getName());
                 }

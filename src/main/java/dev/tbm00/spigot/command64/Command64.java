@@ -11,6 +11,7 @@ import dev.tbm00.spigot.command64.listener.ItemUse;
 public class Command64 extends JavaPlugin {
     private static ConfigHandler configHandler;
     private static CommandRunner cmdRunner;
+    private static QueueManager queueManager;
 
     @Override
     public void onEnable() {
@@ -26,14 +27,15 @@ public class Command64 extends JavaPlugin {
         // initialize managers
         cmdRunner = new CommandRunner(this);
         configHandler = new ConfigHandler(this);
+        queueManager = new QueueManager(this);
 
         // load command
-        getCommand("cmd").setExecutor(new CmdCommand(this, cmdRunner, configHandler));
+        getCommand("cmd").setExecutor(new CmdCommand(this, cmdRunner, configHandler, queueManager));
 
         // register listeners
         if (this.getConfig().getBoolean("itemCommandEntries.enabled"))
             getServer().getPluginManager().registerEvents(new ItemUse(this, cmdRunner, configHandler), this);
-        if (this.getConfig().getBoolean("joinCommandEntries.enabled")) 
+        if (this.getConfig().getBoolean("joinCommandEntries.enabled") || this.getConfig().getBoolean("rewardClaimingSystem.enabled")) 
             getServer().getPluginManager().registerEvents(new PlayerJoin(this, cmdRunner, configHandler), this);
     }
 

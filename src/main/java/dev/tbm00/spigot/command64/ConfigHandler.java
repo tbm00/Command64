@@ -9,24 +9,58 @@ import org.bukkit.plugin.java.JavaPlugin;
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.ItemCmdEntry;
 import dev.tbm00.spigot.command64.model.JoinCmdEntry;
+import dev.tbm00.spigot.command64.model.RewardCmdEntry;
 
 public class ConfigHandler {
     private final JavaPlugin javaPlugin;
+    private final List<RewardCmdEntry> rewardCmdEntries = new ArrayList<>();
     private final List<CustomCmdEntry> customCmdEntries = new ArrayList<>();
     private final List<ItemCmdEntry> itemCmdEntries = new ArrayList<>();
     private final List<JoinCmdEntry> joinCmdEntries = new ArrayList<>();
-    boolean itemEnabled;
-    boolean customEnabled;
-    boolean joinEnabled;
+    public boolean rewardsEnabled;
+    public boolean itemEnabled;
+    public boolean customEnabled;
+    public boolean joinEnabled;
+    public String noRewardMessage;
+    public String noInvSpaceMessage;
+    public String rewardedMessage;
 
     public ConfigHandler(JavaPlugin javaPlugin) {
         this.javaPlugin = javaPlugin;
+        if (!loadRewardConfig()) rewardsEnabled = false;
+        else rewardsEnabled = true;
         if (!loadItemConfig()) itemEnabled = false;
         else itemEnabled = true;
         if (!loadCustomConfig()) customEnabled = false;
         else customEnabled = true;
         if (!loadJoinConfig()) joinEnabled = false;
         else joinEnabled = true;
+    }
+
+    private boolean loadRewardConfig() {
+        ConfigurationSection rewardCmdSection = javaPlugin.getConfig().getConfigurationSection("rewardSystem");
+        if (rewardCmdSection == null || !rewardCmdSection.getBoolean("enabled")) return false;
+
+        noRewardMessage = rewardCmdSection.getString("noRewardMessage");
+        noInvSpaceMessage = rewardCmdSection.getString("noInvSpaceMessage");
+        rewardedMessage = rewardCmdSection.getString("rewardedMessage");
+
+        for (String key : rewardCmdSection.getKeys(false)) {
+            ConfigurationSection rewardCmdEntry = rewardCmdSection.getConfigurationSection(key);
+            if (rewardCmdEntry == null || !rewardCmdEntry.getBoolean("enabled"))
+                continue;
+            
+            String name = rewardCmdEntry.getString("name");
+            Boolean invCheck = rewardCmdEntry.getBoolean("invCheck");
+            List<String> consoleCommands = rewardCmdEntry.getStringList("consoleCommands");
+
+            if (name != null && consoleCommands != null && !consoleCommands.isEmpty()) {
+                RewardCmdEntry entry = new RewardCmdEntry(name, invCheck, consoleCommands);
+                rewardCmdEntries.add(entry);
+                javaPlugin.getLogger().info("Loaded rewardCmdEntry: " + name + " " + invCheck + " " + consoleCommands);
+            } else
+                javaPlugin.getLogger().warning("Error: Poorly defined rewardCmdEntry: " + name + " " + invCheck);
+        } return true;
     }
 
     public boolean loadItemConfig() {
@@ -104,7 +138,7 @@ public class ConfigHandler {
                 javaPlugin.getLogger().warning("Error: Poorly defined joinCmdEntry: " + checkPerm + " " + checkPermValue + " " + tickDelay);
         } return true;
     }
-
+    
     public List<CustomCmdEntry> getCustomCmdEntries() {
         return customCmdEntries;
     }
@@ -116,7 +150,15 @@ public class ConfigHandler {
     public List<JoinCmdEntry> getJoinCmdEntries() {
         return joinCmdEntries;
     }
+
+    public List<RewardCmdEntry> getRewardCmdEntries() {
+        return rewardCmdEntries;
+    }
     
+    public boolean isRewardsEnabled() {
+        return rewardsEnabled;
+    }
+
     public boolean isJoinEnabled() {
         return joinEnabled;
     }
