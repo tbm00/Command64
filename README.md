@@ -1,13 +1,14 @@
 # Command64 <img align="left" src="icon.png" alt="Item64 Icon" width="40"/>
-A spigot plugin that runs commands with configurable triggers.
+A spigot plugin that runs commands with configurable triggers, and introduces a user-friendly reward system.
 
 Created by tbm00 for play.mc64.wtf.
 
 ## Features
-- **Reward System** give players rewards that can be triggered when they want to, with inventory checks!
-- **Custom Commands** run command(s) as the console when a player/console uses a custom command, with optional delays and inventory checks.
-- **Join Commands** run command(s) as the console when a player joins.
-- **Command Items** run command(s) as the console when a player uses a custom item.
+- **Simple, but Powerful** Use the 4 different entry types to create a variety of things from events to custom items. Use delays to create a chain of commands that are initially triggered by a parent/root command, item, or player join.
+- **Reward System** Let players redeem rewards FROM ANY PLUGIN when they want to, without losing items due to full inventory space.
+- **Custom Commands** Run predefined command(s) as the console when a player uses a custom command, with optional delays and inventory checks.
+- **Join Commands** Run predefined command(s) as the console when a player joins the server.
+- **Command Items** Run predefined command(s) as the console when a player uses a custom item.
 
 ## Dependencies
 - **Java 17+**: REQUIRED
