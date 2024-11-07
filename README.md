@@ -41,18 +41,17 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 
 
 # -------------------------------------------------------------------------------------- #
-# This module gives players the ability redeem pending rewards (commands) by using `/redeemreward`.
-# -- If the player has no pending rewards, they will be sent noPendingRewardMessage.
-# -- Else if the the player has inventory space, the first rewardEntry's consoleCommands 
-#     in the player's pending queue will be run.
-# -- Else the first rewardEntry's consoleCommands that doesn't have a invCheck will be run.
-# -- If there is no pending reward without a invCheck, they will be sent noInvSpaceMessage.
-# ---------
-# 1st) Admins/Console add rewardCommandEntries to a player's pending queue
+# This module gives players the ability redeem pending rewards (commands).
+# 1st) Admins/Console add rewardEntries to a player's pending queue
 #        by using `/cmd reward <rewardName> <username>`.
 # 2nd) Players redeem rewards (in-order, unless there are skips due to full invs) by using `/redeemreward`.
+#      -- If the player has no pending rewards, they will be sent noPendingRewardMessage.
+#      -- Else if the the player has inventory space, the first rewardEntry's consoleCommands 
+#           in the player's pending queue will be run.
+#      -- Else if there is no pending reward without an invCheck, they will be sent noInvSpaceMessage.
+#      -- Else the first rewardEntry's consoleCommands that doesn't have a invCheck will be run.
 # ---------
-# <player> == player who joined
+# <player> == player who is rewarded
 # -------------------------------------------------------------------------------------- #
 rewardSystem:
   enabled: false
@@ -81,7 +80,7 @@ rewardSystem:
 
 # -------------------------------------------------------------------------------------- #
 # joinCommandEntries get ran by the console when a player 
-# (with the correct permission) connects to the server.
+# (whose checkPerm==checkPermValue) connects to the server.
 # ---------
 # <player> == player who joined
 # -------------------------------------------------------------------------------------- #
@@ -113,17 +112,15 @@ joinCommandEntries:
 
 
 # -------------------------------------------------------------------------------------- #
-# customCommandEntries get ran by the console when the console, or
-# a player (with the correct permission), uses the associated custom subcommand.
+# customCommandEntries get ran by the console when the console, or a player
+#   (whose usePerm==userPermVaue), uses the associated customCommand.
+# - You can run any customCommand with a delay by using the "-d" command flag;
+#     i.e. "/cmd -d 1200 stop" to stop the server in 1 minute,
+# - You can add an invCheck to any customCommandEntry, that confirms ARGUMENT or SENDER
+#     has inventory space before running the consoleCommands.
 # ---------
 # <player> == player who used the command
 # <argument> == string included as running command's argument
-# ---------
-# If wanted, you can add an inventory check to any custom command entry.
-# If so, invCheck.checkOnPlayer should be "ARGUMENT" or "SENDER".
-# ---------
-# If wanted, you can add "-d <X>" when running any custom command to delay the console
-# commands for X ticks.
 # -------------------------------------------------------------------------------------- #
 customCommandEntries:
   enabled: false
@@ -160,7 +157,6 @@ customCommandEntries:
       - "say <argument> has inventory space!"
     invCheck:
       checkIfSpaceBeforeRun: true
-      checkPlayer: "ARGUMENT"
       checkOnPlayer: "ARGUMENT"
       ifNoSpaceConsoleCommands:
         - "msg <argument> &4You do not have space in your inventory..."
@@ -195,11 +191,10 @@ customCommandEntries:
 
 
 # -------------------------------------------------------------------------------------- #
-# itemCommandEntries get ran by the console when a player
-# (with the correct permission) uses a custom item.
+# itemCommandEntries get ran by the console when a player 
+# (whose usePerm==userPermVaue) uses a custom item.
 # ---------
 # <player> == player who used the item
-# <argument> == string included as running command's argument
 # -------------------------------------------------------------------------------------- #
 itemCommandEntries:
   enabled: false
