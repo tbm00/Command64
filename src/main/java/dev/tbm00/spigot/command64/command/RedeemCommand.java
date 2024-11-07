@@ -12,7 +12,7 @@ import org.bukkit.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import dev.tbm00.spigot.command64.ConfigHandler;
-import dev.tbm00.spigot.command64.QueueManager;
+import dev.tbm00.spigot.command64.reward.QueueManager;
 
 public class RedeemCommand implements TabExecutor {
     private final ConfigHandler configHandler;

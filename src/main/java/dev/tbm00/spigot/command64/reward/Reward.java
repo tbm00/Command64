@@ -1,4 +1,4 @@
-package dev.tbm00.spigot.command64.model;
+package dev.tbm00.spigot.command64.reward;
 
 import java.util.List;
 

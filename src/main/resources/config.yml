@@ -21,13 +21,11 @@
 #        by using `/cmd reward <rewardName> <username>`.
 # 2nd) Players redeem rewards (in-order, unless there are skips due to full invs) by using `/redeemreward`.
 # ---------
-# Currently, there is no database saving players' pending reward queues.
-# So, pending rewards do not persist after restarting/reloading the server/plugin!
-# ---------
 # <player> == player who joined
 # -------------------------------------------------------------------------------------- #
 rewardSystem:
   enabled: false
+  saveDataInterval: 15 # save data to json every X minutes, -1 to only save on shutdown
   pendingRewardsJoinMessage:
     message: "&aYou have reward(s) to claim! &2/redeemReward"
     tickDelay: 300

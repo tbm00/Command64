@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import dev.tbm00.spigot.command64.command.*;
 import dev.tbm00.spigot.command64.listener.*;
+import dev.tbm00.spigot.command64.reward.QueueManager;
 
 public class Command64 extends JavaPlugin {
     private static ConfigHandler configHandler;
@@ -23,25 +24,32 @@ public class Command64 extends JavaPlugin {
             ChatColor.DARK_PURPLE + "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 		);
 
-        // initialize managers
+        // initialize managers, listeners, & commands
         configHandler = new ConfigHandler(this);
         cmdRunner = new CommandRunner(this);
-        queueManager = new QueueManager(cmdRunner);
-
-        // load command
-        getCommand("cmd").setExecutor(new CmdCommand(this, cmdRunner, configHandler, queueManager));
-        if (this.getConfig().getBoolean("rewardSystem.enabled"))
+        
+        if (this.getConfig().getBoolean("rewardSystem.enabled")) {
+            queueManager = new QueueManager(this, cmdRunner, configHandler);
             getCommand("redeemreward").setExecutor(new RedeemCommand(configHandler, queueManager));
+        } else queueManager = null;
+        
+        getCommand("cmd").setExecutor(new CmdCommand(this, cmdRunner, configHandler, queueManager));
 
-        // register listeners
         if (this.getConfig().getBoolean("itemCommandEntries.enabled"))
             getServer().getPluginManager().registerEvents(new ItemUse(this, cmdRunner, configHandler), this);
         if (this.getConfig().getBoolean("joinCommandEntries.enabled") || this.getConfig().getBoolean("rewardSystem.enabled")) 
-            getServer().getPluginManager().registerEvents(new PlayerJoin(this, cmdRunner, configHandler, queueManager), this);
+            getServer().getPluginManager().registerEvents(new PlayerConnection(this, cmdRunner, configHandler, queueManager), this);
     }
 
     private void log(String... strings) {
 		for (String s : strings)
             getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + s);
 	}
+
+    @Override
+    public void onDisable() {
+        if (queueManager != null) {
+            queueManager.shutdown();
+        }
+    }
 }

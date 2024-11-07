@@ -26,6 +26,7 @@ public class ConfigHandler {
     private String rewardedMessage;
     private String joinMessage;
     private int joinMessageDelay;
+    private int saveDataInterval;
 
     public ConfigHandler(JavaPlugin javaPlugin) {
         this.javaPlugin = javaPlugin;
@@ -43,6 +44,7 @@ public class ConfigHandler {
         ConfigurationSection rewardSystemSec = javaPlugin.getConfig().getConfigurationSection("rewardSystem");
         if (rewardSystemSec == null || !rewardSystemSec.getBoolean("enabled")) return false;
 
+        saveDataInterval = rewardSystemSec.getInt("saveDataInterval");
         noRewardMessage = rewardSystemSec.getString("redeemMessages.noRewardMessage");
         noInvSpaceMessage = rewardSystemSec.getString("redeemMessages.noInvSpaceMessage");
         rewardedMessage = rewardSystemSec.getString("redeemMessages.rewardedMessage");
@@ -194,5 +196,9 @@ public class ConfigHandler {
     
     public int getJoinMessageDelay() {
         return joinMessageDelay;
-    }    
+    }
+
+    public int getSaveDataInterval() {
+        return saveDataInterval;
+    }
 }

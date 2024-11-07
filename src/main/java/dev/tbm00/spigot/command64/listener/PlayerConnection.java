@@ -15,18 +15,18 @@ import org.bukkit.scheduler.BukkitRunnable;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import dev.tbm00.spigot.command64.ConfigHandler;
-import dev.tbm00.spigot.command64.QueueManager;
 import dev.tbm00.spigot.command64.CommandRunner;
 import dev.tbm00.spigot.command64.model.JoinCmdEntry;
+import dev.tbm00.spigot.command64.reward.QueueManager;
 
-public class PlayerJoin implements Listener {
+public class PlayerConnection implements Listener {
     private final JavaPlugin javaPlugin;
     private final CommandRunner cmdRunner;
     private final List<JoinCmdEntry> joinCmdEntries;
     private final ConfigHandler configHandler;
     private final QueueManager queueManager;
 
-    public PlayerJoin(JavaPlugin javaPlugin, CommandRunner cmdRunner, ConfigHandler configHandler, QueueManager queueManager) {
+    public PlayerConnection(JavaPlugin javaPlugin, CommandRunner cmdRunner, ConfigHandler configHandler, QueueManager queueManager) {
         this.javaPlugin = javaPlugin;
         this.cmdRunner = cmdRunner;
         this.joinCmdEntries = configHandler.getJoinCmdEntries();

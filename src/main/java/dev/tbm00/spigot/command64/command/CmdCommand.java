@@ -20,10 +20,10 @@ import org.bukkit.NamespacedKey;
 
 import dev.tbm00.spigot.command64.ConfigHandler;
 import dev.tbm00.spigot.command64.CommandRunner;
-import dev.tbm00.spigot.command64.QueueManager;
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.ItemCmdEntry;
 import dev.tbm00.spigot.command64.model.RewardCmdEntry;
+import dev.tbm00.spigot.command64.reward.QueueManager;
 
 public class CmdCommand implements TabExecutor {
     private final JavaPlugin javaPlugin;
