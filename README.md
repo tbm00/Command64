@@ -29,7 +29,7 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 
 ## Default Config
 ```
-# Command64 v1.1.0 by @tbm00
+# Command64 v1.1.1 by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, everything is disabled.
@@ -57,8 +57,9 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 rewardSystem:
   enabled: false
   saveDataInterval: 15 # save data to json every X minutes, -1 to only save on shutdown
+  newRewardMessage: "&8[&fRewards&8] &aYou just received a reward, claim it with &2/redeemreward&a!"
   pendingRewardsJoinMessage:
-    message: "&8[&fRewards&8] &aYou have reward(s) to claim! &2/redeemReward"
+    message: "&8[&fRewards&8] &aYou have reward(s) to claim! &2/redeemreward"
     tickDelay: 300
   redeemMessages:
     noRewardMessage: "&8[&fRewards&8] &cYou don't have any pending rewards!"
@@ -150,7 +151,21 @@ customCommandEntries:
     consoleCommands:
       - "lp user <argument> promote donor"
       - "say <argument> donated to the server and was promoted by <player>!"
-  '4': # Usage "/cmd boss-fight-start"
+  '4': # Usage: "/cmd invSpaceCheck <argument>" i.e. "/cmd invSpaceCheck Notch"
+    enabled: false
+    usePerm: "command64.admin"
+    usePermValue: true
+    customCommand: "invSpaceCheckLoop"
+    consoleCommands:
+      - "say <argument> has inventory space!"
+    invCheck:
+      checkIfSpaceBeforeRun: true
+      checkPlayer: "ARGUMENT"
+      checkOnPlayer: "ARGUMENT"
+      ifNoSpaceConsoleCommands:
+        - "msg <argument> &4You do not have space in your inventory..."
+        - "cmd -d 2400 invSpaceCheckLoop <argument>" # 2 minute delay
+  '5': # Usage "/cmd boss-fight-start"
     enabled: false
     usePerm: "command64.supermod"
     usePermValue: true
@@ -165,7 +180,7 @@ customCommandEntries:
       - "mm mobs spawn BossMob -t world,-672,36,727"
       - "broadcast &bBoss fight started!"
       - "cmd -d 1200 boss-fight-round2" # 1 minute delay
-  '5': # Intended Usage "/cmd -d <tickDelay> boss-fight-round2" i.e. "/cmd -d 1200 boss-fight-round2"
+  '6': # Intended Usage "/cmd -d <tickDelay> boss-fight-round2" i.e. "/cmd -d 1200 boss-fight-round2"
     enabled: false
     usePerm: "command64.supermod"
     usePermValue: true

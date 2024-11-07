@@ -24,6 +24,7 @@ public class ConfigHandler {
     private String noRewardMessage;
     private String noInvSpaceMessage;
     private String rewardedMessage;
+    private String newRewardMessage;
     private String joinMessage;
     private int joinMessageDelay;
     private int saveDataInterval;
@@ -45,6 +46,7 @@ public class ConfigHandler {
         if (rewardSystemSec == null || !rewardSystemSec.getBoolean("enabled")) return false;
 
         saveDataInterval = rewardSystemSec.getInt("saveDataInterval");
+        newRewardMessage = rewardSystemSec.getString("newRewardMessage");
         noRewardMessage = rewardSystemSec.getString("redeemMessages.noRewardMessage");
         noInvSpaceMessage = rewardSystemSec.getString("redeemMessages.noInvSpaceMessage");
         rewardedMessage = rewardSystemSec.getString("redeemMessages.rewardedMessage");
@@ -206,6 +208,10 @@ public class ConfigHandler {
     
     public String getRewardedMessage() {
         return rewardedMessage;
+    }
+
+    public String getNewRewardMessage() {
+        return newRewardMessage;
     }
     
     public String getJoinMessage() {

@@ -24,6 +24,7 @@ import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.ItemCmdEntry;
 import dev.tbm00.spigot.command64.model.RewardCmdEntry;
 import dev.tbm00.spigot.command64.reward.QueueManager;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class CmdCommand implements TabExecutor {
     private final JavaPlugin javaPlugin;
@@ -83,10 +84,16 @@ public class CmdCommand implements TabExecutor {
     private boolean handleQueueCommand(CommandSender sender, String[] args) {
         for (RewardCmdEntry entry : configHandler.getRewardCmdEntries()) {
             if (args[1].equalsIgnoreCase(entry.getName())) {
-                String player = args[2];
-                if (queueManager.enqueueReward(player, entry.getName())) {
-                    sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() + " reward for " + player);
-                    javaPlugin.getLogger().info(sender.getName() + " has enqueued the " + entry.getName() + " reward for " + player);
+                String playerName = args[2];
+                if (queueManager.enqueueReward(playerName, entry.getName())) {
+                    sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() + " reward for " + playerName);
+                    javaPlugin.getLogger().info(sender.getName() + " has enqueued the " + entry.getName() + " reward for " + playerName);
+                    
+                    Player player = javaPlugin.getServer().getPlayer(playerName);
+                    if (player != null && player.isOnline()) {
+                        player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getNewRewardMessage())));
+                    }
+                    
                     return true;
                 } else return false;
             }
