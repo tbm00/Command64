@@ -15,17 +15,21 @@ import dev.tbm00.spigot.command64.CommandRunner;
 import dev.tbm00.spigot.command64.ConfigHandler;
 
 public class QueueManager {
+    private final JavaPlugin javaPlugin;
     private final CommandRunner cmdRunner;
-    private final Map<String, Queue<Reward>> rewardQueues;
+    private final ConfigHandler configHandler;
+    private final Map<String, Queue<String>> rewardQueues;
     private final JSONHandler jsonHandler;
     private BukkitTask saveTask;
 
     public QueueManager(JavaPlugin javaPlugin, CommandRunner cmdRunner, ConfigHandler configHandler) {
+        this.javaPlugin = javaPlugin;
         this.cmdRunner = cmdRunner;
+        this.configHandler = configHandler;
         this.rewardQueues = new HashMap<>();
         this.jsonHandler = new JSONHandler(javaPlugin);
 
-        Map<String, Queue<Reward>> loadedQueues = jsonHandler.loadRewards();
+        Map<String, Queue<String>> loadedQueues = jsonHandler.loadRewards();
         if (loadedQueues != null) {
             synchronized (rewardQueues) {
                 rewardQueues.putAll(loadedQueues);
@@ -50,45 +54,56 @@ public class QueueManager {
     }
 
     // get or make player's queue and add reward to it
-    public boolean enqueueReward(String playerName, List<String> consoleCommands, boolean invCheck) {
-        Reward reward = new Reward(consoleCommands, invCheck);
+    public boolean enqueueReward(String playerName, String rewardName) {
         synchronized (rewardQueues) {
-            Queue<Reward> queue = rewardQueues.computeIfAbsent(playerName, k -> new LinkedList<>());
-            queue.add(reward);
+            Queue<String> queue = rewardQueues.computeIfAbsent(playerName, k -> new LinkedList<>());
+            queue.add(rewardName);
         }
         return true;
     }
 
     public int getPlayersQueueSize(String playerName) {
         synchronized (rewardQueues) {
-            Queue<Reward> queue = rewardQueues.get(playerName);
+            Queue<String> queue = rewardQueues.get(playerName);
             return (queue != null) ? queue.size() : 0;
         }
     }
 
     // dequeue and run commands
-    public boolean redeemReward(String playerName, boolean checkInvSpace) {
+    public boolean redeemReward(String playerName, boolean hasInvSpace) {
         synchronized (rewardQueues) {
-            Queue<Reward> queue = rewardQueues.get(playerName);
+            Queue<String> queue = rewardQueues.get(playerName);
 
             if (queue == null || queue.isEmpty()) {
                 return false;
             }
 
-            if (checkInvSpace) { // redeem first rewards since there is space
+            if (hasInvSpace) { // redeem first rewards since there is space
                 // Player has inventory space, redeem the first reward
-                Reward reward = queue.poll();
-                if (reward != null) {
-                    cmdRunner.runRewardCommand(reward.getConsoleCommands(), playerName);
+                String rewardName = queue.poll();
+                if (rewardName != null) {
+                    List<String> consoleCommands = configHandler.getRewardCommandsByName(rewardName);
+                    Boolean invCheck = configHandler.getRewardInvCheckByName(rewardName);
+                    if (consoleCommands == null || invCheck == null) {
+                        javaPlugin.getLogger().warning(playerName + "'s Reward '" + rewardName + "' not found in config..!");
+                        return false;
+                    }
+                    cmdRunner.runRewardCommand(consoleCommands, playerName);
                     return true;
                 }
             } else { // redeem the first reward that doesn't require space
-                Iterator<Reward> iterator = queue.iterator();
+                Iterator<String> iterator = queue.iterator();
                 while (iterator.hasNext()) {
-                    Reward reward = iterator.next();
-                    if (!reward.isInvCheck()) {
+                    String rewardName = iterator.next();
+                    Boolean invCheck = configHandler.getRewardInvCheckByName(rewardName);
+                    if (invCheck != null && !invCheck) {
                         iterator.remove();
-                        cmdRunner.runRewardCommand(reward.getConsoleCommands(), playerName);
+                        List<String> consoleCommands = configHandler.getRewardCommandsByName(rewardName);
+                        if (consoleCommands == null) {
+                            javaPlugin.getLogger().warning("Reward '" + rewardName + "' not found in config.");
+                            return false;
+                        }
+                        cmdRunner.runRewardCommand(consoleCommands, playerName);
                         return true;
                     }
                 }

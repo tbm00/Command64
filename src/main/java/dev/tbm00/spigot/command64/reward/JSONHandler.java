@@ -32,9 +32,8 @@ public class JSONHandler {
         try {
             if (!jsonFile.exists()) {
                 jsonFile.createNewFile();
-                // Optionally write an empty JSON object to it
                 try (Writer writer = new FileWriter(jsonFile)) {
-                    gson.toJson(new HashMap<String, Queue<Reward>>(), writer);
+                    gson.toJson(new HashMap<String, Queue<String>>(), writer);
                 }
             }
         } catch (IOException e) {
@@ -43,14 +42,12 @@ public class JSONHandler {
     }
 
     // load rewards from JSON
-    public Map<String, Queue<Reward>> loadRewards() {
+    public Map<String, Queue<String>> loadRewards() {
         try (Reader reader = new FileReader(jsonFile)) {
-            Type type = new TypeToken<Map<String, Queue<Reward>>>() {}.getType();
-            Map<String, Queue<Reward>> rewardQueues = gson.fromJson(reader, type);
-            if (rewardQueues == null) {
-                // Return empty map if file is empty
+            Type type = new TypeToken<Map<String, Queue<String>>>() {}.getType();
+            Map<String, Queue<String>> rewardQueues = gson.fromJson(reader, type);
+            if (rewardQueues == null)
                 return new HashMap<>();
-            }
             return rewardQueues;
         } catch (IOException e) {
             javaPlugin.getLogger().severe("Could not read player_rewards.json: " + e.getMessage());
@@ -58,11 +55,11 @@ public class JSONHandler {
         }
     }
 
-    public void saveRewards(Map<String, Queue<Reward>> rewardQueues) {
+    public void saveRewards(Map<String, Queue<String>> rewardQueues) {
         // make copy of rewardQueues to avoid concurrent modification
-        Map<String, Queue<Reward>> rewardQueuesCopy = new HashMap<>();
+        Map<String, Queue<String>> rewardQueuesCopy = new HashMap<>();
         synchronized (rewardQueues) {
-            for (Map.Entry<String, Queue<Reward>> entry : rewardQueues.entrySet()) {
+            for (Map.Entry<String, Queue<String>> entry : rewardQueues.entrySet()) {
                 rewardQueuesCopy.put(entry.getKey(), new LinkedList<>(entry.getValue()));
             }
         }

@@ -4,10 +4,10 @@ A spigot plugin that runs commands with configurable triggers.
 Created by tbm00 for play.mc64.wtf.
 
 ## Features
-- **CustomCommandEntries** run command(s) as the console when a player/console uses a custom command, with optional delays and inventory checks.
-- **JoinCommandEntries** run command(s) as the console when a player joins.
-- **ItemCommandEntries** run command(s) as the console when a player uses a custom item.
-- **RewardSystem** give players rewards that can be triggered when they're ready and have inventory space.
+- **Reward System** give players rewards that can be triggered when they want to, with inventory checks!
+- **Custom Commands** run command(s) as the console when a player/console uses a custom command, with optional delays and inventory checks.
+- **Join Commands** run command(s) as the console when a player joins.
+- **Command Items** run command(s) as the console when a player uses a custom item.
 
 ## Dependencies
 - **Java 17+**: REQUIRED
@@ -21,14 +21,14 @@ Created by tbm00 for play.mc64.wtf.
 - `/cmd -d <tickDelay> <customCommand> [argument]` Run delayed custom command as Console w/ optional argument
 - `/cmd reward <rewardName> <player>` Add reward to a player's reward queue
 #### Permissions
-Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfiled for a player to use the respective feature. The only hardcoded permission nodes are:
+Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfilled for a player to use the respective feature. The only hardcoded permission nodes are:
 - `command64.help` Ability to display the command list *(Default: OP)*
 - `command64.enqueuerewards` Ability add rewards to a player's queue *(Default: OP)*
 - `command64.redeemrewards` Ability redeem queued rewards *(Default: everyone)*
 
 ## Default Config
 ```
-# Command64 v1.1.0-beta by @tbm00
+# Command64 v1.1.0 by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, everything is disabled.
@@ -57,12 +57,12 @@ rewardSystem:
   enabled: false
   saveDataInterval: 15 # save data to json every X minutes, -1 to only save on shutdown
   pendingRewardsJoinMessage:
-    message: "&aYou have reward(s) to claim! &2/redeemReward"
+    message: "&8[&fRewards&8] &aYou have reward(s) to claim! &2/redeemReward"
     tickDelay: 300
   redeemMessages:
-    noRewardMessage: "&cYou don't have any pending rewards!"
-    noInvSpaceMessage: "&cYou don't have enough inventory space for your reward!"
-    rewardedMessage: "&aYou redeemed a reward!"
+    noRewardMessage: "&8[&fRewards&8] &cYou don't have any pending rewards!"
+    noInvSpaceMessage: "&8[&fRewards&8] &cYou don't have enough inventory space for your reward!"
+    rewardedMessage: "&8[&fRewards&8] &aYou redeemed a reward!"
   rewardEntries:
     '1': # Usage: `/cmd reward cratekey <player>`
       name: "cratekey"
@@ -160,7 +160,7 @@ customCommandEntries:
       - "mm mobs spawn BossMinion -t world,-677,52,727"
       - "mm mobs spawn BossMinion -t world,-667,52,726"
       - "mm mobs spawn BossMinion -t world,-672,52,732"
-      - "mm mobs spawn BossMinion -t Tadow,-673,52,722"
+      - "mm mobs spawn BossMinion -t world,-673,52,722"
       - "mm mobs spawn BossMob -t world,-672,36,727"
       - "broadcast &bBoss fight started!"
       - "cmd -d 1200 boss-fight-round2" # 1 minute delay
@@ -170,12 +170,12 @@ customCommandEntries:
     usePermValue: true
     timerCommand: "boss-fight-round2"
     consoleCommands:
-      - "mm mobs spawn BossMinion -t Tadow,-677,36,727"
-      - "mm mobs spawn BossMinion -t Tadow,-667,36,726"
-      - "mm mobs spawn BossMinion -t Tadow,-672,46,732"
-      - "mm mobs spawn BossMinion -t Tadow,-673,46,722"
-      - "mm mobs spawn BossMinion -t Tadow,-677,52,727"
-      - "mm mobs spawn BossMinion -t Tadow,-667,52,726"
+      - "mm mobs spawn BossMinion -t world,-677,36,727"
+      - "mm mobs spawn BossMinion -t world,-667,36,726"
+      - "mm mobs spawn BossMinion -t world,-672,46,732"
+      - "mm mobs spawn BossMinion -t world,-673,46,722"
+      - "mm mobs spawn BossMinion -t world,-677,52,727"
+      - "mm mobs spawn BossMinion -t world,-667,52,726"
 
 
 # -------------------------------------------------------------------------------------- #

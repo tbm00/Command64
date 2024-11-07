@@ -145,7 +145,25 @@ public class ConfigHandler {
                 javaPlugin.getLogger().warning("Error: Poorly defined joinCmdEntry: " + checkPerm + " " + checkPermValue + " " + tickDelay);
         } return true;
     }
+
+    public List<String> getRewardCommandsByName(String rewardName) {
+        for (RewardCmdEntry entry : rewardCmdEntries) {
+            if (entry.getName().equalsIgnoreCase(rewardName)) {
+                return entry.getConsoleCommands();
+            }
+        }
+        return null;
+    }
     
+    public Boolean getRewardInvCheckByName(String rewardName) {
+        for (RewardCmdEntry entry : rewardCmdEntries) {
+            if (entry.getName().equalsIgnoreCase(rewardName)) {
+                return entry.getInvCheck();
+            }
+        }
+        return null;
+    }
+
     public List<CustomCmdEntry> getCustomCmdEntries() {
         return customCmdEntries;
     }

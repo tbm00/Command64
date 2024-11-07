@@ -1,4 +1,4 @@
-# Command64 v1.1.0-beta by @tbm00
+# Command64 v1.1.0 by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, everything is disabled.
@@ -27,12 +27,12 @@ rewardSystem:
   enabled: false
   saveDataInterval: 15 # save data to json every X minutes, -1 to only save on shutdown
   pendingRewardsJoinMessage:
-    message: "&aYou have reward(s) to claim! &2/redeemReward"
+    message: "&8[&fRewards&8] &aYou have reward(s) to claim! &2/redeemReward"
     tickDelay: 300
   redeemMessages:
-    noRewardMessage: "&cYou don't have any pending rewards!"
-    noInvSpaceMessage: "&cYou don't have enough inventory space for your reward!"
-    rewardedMessage: "&aYou redeemed a reward!"
+    noRewardMessage: "&8[&fRewards&8] &cYou don't have any pending rewards!"
+    noInvSpaceMessage: "&8[&fRewards&8] &cYou don't have enough inventory space for your reward!"
+    rewardedMessage: "&8[&fRewards&8] &aYou redeemed a reward!"
   rewardEntries:
     '1': # Usage: `/cmd reward cratekey <player>`
       name: "cratekey"
