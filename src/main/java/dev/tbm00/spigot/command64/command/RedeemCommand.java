@@ -3,38 +3,22 @@ package dev.tbm00.spigot.command64.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+
+import net.md_5.bungee.api.chat.TextComponent;
 
 import dev.tbm00.spigot.command64.ConfigHandler;
 import dev.tbm00.spigot.command64.QueueManager;
-import dev.tbm00.spigot.command64.CommandRunner;
-import dev.tbm00.spigot.command64.model.CustomCmdEntry;
-import dev.tbm00.spigot.command64.model.ItemCmdEntry;
-import dev.tbm00.spigot.command64.model.RewardCmdEntry;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class RedeemCommand implements TabExecutor {
-    private final JavaPlugin javaPlugin;
-    private final CommandRunner cmdRunner;
     private final ConfigHandler configHandler;
     private final QueueManager queueManager;
 
-    public RedeemCommand(JavaPlugin javaPlugin, CommandRunner cmdRunner, ConfigHandler configHandler, QueueManager queueManager) {
-        this.javaPlugin = javaPlugin;
-        this.cmdRunner = cmdRunner;
+    public RedeemCommand(ConfigHandler configHandler, QueueManager queueManager) {
         this.configHandler = configHandler;
         this.queueManager = queueManager;
     }
@@ -47,29 +31,28 @@ public class RedeemCommand implements TabExecutor {
         Player player = (Player) sender;
 
         if (queueManager.getPlayersQueueSize(player.getName())<=0) {
-            player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.noRewardMessage)));
+            player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getNoRewardMessage())));
             return false;
         }
 
         // if player doesn't have inv space, run the first queued reward in which invCheck==false
         // else run the first queued reward
         if ((player.getInventory().firstEmpty() == -1)) {
-            if (queueManager.redeemReward(player.getDisplayName(), false)) {
-                player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.rewardedMessage)));
+            if (queueManager.redeemReward(player.getName(), false)) {
+                player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getRewardedMessage())));
                 return true;
             } else {
-                player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.noInvSpaceMessage)));
+                player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getNoInvSpaceMessage())));
                 return true;
             }
         } else {
-            if (queueManager.redeemReward(player.getDisplayName(), true)) {
-                player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.rewardedMessage)));
+            if (queueManager.redeemReward(player.getName(), true)) {
+                player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getRewardedMessage())));
                 return true;
             } else {
                 return false;
             }
         }
-
     }
     
     @Override

@@ -19,8 +19,8 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
 import dev.tbm00.spigot.command64.ConfigHandler;
-import dev.tbm00.spigot.command64.QueueManager;
 import dev.tbm00.spigot.command64.CommandRunner;
+import dev.tbm00.spigot.command64.QueueManager;
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.ItemCmdEntry;
 import dev.tbm00.spigot.command64.model.RewardCmdEntry;
@@ -57,7 +57,7 @@ public class CmdCommand implements TabExecutor {
                 if (configHandler.isItemEnabled() && args.length >= 2)
                     return handleGiveCommand(sender, args);
                 break;
-            case "queue":
+            case "reward":
                 if (configHandler.isRewardsEnabled() && sender.hasPermission("command64.enqueuerewards") && args.length == 3)
                     return handleQueueCommand(sender, args);
                 break;
@@ -75,14 +75,14 @@ public class CmdCommand implements TabExecutor {
             + ChatColor.WHITE + "/cmd give <itemKey> [player]" + ChatColor.GRAY + " Spawn a custom item\n"
             + ChatColor.WHITE + "/cmd <customCommand> [argument]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument\n"
             + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument]" + ChatColor.GRAY + " Run delayed custom command as Console w/ optional argument\n"
-            + ChatColor.WHITE + "/cmd queue <rewardName> <player>" + ChatColor.GRAY + " Add reward to a player's reward queue\n"
+            + ChatColor.WHITE + "/cmd reward <rewardName> <player>" + ChatColor.GRAY + " Add reward to a player's reward queue\n"
             );
         return true;
     }
     
     private boolean handleQueueCommand(CommandSender sender, String[] args) {
         for (RewardCmdEntry entry : configHandler.getRewardCmdEntries()) {
-            if (args[0].equalsIgnoreCase(entry.getName())) {
+            if (args[1].equalsIgnoreCase(entry.getName())) {
                 String player = args[2];
                 if (queueManager.enqueueReward(player, entry.getConsoleCommands(), entry.getInvCheck())) {
                     sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() + " reward for " + player);
@@ -154,7 +154,7 @@ public class CmdCommand implements TabExecutor {
         }
         player.getInventory().addItem(item);
         player.sendMessage(prefix + ChatColor.GREEN + "You have been given the " + entry.getKeyString());
-        javaPlugin.getLogger().info(player.getDisplayName() + " has been given the " + entry.getKeyString());
+        javaPlugin.getLogger().info(player.getName() + " has been given the " + entry.getKeyString());
     }
 
     @Override
@@ -187,7 +187,7 @@ public class CmdCommand implements TabExecutor {
                 list.add("help");
             }
             if (sender.hasPermission("command64.enqueuerewards")) {
-                list.add("queue");
+                list.add("reward");
             }
         }
         
@@ -199,9 +199,9 @@ public class CmdCommand implements TabExecutor {
                         list.add(n.getKeyString());
                     }
                 }
-            } else if (args[0].toString().equals("queue")) {
+            } else if (args[0].toString().equals("reward") && sender.hasPermission("enqueuerewards")) {
                     for (RewardCmdEntry n : configHandler.getRewardCmdEntries()) {
-                        if (n != null && sender.hasPermission("enqueuerewards") && n.getName().startsWith(args[1])) {
+                        if (n != null && n.getName().startsWith(args[1])) {
                             list.add(n.getName());
                         }
                     }
@@ -222,7 +222,7 @@ public class CmdCommand implements TabExecutor {
                         list.add(n.getPlayerCommand());
                     }
                 }
-            } else if (args[0].toString().equals("give") || args[0].toString().equals("queue")) {
+            } else if (args[0].toString().equals("give") || args[0].toString().equals("reward")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     list.add(p.getName());
                 }

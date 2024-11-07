@@ -3,21 +3,22 @@
 
 # By default, everything is disabled.
 # You should configure each module to your own liking.
-# The predefined config is an example to give you and idea of what
-# you can do when using this plugin with other plugins, like EssentialsX
-# LuckPerms, PlayerParticles, SpecializedCrates, and MythicMobs.
+# ---------
+# The predefined config is there to give you and idea of what  
+# you can do when using this plugin with other plugins, like 
+# EssentialsX, LuckPerms, MythicMobs, a crate plugin, and more.
 
 
 # -------------------------------------------------------------------------------------- #
 # This module gives players the ability redeem pending rewards (commands) by using `/redeemreward`.
 # -- If the player has no pending rewards, they will be sent noPendingRewardMessage.
 # -- Else if the the player has inventory space, the first rewardEntry's consoleCommands 
-#      (in the player's pending queue) will be run.
+#     in the player's pending queue will be run.
 # -- Else the first rewardEntry's consoleCommands that doesn't have a invCheck will be run.
 # -- If there is no pending reward without a invCheck, they will be sent noInvSpaceMessage.
 # ---------
 # 1st) Admins/Console add rewardCommandEntries to a player's pending queue
-#       by using `/cmd queue <rewardName> <username>`.
+#        by using `/cmd reward <rewardName> <username>`.
 # 2nd) Players redeem rewards (in-order, unless there are skips due to full invs) by using `/redeemreward`.
 # ---------
 # Currently, there is no database saving players' pending reward queues.
@@ -27,15 +28,24 @@
 # -------------------------------------------------------------------------------------- #
 rewardSystem:
   enabled: false
-  noRewardMessage: "&cYou don't have any pending rewards!"
-  noInvSpaceMessage: "&cYou don't have enough inventory space for your reward!"
-  rewardedMessage: "&aYou redeemed a reward!"
+  pendingRewardsJoinMessage:
+    message: "&aYou have reward(s) to claim! &2/redeemReward"
+    tickDelay: 300
+  redeemMessages:
+    noRewardMessage: "&cYou don't have any pending rewards!"
+    noInvSpaceMessage: "&cYou don't have enough inventory space for your reward!"
+    rewardedMessage: "&aYou redeemed a reward!"
   rewardEntries:
-    '1': # Usage: `/cmd queue forcecrateopen <player>`
-      name: "forcecrateopen"
+    '1': # Usage: `/cmd reward cratekey <player>`
+      name: "cratekey"
       consoleCommands:
-        - "crates forceopen Crate32 <player>"
+        - "crates givekey Crate <player>"
       invCheck: true
+    '2': # Usage: `/cmd reward money <player>`
+      name: "money"
+      consoleCommands:
+        - "eco give <player> 100"
+      invCheck: false
     # Add more entries as needed
 
 
@@ -151,18 +161,18 @@ itemCommandEntries:
   enabled: false
   '1':
     enabled: false
-    givePerm: "command64.give.spawncompass"
+    givePerm: "command64.give.navigator"
     givePermValue: true
-    usePerm: "essentials.spawn"
+    usePerm: "commandpanel.panel.menugui"
     usePermValue: true
     consoleCommands:
-      - "sudo <player> spawn"
-    key: "SPAWNCOMPASS"
-    name: "&dSpawn Teleporter"
+      - "sudo <player> commandpanel menugui"
+    key: "NAVIGATOR"
+    name: "&dServer navigator"
     item: "COMPASS"
     glowing: true
     lore:
-      - "&5Teleports you to spawn"
+      - "&5Opens the server's menu GUI"
   '2':
     enabled: false
     givePerm: "command64.give.staffpick"
@@ -172,9 +182,9 @@ itemCommandEntries:
     consoleCommands:
       - "sudo <player> break"
     key: "STAFFPICK"
-    name: "&0Staff Pickaxe"
+    name: "&4Admin Pickaxe"
     item: "GOLDEN_PICKAXE"
     glowing: true
     lore:
-      - "&4Be careful!"
+      - "&cBreaks bedrock"
   # Add more entries as needed

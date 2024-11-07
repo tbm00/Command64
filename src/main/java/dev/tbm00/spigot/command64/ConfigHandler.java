@@ -17,13 +17,15 @@ public class ConfigHandler {
     private final List<CustomCmdEntry> customCmdEntries = new ArrayList<>();
     private final List<ItemCmdEntry> itemCmdEntries = new ArrayList<>();
     private final List<JoinCmdEntry> joinCmdEntries = new ArrayList<>();
-    public boolean rewardsEnabled;
-    public boolean itemEnabled;
-    public boolean customEnabled;
-    public boolean joinEnabled;
-    public String noRewardMessage;
-    public String noInvSpaceMessage;
-    public String rewardedMessage;
+    private boolean rewardsEnabled;
+    private boolean itemEnabled;
+    private boolean customEnabled;
+    private boolean joinEnabled;
+    private String noRewardMessage;
+    private String noInvSpaceMessage;
+    private String rewardedMessage;
+    private String joinMessage;
+    private int joinMessageDelay;
 
     public ConfigHandler(JavaPlugin javaPlugin) {
         this.javaPlugin = javaPlugin;
@@ -38,16 +40,19 @@ public class ConfigHandler {
     }
 
     private boolean loadRewardConfig() {
-        ConfigurationSection rewardCmdSection = javaPlugin.getConfig().getConfigurationSection("rewardSystem");
-        if (rewardCmdSection == null || !rewardCmdSection.getBoolean("enabled")) return false;
+        ConfigurationSection rewardSystemSec = javaPlugin.getConfig().getConfigurationSection("rewardSystem");
+        if (rewardSystemSec == null || !rewardSystemSec.getBoolean("enabled")) return false;
 
-        noRewardMessage = rewardCmdSection.getString("noRewardMessage");
-        noInvSpaceMessage = rewardCmdSection.getString("noInvSpaceMessage");
-        rewardedMessage = rewardCmdSection.getString("rewardedMessage");
+        noRewardMessage = rewardSystemSec.getString("redeemMessages.noRewardMessage");
+        noInvSpaceMessage = rewardSystemSec.getString("redeemMessages.noInvSpaceMessage");
+        rewardedMessage = rewardSystemSec.getString("redeemMessages.rewardedMessage");
+        joinMessage = rewardSystemSec.getString("pendingRewardsJoinMessage.message");
+        joinMessageDelay = rewardSystemSec.getInt("pendingRewardsJoinMessage.tickDelay");
 
+        ConfigurationSection rewardCmdSection = rewardSystemSec.getConfigurationSection("rewardEntries");
         for (String key : rewardCmdSection.getKeys(false)) {
             ConfigurationSection rewardCmdEntry = rewardCmdSection.getConfigurationSection(key);
-            if (rewardCmdEntry == null || !rewardCmdEntry.getBoolean("enabled"))
+            if (rewardCmdEntry == null)
                 continue;
             
             String name = rewardCmdEntry.getString("name");
@@ -170,4 +175,24 @@ public class ConfigHandler {
     public boolean isCustomEnabled() {
         return customEnabled;
     }
+
+    public String getNoRewardMessage() {
+        return noRewardMessage;
+    }
+    
+    public String getNoInvSpaceMessage() {
+        return noInvSpaceMessage;
+    }
+    
+    public String getRewardedMessage() {
+        return rewardedMessage;
+    }
+    
+    public String getJoinMessage() {
+        return joinMessage;
+    }
+    
+    public int getJoinMessageDelay() {
+        return joinMessageDelay;
+    }    
 }

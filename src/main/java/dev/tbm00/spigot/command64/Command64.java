@@ -4,9 +4,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import dev.tbm00.spigot.command64.listener.PlayerJoin;
-import dev.tbm00.spigot.command64.command.CmdCommand;
-import dev.tbm00.spigot.command64.listener.ItemUse;
+import dev.tbm00.spigot.command64.command.*;
+import dev.tbm00.spigot.command64.listener.*;
 
 public class Command64 extends JavaPlugin {
     private static ConfigHandler configHandler;
@@ -25,18 +24,20 @@ public class Command64 extends JavaPlugin {
 		);
 
         // initialize managers
-        cmdRunner = new CommandRunner(this);
         configHandler = new ConfigHandler(this);
-        queueManager = new QueueManager(this);
+        cmdRunner = new CommandRunner(this);
+        queueManager = new QueueManager(cmdRunner);
 
         // load command
         getCommand("cmd").setExecutor(new CmdCommand(this, cmdRunner, configHandler, queueManager));
+        if (this.getConfig().getBoolean("rewardSystem.enabled"))
+            getCommand("redeemreward").setExecutor(new RedeemCommand(configHandler, queueManager));
 
         // register listeners
         if (this.getConfig().getBoolean("itemCommandEntries.enabled"))
             getServer().getPluginManager().registerEvents(new ItemUse(this, cmdRunner, configHandler), this);
-        if (this.getConfig().getBoolean("joinCommandEntries.enabled") || this.getConfig().getBoolean("rewardClaimingSystem.enabled")) 
-            getServer().getPluginManager().registerEvents(new PlayerJoin(this, cmdRunner, configHandler), this);
+        if (this.getConfig().getBoolean("joinCommandEntries.enabled") || this.getConfig().getBoolean("rewardSystem.enabled")) 
+            getServer().getPluginManager().registerEvents(new PlayerJoin(this, cmdRunner, configHandler, queueManager), this);
     }
 
     private void log(String... strings) {
