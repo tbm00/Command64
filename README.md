@@ -18,9 +18,9 @@ Created by tbm00 for play.mc64.wtf.
 #### Commands
 - `/cmd help` Display this command list
 - `/cmd give <itemKey> [player]` Spawn a custom item
-- `/cmd <customCommand> [argument]` Run custom command as Console w/ optional argument
-- `/cmd -d <tickDelay> <customCommand> [argument]` Run delayed custom command as Console w/ optional argument
-- `/cmd reward <rewardName> <player>` Add reward to a player's reward queue
+- `/cmd <customCommand> [argument]` Run custom command as console w/ optional argument
+- `/cmd -d <tickDelay> <customCommand> [argument]` Run delayed custom command as console w/ optional argument
+- `/cmd reward <rewardName> <player> [argument]` Add reward command to a player's reward queue w/ optional argument
 #### Permissions
 Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfilled for a player to use the respective feature. The only hardcoded permission nodes are:
 - `command64.help` Ability to display the command list *(Default: OP)*
@@ -29,7 +29,7 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 
 ## Default Config
 ```
-# Command64 v1.1.1 by @tbm00
+# Command64 v1.1.2-beta by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, everything is disabled.
@@ -43,7 +43,7 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 # -------------------------------------------------------------------------------------- #
 # This module gives players the ability redeem pending rewards (commands).
 # 1st) Admins/Console add rewardEntries to a player's pending queue
-#        by using `/cmd reward <rewardName> <username>`.
+#        by using `/cmd reward <rewardName> <username> [argument]`.
 # 2nd) Players redeem rewards (in-order, unless there are skips due to full invs) by using `/redeemreward`.
 #      -- If the player has no pending rewards, they will be sent noPendingRewardMessage.
 #      -- Else if the the player has inventory space, the first rewardEntry's consoleCommands 
@@ -51,7 +51,8 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 #      -- Else if there is no pending reward without an invCheck, they will be sent noInvSpaceMessage.
 #      -- Else the first rewardEntry's consoleCommands that doesn't have a invCheck will be run.
 # ---------
-# <player> == player who is rewarded
+# <player> == player who is rewarded (optional)
+# <argument> == string included as running command's argument (optional)
 # -------------------------------------------------------------------------------------- #
 rewardSystem:
   enabled: false
@@ -70,10 +71,10 @@ rewardSystem:
       consoleCommands:
         - "crates givekey Crate <player>"
       invCheck: true
-    '2': # Usage: `/cmd reward money <player>`
+    '2': # Usage: `/cmd reward money <player> 1000`
       name: "money"
       consoleCommands:
-        - "eco give <player> 100"
+        - "eco give <player> <argument>"
       invCheck: false
     # Add more entries as needed
 
@@ -82,7 +83,7 @@ rewardSystem:
 # joinCommandEntries get ran by the console when a player 
 # (whose checkPerm==checkPermValue) connects to the server.
 # ---------
-# <player> == player who joined
+# <player> == player who joined (optional)
 # -------------------------------------------------------------------------------------- #
 joinCommandEntries:
   enabled: false
@@ -119,8 +120,8 @@ joinCommandEntries:
 # - You can add an invCheck to any customCommandEntry, that confirms ARGUMENT or SENDER
 #     has inventory space before running the consoleCommands.
 # ---------
-# <player> == player who used the command
-# <argument> == string included as running command's argument
+# <player> == player who used the command (optional)
+# <argument> == string included as running command's argument (optional)
 # -------------------------------------------------------------------------------------- #
 customCommandEntries:
   enabled: false
@@ -194,7 +195,7 @@ customCommandEntries:
 # itemCommandEntries get ran by the console when a player 
 # (whose usePerm==userPermVaue) uses a custom item.
 # ---------
-# <player> == player who used the item
+# <player> == player who used the item (optional)
 # -------------------------------------------------------------------------------------- #
 itemCommandEntries:
   enabled: false

@@ -54,10 +54,15 @@ public class QueueManager {
     }
 
     // get or make player's queue and add reward to it
-    public boolean enqueueReward(String playerName, String rewardName) {
+    public boolean enqueueReward(String playerName, String rewardName, String argument) {
+        String stored = null; 
+        if (argument!=null && !argument.isBlank())
+            stored = rewardName + ":" + argument;
+        else stored = rewardName;
+        
         synchronized (rewardQueues) {
             Queue<String> queue = rewardQueues.computeIfAbsent(playerName, k -> new LinkedList<>());
-            queue.add(rewardName);
+            queue.add(stored);
         }
         return true;
     }
@@ -80,7 +85,10 @@ public class QueueManager {
 
             if (hasInvSpace) { // redeem first rewards since there is space
                 // Player has inventory space, redeem the first reward
-                String rewardName = queue.poll();
+                String[] reward = queue.poll().split(":");
+                String rewardName = reward[0];
+                String arg = (reward[1]!=null) ? reward[1] : null; 
+
                 if (rewardName != null) {
                     List<String> consoleCommands = configHandler.getRewardCommandsByName(rewardName);
                     Boolean invCheck = configHandler.getRewardInvCheckByName(rewardName);
@@ -88,13 +96,15 @@ public class QueueManager {
                         javaPlugin.getLogger().warning(playerName + "'s Reward '" + rewardName + "' not found in config..!");
                         return false;
                     }
-                    cmdRunner.runRewardCommand(consoleCommands, playerName);
+                    cmdRunner.runRewardCommand(consoleCommands, playerName, arg);
                     return true;
                 }
             } else { // redeem the first reward that doesn't require space
                 Iterator<String> iterator = queue.iterator();
                 while (iterator.hasNext()) {
-                    String rewardName = iterator.next();
+                    String[] reward = queue.poll().split(":");
+                    String rewardName = reward[0];
+                    String arg = reward[1];
                     Boolean invCheck = configHandler.getRewardInvCheckByName(rewardName);
                     if (invCheck != null && !invCheck) {
                         iterator.remove();
@@ -103,7 +113,7 @@ public class QueueManager {
                             javaPlugin.getLogger().warning("Reward '" + rewardName + "' not found in config.");
                             return false;
                         }
-                        cmdRunner.runRewardCommand(consoleCommands, playerName);
+                        cmdRunner.runRewardCommand(consoleCommands, playerName, arg);
                         return true;
                     }
                 }

@@ -59,7 +59,7 @@ public class CmdCommand implements TabExecutor {
                     return handleGiveCommand(sender, args);
                 break;
             case "reward":
-                if (configHandler.isRewardsEnabled() && sender.hasPermission("command64.enqueuerewards") && args.length == 3)
+                if (configHandler.isRewardsEnabled() && sender.hasPermission("command64.enqueuerewards") && args.length > 2)
                     return handleQueueCommand(sender, args);
                 break;
             default:
@@ -76,7 +76,7 @@ public class CmdCommand implements TabExecutor {
             + ChatColor.WHITE + "/cmd give <itemKey> [player]" + ChatColor.GRAY + " Spawn a custom item\n"
             + ChatColor.WHITE + "/cmd <customCommand> [argument]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument\n"
             + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument]" + ChatColor.GRAY + " Run delayed custom command as Console w/ optional argument\n"
-            + ChatColor.WHITE + "/cmd reward <rewardName> <player>" + ChatColor.GRAY + " Add reward to a player's reward queue\n"
+            + ChatColor.WHITE + "/cmd reward <rewardName> <player> [argument]" + ChatColor.GRAY + " Add reward command to a player's reward queue w/ optional argument\n"
             );
         return true;
     }
@@ -85,9 +85,15 @@ public class CmdCommand implements TabExecutor {
         for (RewardCmdEntry entry : configHandler.getRewardCmdEntries()) {
             if (args[1].equalsIgnoreCase(entry.getName())) {
                 String playerName = args[2];
-                if (queueManager.enqueueReward(playerName, entry.getName())) {
-                    sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() + " reward for " + playerName);
-                    javaPlugin.getLogger().info(sender.getName() + " has enqueued the " + entry.getName() + " reward for " + playerName);
+                String argument = (args[3]!=null && !args[3].isBlank()) ? args[3] : null;
+                if (queueManager.enqueueReward(playerName, entry.getName(), argument)) {
+                    if (argument==null) {
+                        sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() + " reward for " + playerName);
+                        javaPlugin.getLogger().info(sender.getName() + " has enqueued the " + entry.getName() + " reward for " + playerName);
+                    } else {
+                        sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() +":"+ argument + " reward for " + playerName);
+                        javaPlugin.getLogger().info(sender.getName() + " has enqueued the " + entry.getName() +":"+ argument + " reward for " + playerName);
+                    }
                     
                     Player player = javaPlugin.getServer().getPlayer(playerName);
                     if (player != null && player.isOnline()) {
@@ -242,7 +248,6 @@ public class CmdCommand implements TabExecutor {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     list.add(p.getName());
                 }
-
             }
         }
         

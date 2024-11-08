@@ -45,8 +45,9 @@ public class CommandRunner {
 
             Bukkit.getScheduler().runTask(javaPlugin, () -> {
                 for (String processedCmd : processedCmds) {
-                    Bukkit.dispatchCommand(console, processedCmd);
                     javaPlugin.getLogger().info(name + " triggered join command: " + processedCmd);
+
+                    Bukkit.dispatchCommand(console, processedCmd);
                 }
             });
         }, tickDelay);
@@ -62,14 +63,14 @@ public class CommandRunner {
 
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", name);
+            javaPlugin.getLogger().info(name + " triggered item command: " + consoleCmd);
 
             Bukkit.dispatchCommand(console, consoleCmd);
-            javaPlugin.getLogger().info(name + " triggered item command: " + consoleCmd);
         }
         return true;
     }
 
-    public boolean runRewardCommand(List<String> consoleCmds, String player) {
+    public boolean runRewardCommand(List<String> consoleCmds, String player, String argument) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         javaPlugin.getLogger().info(player + " triggered a rewardEntry's consoleCommands...");
@@ -77,9 +78,13 @@ public class CommandRunner {
         for (String consoleCmd : consoleCmds) {
             if (player != null)
                 consoleCmd = consoleCmd.replace("<player>", player);
+            else return false;
+            if (argument != null) {
+                consoleCmd = consoleCmd.replace("<argument>", argument);
+                javaPlugin.getLogger().info(player + " triggered reward command: <"+argument+"> - " + consoleCmd);
+            } else javaPlugin.getLogger().info(player + " triggered reward command: " + consoleCmd);
 
             Bukkit.dispatchCommand(console, consoleCmd);
-            javaPlugin.getLogger().info(player + " triggered reward command: " + consoleCmd);
         }
         return true;
     }
@@ -93,11 +98,12 @@ public class CommandRunner {
 
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", name);
-            if (argument != null)
+            if (argument != null) {
                 consoleCmd = consoleCmd.replace("<argument>", argument);
+                javaPlugin.getLogger().info(name + " triggered custom command: <"+argument+"> - " + consoleCmd);
+            } else javaPlugin.getLogger().info(name + " triggered custom command: " + consoleCmd);
 
             Bukkit.dispatchCommand(console, consoleCmd);
-            javaPlugin.getLogger().info(name + " triggered custom command: " + consoleCmd);
         }
         return true;
     }
@@ -145,22 +151,24 @@ public class CommandRunner {
                         sender.sendMessage(prefix + ChatColor.GREEN + "Delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if applicable...");
                         for (String consoleCmd : bkupConsoleCommands) {
                             consoleCmd = consoleCmd.replace("<player>", name);
-                            if (args.length == 4)
+                            if (args.length == 4) {
                                 consoleCmd = consoleCmd.replace("<argument>", args[3]);
-        
+                                javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: <"+args[3]+"> - " + consoleCmd);
+                            } else javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: " + consoleCmd);
+                            
                             Bukkit.dispatchCommand(console, consoleCmd);
-                            javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: " + consoleCmd);
                         } pendingTasks.remove(delayedTask);
                         return;
                     }
                 }
                 for (String consoleCmd : consoleCmds) {
                     consoleCmd = consoleCmd.replace("<player>", name);
-                    if (args.length == 4)
+                    if (args.length == 4) {
                         consoleCmd = consoleCmd.replace("<argument>", args[3]);
-
+                        javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: <"+args[3]+"> - " + consoleCmd);
+                    } else javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: " + consoleCmd);
+                    
                     Bukkit.dispatchCommand(console, consoleCmd);
-                    javaPlugin.getLogger().info(name + " triggered delayed custom command: " + consoleCmd);
                 } pendingTasks.remove(delayedTask);
             }
         }.runTaskLater(javaPlugin, tickDelay);
