@@ -16,7 +16,7 @@ Created by tbm00 for play.mc64.wtf.
 
 ## Commands & Permissions
 #### Commands
-- `/redeemreward` Redeem the reward the top of your queue
+- `/redeemreward` Redeem the reward at the top of your queue
 - `/cmd help` Display this command list
 - `/cmd give <itemKey> [player]` Spawn a custom item
 - `/cmd <customCommand> [argument] [argument2]` Run custom command as console w/ optional argument(s)
