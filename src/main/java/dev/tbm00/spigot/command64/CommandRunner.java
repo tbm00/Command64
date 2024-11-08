@@ -80,8 +80,9 @@ public class CommandRunner {
                 consoleCmd = consoleCmd.replace("<player>", player);
             else return false;
             if (argument != null) {
+                argument = argument.replace("_", " ");
                 consoleCmd = consoleCmd.replace("<argument>", argument);
-                javaPlugin.getLogger().info(player + " triggered reward command: <"+argument+"> - " + consoleCmd);
+                javaPlugin.getLogger().info(player + " triggered reward command: <"+argument+"> " + consoleCmd);
             } else javaPlugin.getLogger().info(player + " triggered reward command: " + consoleCmd);
 
             Bukkit.dispatchCommand(console, consoleCmd);
@@ -89,8 +90,12 @@ public class CommandRunner {
         return true;
     }
 
-    public boolean runCustomCommand(List<String> consoleCmds, CommandSender sender, String argument) {
+    public boolean runCustomCommand(List<String> consoleCmds, CommandSender sender, String[] args) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
+
+        String argument = null, argument2 = null;
+        if (args.length>1) argument = args[1];
+        if (args.length>2) argument2 = args[2];
 
         String name = sender.getName();
         javaPlugin.getLogger().info(name + " triggered a customCmdEntry's consoleCommands...");
@@ -98,9 +103,17 @@ public class CommandRunner {
 
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", name);
-            if (argument != null) {
+
+            if (args.length==2 && argument !=null) {
+                argument = argument.replace("_", " ");
                 consoleCmd = consoleCmd.replace("<argument>", argument);
-                javaPlugin.getLogger().info(name + " triggered custom command: <"+argument+"> - " + consoleCmd);
+                javaPlugin.getLogger().info(name + " triggered custom command: <"+argument+"> " + consoleCmd);
+            } else if (args.length==3 && argument !=null && argument2 !=null) {
+                argument = argument.replace("_", " ");
+                argument2 = argument2.replace("_", " ");
+                consoleCmd = consoleCmd.replace("<argument>", argument);
+                consoleCmd = consoleCmd.replace("<argument2>", argument2);
+                javaPlugin.getLogger().info(name + " triggered custom command: <"+argument+":"+argument2+"> " + consoleCmd);
             } else javaPlugin.getLogger().info(name + " triggered custom command: " + consoleCmd);
 
             Bukkit.dispatchCommand(console, consoleCmd);
@@ -128,6 +141,7 @@ public class CommandRunner {
                 if (entry.getCheckInv()) {
                     String checkPlayer = entry.getCheckPlayer();
                     Player target = null;
+
                     if (checkPlayer.equalsIgnoreCase("SENDER"))
                         target = (Player) sender;
                     else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
@@ -144,16 +158,23 @@ public class CommandRunner {
                         return;
                     }
 
-                    List<String> bkupConsoleCommands = entry.getBkupConsoleCommands();
-
                     // check for space
+                    List<String> bkupConsoleCommands = entry.getBkupConsoleCommands();
                     if ((target.getInventory().firstEmpty() == -1)) {
                         sender.sendMessage(prefix + ChatColor.GREEN + "Delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if applicable...");
                         for (String consoleCmd : bkupConsoleCommands) {
                             consoleCmd = consoleCmd.replace("<player>", name);
-                            if (args.length == 4) {
+
+                            if (args.length==4) {
+                                args[3] = args[3].replace("_", " ");
                                 consoleCmd = consoleCmd.replace("<argument>", args[3]);
-                                javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: <"+args[3]+"> - " + consoleCmd);
+                                javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: <"+args[3]+"> " + consoleCmd);
+                            } else if (args.length==5) {
+                                args[3] = args[3].replace("_", " ");
+                                args[4] = args[4].replace("_", " ");
+                                consoleCmd = consoleCmd.replace("<argument>", args[3]);
+                                consoleCmd = consoleCmd.replace("<argument2>", args[4]);
+                                javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: <"+args[3]+":"+args[4]+"> " + consoleCmd);
                             } else javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: " + consoleCmd);
                             
                             Bukkit.dispatchCommand(console, consoleCmd);
@@ -163,10 +184,18 @@ public class CommandRunner {
                 }
                 for (String consoleCmd : consoleCmds) {
                     consoleCmd = consoleCmd.replace("<player>", name);
-                    if (args.length == 4) {
+
+                    if (args.length==4) {
+                        args[3] = args[3].replace("_", " ");
                         consoleCmd = consoleCmd.replace("<argument>", args[3]);
-                        javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: <"+args[3]+"> - " + consoleCmd);
-                    } else javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: " + consoleCmd);
+                        javaPlugin.getLogger().info(name + " triggered delayed custom command command: <"+args[3]+"> " + consoleCmd);
+                    } else if (args.length==5) {
+                        args[3] = args[3].replace("_", " ");
+                        args[4] = args[4].replace("_", " ");
+                        consoleCmd = consoleCmd.replace("<argument>", args[3]);
+                        consoleCmd = consoleCmd.replace("<argument2>", args[4]);
+                        javaPlugin.getLogger().info(name + " triggered delayed custom command command: <"+args[3]+":"+args[4]+"> " + consoleCmd);
+                    } else javaPlugin.getLogger().info(name + " triggered delayed custom command command: " + consoleCmd);
                     
                     Bukkit.dispatchCommand(console, consoleCmd);
                 } pendingTasks.remove(delayedTask);

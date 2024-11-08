@@ -4,11 +4,11 @@ A spigot plugin that runs commands with configurable triggers, and introduces a 
 Created by tbm00 for play.mc64.wtf.
 
 ## Features
-- **Simple, but Powerful** Use the 4 different entry types to create a variety of things from events to custom items. Use delays to create a chain of commands that are initially triggered by a parent/root command, item, or player join.
+- **Simple, but Powerful** Use the 4 different entry types to create a variety of things from events to custom items. Use delays & checks to create chains or loops of commands that are initially triggered by a parent/root command, item, or player join. Or just use it for simpler means :D
 - **Reward System** Let players redeem rewards FROM ANY PLUGIN when they want to, without losing items due to full inventory space.
-- **Custom Commands** Run predefined command(s) as the console when a player uses a custom command, with optional delays and inventory checks.
-- **Join Commands** Run predefined command(s) as the console when a player joins the server.
-- **Command Items** Run predefined command(s) as the console when a player uses a custom item.
+- **Custom Commands** Run predefined command(s) as the console when a player uses a custom command, with optional delays, permission checks, and inventory checks.
+- **Join Commands** Run predefined command(s) as the console when a player joins the server, with optional permission checks.
+- **Command Items** Run predefined command(s) as the console when a player uses a custom item, with optional permission checks.
 
 ## Dependencies
 - **Java 17+**: REQUIRED
@@ -16,11 +16,12 @@ Created by tbm00 for play.mc64.wtf.
 
 ## Commands & Permissions
 #### Commands
+- `/redeemreward` Redeem the reward the top of your queue
 - `/cmd help` Display this command list
 - `/cmd give <itemKey> [player]` Spawn a custom item
-- `/cmd <customCommand> [argument]` Run custom command as console w/ optional argument
-- `/cmd -d <tickDelay> <customCommand> [argument]` Run delayed custom command as console w/ optional argument
-- `/cmd reward <rewardName> <player> [argument]` Add reward command to a player's reward queue w/ optional argument
+- `/cmd <customCommand> [argument] [argument2]` Run custom command as console w/ optional argument(s)
+- `/cmd -d <tickDelay> <customCommand> [argument] [argument2]` Run delayed custom command as console w/ optional argument(s)
+- `/cmd reward <rewardName> <player> [argument]` Add reward to a player's queue w/ optional argument
 #### Permissions
 Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfilled for a player to use the respective feature. The only hardcoded permission nodes are:
 - `command64.help` Ability to display the command list *(Default: OP)*
@@ -29,12 +30,12 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 
 ## Default Config
 ```
-# Command64 v1.1.2-beta by @tbm00
+# Command64 v1.1.2 by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, everything is disabled.
 # You should configure each module to your own liking.
-# ---------
+#
 # The predefined config is there to give you and idea of what  
 # you can do when using this plugin with other plugins, like 
 # EssentialsX, LuckPerms, MythicMobs, a crate plugin, and more.
@@ -44,15 +45,16 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 # This module gives players the ability redeem pending rewards (commands).
 # 1st) Admins/Console add rewardEntries to a player's pending queue
 #        by using `/cmd reward <rewardName> <username> [argument]`.
-# 2nd) Players redeem rewards (in-order, unless there are skips due to full invs) by using `/redeemreward`.
+# 2nd) Players redeem rewards (in-order, unless there are skips due to full inv) by using `/redeemreward`.
 #      -- If the player has no pending rewards, they will be sent noPendingRewardMessage.
 #      -- Else if the the player has inventory space, the first rewardEntry's consoleCommands 
 #           in the player's pending queue will be run.
 #      -- Else if there is no pending reward without an invCheck, they will be sent noInvSpaceMessage.
 #      -- Else the first rewardEntry's consoleCommands that doesn't have a invCheck will be run.
-# ---------
-# <player> == player who is rewarded (optional)
-# <argument> == string included as running command's argument (optional)
+#
+# Optional Arguments:
+# <player> == player who is rewarded
+# <argument> == string included as running command's argument (underscores convert to spaces)
 # -------------------------------------------------------------------------------------- #
 rewardSystem:
   enabled: false
@@ -76,14 +78,15 @@ rewardSystem:
       consoleCommands:
         - "eco give <player> <argument>"
       invCheck: false
-    # Add more entries as needed
+    # Add/remove entries as needed
 
 
 # -------------------------------------------------------------------------------------- #
 # joinCommandEntries get ran by the console when a player 
-# (whose checkPerm==checkPermValue) connects to the server.
-# ---------
-# <player> == player who joined (optional)
+#   (whose checkPerm==checkPermValue) connects to the server.
+#
+# Optional Argument:
+# <player> == player who joined
 # -------------------------------------------------------------------------------------- #
 joinCommandEntries:
   enabled: false
@@ -109,7 +112,7 @@ joinCommandEntries:
     consoleCommands:
       - "say <player>, why haven't you donated?"
       - "say Gimme yo money!"
-  # Add more entries as needed
+  # Add/remove entries as needed
 
 
 # -------------------------------------------------------------------------------------- #
@@ -119,9 +122,11 @@ joinCommandEntries:
 #     i.e. "/cmd -d 1200 stop" to stop the server in 1 minute,
 # - You can add an invCheck to any customCommandEntry, that confirms ARGUMENT or SENDER
 #     has inventory space before running the consoleCommands.
-# ---------
-# <player> == player who used the command (optional)
-# <argument> == string included as running command's argument (optional)
+#
+# Optional Arguments:
+# <player> == player who used the command
+# <argument> == string included as running command's argument (underscores convert to spaces)
+# <argument2> == string included as running command's argument (underscores convert to spaces)
 # -------------------------------------------------------------------------------------- #
 customCommandEntries:
   enabled: false
@@ -189,13 +194,22 @@ customCommandEntries:
       - "mm mobs spawn BossMinion -t world,-673,46,722"
       - "mm mobs spawn BossMinion -t world,-677,52,727"
       - "mm mobs spawn BossMinion -t world,-667,52,726"
+  '7': # Usage: "/cmd consolemsg <argument> <argument2>" i.e. "/cmd consolemsg Notch hi_underscores_convert_to_spaces"
+    enabled: false
+    usePerm: "command64.admin"
+    usePermValue: true
+    customCommand: "consolemsg"
+    consoleCommands:
+      - "msg <argument> <argument2>"
+  # Add/remove entries as needed
 
 
 # -------------------------------------------------------------------------------------- #
 # itemCommandEntries get ran by the console when a player 
-# (whose usePerm==userPermVaue) uses a custom item.
-# ---------
-# <player> == player who used the item (optional)
+#   (whose usePerm==userPermVaue) uses a custom item.
+#
+# Optional Argument:
+# <player> == player who used the item
 # -------------------------------------------------------------------------------------- #
 itemCommandEntries:
   enabled: false
@@ -227,5 +241,6 @@ itemCommandEntries:
     glowing: true
     lore:
       - "&cBreaks bedrock"
-  # Add more entries as needed
+  # Add/remove entries as needed
+
 ```

@@ -1,9 +1,9 @@
-# Command64 v1.1.2-beta by @tbm00
+# Command64 v1.1.2 by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, everything is disabled.
 # You should configure each module to your own liking.
-# ---------
+#
 # The predefined config is there to give you and idea of what  
 # you can do when using this plugin with other plugins, like 
 # EssentialsX, LuckPerms, MythicMobs, a crate plugin, and more.
@@ -13,15 +13,16 @@
 # This module gives players the ability redeem pending rewards (commands).
 # 1st) Admins/Console add rewardEntries to a player's pending queue
 #        by using `/cmd reward <rewardName> <username> [argument]`.
-# 2nd) Players redeem rewards (in-order, unless there are skips due to full invs) by using `/redeemreward`.
+# 2nd) Players redeem rewards (in-order, unless there are skips due to full inv) by using `/redeemreward`.
 #      -- If the player has no pending rewards, they will be sent noPendingRewardMessage.
 #      -- Else if the the player has inventory space, the first rewardEntry's consoleCommands 
 #           in the player's pending queue will be run.
 #      -- Else if there is no pending reward without an invCheck, they will be sent noInvSpaceMessage.
 #      -- Else the first rewardEntry's consoleCommands that doesn't have a invCheck will be run.
-# ---------
-# <player> == player who is rewarded (optional)
-# <argument> == string included as running command's argument (optional)
+#
+# Optional Arguments:
+# <player> == player who is rewarded
+# <argument> == string included as running command's argument (underscores convert to spaces)
 # -------------------------------------------------------------------------------------- #
 rewardSystem:
   enabled: false
@@ -45,14 +46,15 @@ rewardSystem:
       consoleCommands:
         - "eco give <player> <argument>"
       invCheck: false
-    # Add more entries as needed
+    # Add/remove entries as needed
 
 
 # -------------------------------------------------------------------------------------- #
 # joinCommandEntries get ran by the console when a player 
-# (whose checkPerm==checkPermValue) connects to the server.
-# ---------
-# <player> == player who joined (optional)
+#   (whose checkPerm==checkPermValue) connects to the server.
+#
+# Optional Argument:
+# <player> == player who joined
 # -------------------------------------------------------------------------------------- #
 joinCommandEntries:
   enabled: false
@@ -78,7 +80,7 @@ joinCommandEntries:
     consoleCommands:
       - "say <player>, why haven't you donated?"
       - "say Gimme yo money!"
-  # Add more entries as needed
+  # Add/remove entries as needed
 
 
 # -------------------------------------------------------------------------------------- #
@@ -88,9 +90,11 @@ joinCommandEntries:
 #     i.e. "/cmd -d 1200 stop" to stop the server in 1 minute,
 # - You can add an invCheck to any customCommandEntry, that confirms ARGUMENT or SENDER
 #     has inventory space before running the consoleCommands.
-# ---------
-# <player> == player who used the command (optional)
-# <argument> == string included as running command's argument (optional)
+#
+# Optional Arguments:
+# <player> == player who used the command
+# <argument> == string included as running command's argument (underscores convert to spaces)
+# <argument2> == string included as running command's argument (underscores convert to spaces)
 # -------------------------------------------------------------------------------------- #
 customCommandEntries:
   enabled: false
@@ -158,13 +162,22 @@ customCommandEntries:
       - "mm mobs spawn BossMinion -t world,-673,46,722"
       - "mm mobs spawn BossMinion -t world,-677,52,727"
       - "mm mobs spawn BossMinion -t world,-667,52,726"
+  '7': # Usage: "/cmd consolemsg <argument> <argument2>" i.e. "/cmd consolemsg Notch hi_underscores_convert_to_spaces"
+    enabled: false
+    usePerm: "command64.admin"
+    usePermValue: true
+    customCommand: "consolemsg"
+    consoleCommands:
+      - "msg <argument> <argument2>"
+  # Add/remove entries as needed
 
 
 # -------------------------------------------------------------------------------------- #
 # itemCommandEntries get ran by the console when a player 
-# (whose usePerm==userPermVaue) uses a custom item.
-# ---------
-# <player> == player who used the item (optional)
+#   (whose usePerm==userPermVaue) uses a custom item.
+#
+# Optional Argument:
+# <player> == player who used the item
 # -------------------------------------------------------------------------------------- #
 itemCommandEntries:
   enabled: false
@@ -196,4 +209,4 @@ itemCommandEntries:
     glowing: true
     lore:
       - "&cBreaks bedrock"
-  # Add more entries as needed
+  # Add/remove entries as needed

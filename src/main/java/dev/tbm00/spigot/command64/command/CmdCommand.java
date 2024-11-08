@@ -46,7 +46,7 @@ public class CmdCommand implements TabExecutor {
             return true;
         }
 
-        if (args.length < 1 || args.length > 4) return false;
+        if (args.length < 1 || args.length > 5) return false;
 
         String subCommand = args[0].toLowerCase();
         switch (subCommand) {
@@ -74,9 +74,9 @@ public class CmdCommand implements TabExecutor {
         sender.sendMessage(ChatColor.DARK_RED + "--- " + ChatColor.RED + "Command64 Admin Commands" + ChatColor.DARK_RED + " ---\n"
             + ChatColor.WHITE + "/cmd help" + ChatColor.GRAY + " Display this command list\n"
             + ChatColor.WHITE + "/cmd give <itemKey> [player]" + ChatColor.GRAY + " Spawn a custom item\n"
-            + ChatColor.WHITE + "/cmd <customCommand> [argument]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument\n"
-            + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument]" + ChatColor.GRAY + " Run delayed custom command as Console w/ optional argument\n"
-            + ChatColor.WHITE + "/cmd reward <rewardName> <player> [argument]" + ChatColor.GRAY + " Add reward command to a player's reward queue w/ optional argument\n"
+            + ChatColor.WHITE + "/cmd <customCommand> [argument] [argument2]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument(s)\n"
+            + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument] [argument2]" + ChatColor.GRAY + " Run delayed custom command as Console w/ optional argument(s)\n"
+            + ChatColor.WHITE + "/cmd reward <rewardName> <player> [argument]" + ChatColor.GRAY + " Add reward to a player's queue w/ optional argument\n"
             );
         return true;
     }
@@ -116,8 +116,7 @@ public class CmdCommand implements TabExecutor {
                     return true;
                 else return false;
             } else if (args[0].equalsIgnoreCase(entry.getPlayerCommand())) {
-                String argument = args.length > 1 ? args[1] : null;
-                if (cmdRunner.runCustomCommand(entry.getConsoleCommands(), sender, argument))
+                if (cmdRunner.runCustomCommand(entry.getConsoleCommands(), sender, args))
                     return true;
                 else return false;
             }
