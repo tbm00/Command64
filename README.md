@@ -125,7 +125,7 @@ joinCommandEntries:
 #
 # Optional Arguments:
 # <player> == player who used the command
-# <argument> == string included as running command's argument (underscores convert to spaces)
+# <argument> == string included as running command's argument (underscores DON'T convert to spaces)
 # <argument2> == string included as running command's argument (underscores convert to spaces)
 # -------------------------------------------------------------------------------------- #
 customCommandEntries:

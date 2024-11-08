@@ -105,13 +105,11 @@ public class CommandRunner {
             consoleCmd = consoleCmd.replace("<player>", name);
 
             if (args.length==2 && argument !=null) {
-                argument = argument.replace("_", " ");
                 consoleCmd = consoleCmd.replace("<argument>", argument);
                 javaPlugin.getLogger().info(name + " triggered custom command: <"+argument+"> " + consoleCmd);
             } else if (args.length==3 && argument !=null && argument2 !=null) {
-                argument = argument.replace("_", " ");
-                argument2 = argument2.replace("_", " ");
                 consoleCmd = consoleCmd.replace("<argument>", argument);
+                argument2 = argument2.replace("_", " ");
                 consoleCmd = consoleCmd.replace("<argument2>", argument2);
                 javaPlugin.getLogger().info(name + " triggered custom command: <"+argument+":"+argument2+"> " + consoleCmd);
             } else javaPlugin.getLogger().info(name + " triggered custom command: " + consoleCmd);
@@ -166,13 +164,11 @@ public class CommandRunner {
                             consoleCmd = consoleCmd.replace("<player>", name);
 
                             if (args.length==4) {
-                                args[3] = args[3].replace("_", " ");
                                 consoleCmd = consoleCmd.replace("<argument>", args[3]);
                                 javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: <"+args[3]+"> " + consoleCmd);
                             } else if (args.length==5) {
-                                args[3] = args[3].replace("_", " ");
-                                args[4] = args[4].replace("_", " ");
                                 consoleCmd = consoleCmd.replace("<argument>", args[3]);
+                                args[4] = args[4].replace("_", " ");
                                 consoleCmd = consoleCmd.replace("<argument2>", args[4]);
                                 javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: <"+args[3]+":"+args[4]+"> " + consoleCmd);
                             } else javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: " + consoleCmd);
@@ -186,13 +182,11 @@ public class CommandRunner {
                     consoleCmd = consoleCmd.replace("<player>", name);
 
                     if (args.length==4) {
-                        args[3] = args[3].replace("_", " ");
                         consoleCmd = consoleCmd.replace("<argument>", args[3]);
                         javaPlugin.getLogger().info(name + " triggered delayed custom command command: <"+args[3]+"> " + consoleCmd);
                     } else if (args.length==5) {
-                        args[3] = args[3].replace("_", " ");
-                        args[4] = args[4].replace("_", " ");
                         consoleCmd = consoleCmd.replace("<argument>", args[3]);
+                        args[4] = args[4].replace("_", " ");
                         consoleCmd = consoleCmd.replace("<argument2>", args[4]);
                         javaPlugin.getLogger().info(name + " triggered delayed custom command command: <"+args[3]+":"+args[4]+"> " + consoleCmd);
                     } else javaPlugin.getLogger().info(name + " triggered delayed custom command command: " + consoleCmd);
