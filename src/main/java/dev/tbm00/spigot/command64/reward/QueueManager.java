@@ -87,7 +87,8 @@ public class QueueManager {
                 // Player has inventory space, redeem the first reward
                 String[] reward = queue.poll().split(":");
                 String rewardName = reward[0];
-                String arg = (reward[1]!=null) ? reward[1] : null; 
+                String arg = null;
+                if (reward.length>1) arg = reward[1];
 
                 if (rewardName != null) {
                     List<String> consoleCommands = configHandler.getRewardCommandsByName(rewardName);

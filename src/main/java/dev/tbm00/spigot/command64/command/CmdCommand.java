@@ -90,7 +90,8 @@ public class CmdCommand implements TabExecutor {
         for (RewardCmdEntry entry : configHandler.getRewardCmdEntries()) {
             if (args[1].equalsIgnoreCase(entry.getName())) {
                 String playerName = args[2];
-                String argument = (args[3]!=null && !args[3].isBlank()) ? args[3] : null;
+                String argument = null;
+                if (args.length>3) argument = args[3];
                 if (queueManager.enqueueReward(playerName, entry.getName(), argument)) {
                     if (argument==null) {
                         sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() + " reward for " + playerName);
