@@ -6,16 +6,22 @@ main: dev.tbm00.spigot.command64.Command64
 api-version: 1.17
 commands:
   cmd:
-    description: Base command for Command64
+    description: Base admin command
   redeemreward:
     description: Command for players to redeem queued rewards
 permissions:
   command64.help:
-    description: Ability to display the command list
+    description: Ability to display the admin command list
+    default: op
+  command64.sudo.console:
+    description: Ability to add run commands as the console
+    default: op
+  command64.sudo.player:
+    description: Ability to add run commands as someone else
     default: op
   command64.enqueuerewards:
-    description: Ability add rewards to a player's queue
+    description: Ability to add rewards to a player's queue
     default: op
   command64.redeemrewards:
-    description: Ability redeem queued rewards
+    description: Ability to redeem queued rewards
     default: true

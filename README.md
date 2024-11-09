@@ -4,11 +4,12 @@ A spigot plugin that runs commands with configurable triggers, and introduces a 
 Created by tbm00 for play.mc64.wtf.
 
 ## Features
-- **Simple, but Powerful** Use the 4 different entry types to create a variety of things from events to custom items. Use delays & checks to create chains or loops of commands that are initially triggered by a parent/root command, item, or player join. Or just use it for simpler means :D
+- **Simple, but Powerful** Use the 4 different entry types to create a variety of things from events to custom items. Use delays & checks to create chains or loops of commands that are initially triggered by a parent/root command, item, or player join(s). Or just use it for simpler means :D
 - **Reward System** Let players redeem rewards FROM ANY PLUGIN when they want to, without losing items due to full inventory space.
-- **Custom Commands** Run predefined command(s) as the console when a player uses a custom command, with optional delays, permission checks, and inventory checks.
-- **Join Commands** Run predefined command(s) as the console when a player joins the server, with optional permission checks.
-- **Command Items** Run predefined command(s) as the console when a player uses a custom item, with optional permission checks.
+- **Command Items** Run predefined command(s) when a player uses a custom item, with optional permission checks.
+- **Join Commands** Run predefined command(s) when a player joins the server, with optional permission checks.
+- **Custom Commands** Run predefined command(s) when a player uses a custom command, with optional delays, permission checks, and inventory checks.
+- **Sudo Commands** Run any command as someone else or the console.
 
 ## Dependencies
 - **Java 17+**: REQUIRED
@@ -16,33 +17,38 @@ Created by tbm00 for play.mc64.wtf.
 
 ## Commands & Permissions
 #### Commands
-- `/redeemreward` Redeem the reward at the top of your queue
-- `/cmd help` Display this command list
-- `/cmd give <itemKey> [player]` Spawn a custom item
-- `/cmd <customCommand> [argument] [argument2]` Run custom command as console w/ optional argument(s)
-- `/cmd -d <tickDelay> <customCommand> [argument] [argument2]` Run delayed custom command as console w/ optional argument(s)
+- `/cmd help` Display the admin command list
+- `/cmd sudo CONSOLE/<player> <cmd>` Run command as someone else (underscores convert to spaces in cmd)
+- `/cmd give <itemKey> [player] [amount]` Spawn custom item(s)
+- `/cmd <customCommand> [argument] [argument2]` Run custom command w/ optional argument(s)
+- `/cmd -d <tickDelay> <customCommand> [argument] [argument2]` Schedule delayed custom command w/ optional argument(s)
 - `/cmd reward <rewardName> <player> [argument]` Add reward to a player's queue w/ optional argument
+- `/redeemreward` Redeem the reward at the top of your queue
 #### Permissions
 Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfilled for a player to use the respective feature. The only hardcoded permission nodes are:
 - `command64.help` Ability to display the command list *(Default: OP)*
-- `command64.enqueuerewards` Ability add rewards to a player's queue *(Default: OP)*
-- `command64.redeemrewards` Ability redeem queued rewards *(Default: everyone)*
+- `command64.sudo.console` Ability to run commands as the console *(Default: OP)*
+- `command64.sudo.player` Ability to run commands as someone else *(Default: OP)*
+- `command64.enqueuerewards` Ability to add rewards to a player's queue *(Default: OP)*
+- `command64.redeemrewards` Ability to redeem queued rewards *(Default: everyone)*
 
 ## Default Config
 ```
-# Command64 v1.1.2 by @tbm00
+# Command64 v1.1.3 by @tbm00
 # https://github.com/tbm00/Command64/
 
-# By default, everything is disabled.
-# You should configure each module to your own liking.
-#
+# By default, all moduels are disabled is disabled.
+# You should configure each section to your own liking.
+
 # The predefined config is there to give you and idea of what  
 # you can do when using this plugin with other plugins, like 
 # EssentialsX, LuckPerms, MythicMobs, a crate plugin, and more.
 
 
-# -------------------------------------------------------------------------------------- #
+
+# -----------------------------------rewardSystem--------------------------------------- #
 # This module gives players the ability redeem pending rewards (commands).
+#
 # 1st) Admins/Console add rewardEntries to a player's pending queue
 #        by using `/cmd reward <rewardName> <username> [argument]`.
 # 2nd) Players redeem rewards (in-order, unless there are skips due to full inv) by using `/redeemreward`.
@@ -58,7 +64,7 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 # -------------------------------------------------------------------------------------- #
 rewardSystem:
   enabled: false
-  saveDataInterval: 15 # save data to json every X minutes, -1 to only save on shutdown
+  saveDataInterval: 60 # save data to json every X minutes, -1 to only save on shutdown
   newRewardMessage: "&8[&fRewards&8] &aYou just received a reward, claim it with &2/redeemreward&a!"
   pendingRewardsJoinMessage:
     message: "&8[&fRewards&8] &aYou have reward(s) to claim! &2/redeemreward"
@@ -81,9 +87,10 @@ rewardSystem:
     # Add/remove entries as needed
 
 
-# -------------------------------------------------------------------------------------- #
-# joinCommandEntries get ran by the console when a player 
-#   (whose checkPerm==checkPermValue) connects to the server.
+
+# --------------------------------joinCommandEntries------------------------------------ #
+# consoleCommands get triggered when a player (whose checkPerm==checkPermValue)
+#   connects to the server.
 #
 # Optional Argument:
 # <player> == player who joined
@@ -115,13 +122,21 @@ joinCommandEntries:
   # Add/remove entries as needed
 
 
-# -------------------------------------------------------------------------------------- #
-# customCommandEntries get ran by the console when the console, or a player
-#   (whose usePerm==userPermVaue), uses the associated customCommand.
-# - You can run any customCommand with a delay by using the "-d" command flag;
-#     i.e. "/cmd -d 1200 stop" to stop the server in 1 minute,
-# - You can add an invCheck to any customCommandEntry, that confirms ARGUMENT or SENDER
-#     has inventory space before running the consoleCommands.
+
+# ------------------------------customCommandEntries------------------------------------ #
+# consoleCommands get triggered when the console or a player (whose usePerm==userPermVaue)
+#   uses the associated customCommand.
+#
+# You can run any customCommand with a delay by using the "-d" command flag.
+#   i.e. "/cmd -d 1200 stop" to stop the server in 1 minute,
+# You can add an invCheck to any customCommandEntry, that confirms ARGUMENT or SENDER has
+#   one spot avaliable in their inventory before running the consoleCommands. If they don't,
+#   any defined backup commands will run. Use this module on any customCommandEntry:
+#    invCheck:
+#      checkIfSpaceBeforeRun: true
+#      checkOnPlayer: "ARGUMENT"
+#      ifNoSpaceConsoleCommands:
+#        - "msg <argument> &4You do not have space in your inventory..."
 #
 # Optional Arguments:
 # <player> == player who used the command
@@ -132,7 +147,7 @@ customCommandEntries:
   enabled: false
   '1': # Usage: "/cmd save"
     enabled: false
-    usePerm: "command64.admin"
+    usePerm: "command64.mod"
     usePermValue: true
     customCommand: "save"
     consoleCommands:
@@ -148,28 +163,35 @@ customCommandEntries:
       - "stop"
   '3': # Usage: "/cmd promotedonor <argument>" i.e. "/cmd promotedonor Notch"
     enabled: false
-    usePerm: "command64.supermod"
+    usePerm: "command64.admin"
     usePermValue: true
     customCommand: "promotedonor"
     consoleCommands:
       - "lp user <argument> promote donor"
       - "say <argument> donated to the server and was promoted by <player>!"
-  '4': # Usage: "/cmd invSpaceCheck <argument>" i.e. "/cmd invSpaceCheck Notch"
+  '4': # Usage: "/cmd consolemsg <argument> <argument2>" i.e. "/cmd consolemsg Notch hi_underscores_convert_to_spaces"
     enabled: false
     usePerm: "command64.admin"
     usePermValue: true
+    customCommand: "consolemsg"
+    consoleCommands:
+      - "msg <argument> <argument2>"
+  '5': # Usage: "/cmd invSpaceCheckLoop <argument>" i.e. "/cmd invSpaceCheckLoop Notch"
+    enabled: false
+    usePerm: "command64.mod"
+    usePermValue: true
     customCommand: "invSpaceCheckLoop"
     consoleCommands:
-      - "say <argument> has inventory space!"
+      - "msg <player> <argument> has space for an item!"
     invCheck:
       checkIfSpaceBeforeRun: true
       checkOnPlayer: "ARGUMENT"
       ifNoSpaceConsoleCommands:
-        - "msg <argument> &4You do not have space in your inventory..."
+        - "msg <player> <argument> has a full inventory! Checking again in 2 minutes..."
         - "cmd -d 2400 invSpaceCheckLoop <argument>" # 2 minute delay
-  '5': # Usage "/cmd boss-fight-start"
+  '6': # Usage "/cmd boss-fight-start"
     enabled: false
-    usePerm: "command64.supermod"
+    usePerm: "command64.mod"
     usePermValue: true
     customCommand: "boss-fight-start"
     consoleCommands:
@@ -182,11 +204,11 @@ customCommandEntries:
       - "mm mobs spawn BossMob -t world,-672,36,727"
       - "broadcast &bBoss fight started!"
       - "cmd -d 1200 boss-fight-round2" # 1 minute delay
-  '6': # Intended Usage "/cmd -d <tickDelay> boss-fight-round2" i.e. "/cmd -d 1200 boss-fight-round2"
+  '7': # Intended Usage "/cmd -d <tickDelay> boss-fight-round2" i.e. "/cmd -d 1200 boss-fight-round2"
     enabled: false
-    usePerm: "command64.supermod"
+    usePerm: "command64.hide"
     usePermValue: true
-    timerCommand: "boss-fight-round2"
+    customCommand: "boss-fight-round2"
     consoleCommands:
       - "mm mobs spawn BossMinion -t world,-677,36,727"
       - "mm mobs spawn BossMinion -t world,-667,36,726"
@@ -194,19 +216,13 @@ customCommandEntries:
       - "mm mobs spawn BossMinion -t world,-673,46,722"
       - "mm mobs spawn BossMinion -t world,-677,52,727"
       - "mm mobs spawn BossMinion -t world,-667,52,726"
-  '7': # Usage: "/cmd consolemsg <argument> <argument2>" i.e. "/cmd consolemsg Notch hi_underscores_convert_to_spaces"
-    enabled: false
-    usePerm: "command64.admin"
-    usePermValue: true
-    customCommand: "consolemsg"
-    consoleCommands:
-      - "msg <argument> <argument2>"
   # Add/remove entries as needed
 
 
-# -------------------------------------------------------------------------------------- #
-# itemCommandEntries get ran by the console when a player 
-#   (whose usePerm==userPermVaue) uses a custom item.
+
+# ---------------------------------itemCommandEntries----------------------------------- #
+# consoleCommands get triggered when a player (whose usePerm==userPermVaue)
+#   uses a custom item.
 #
 # Optional Argument:
 # <player> == player who used the item
@@ -220,7 +236,7 @@ itemCommandEntries:
     usePerm: "commandpanel.panel.menugui"
     usePermValue: true
     consoleCommands:
-      - "sudo <player> commandpanel menugui"
+      - "cmd sudo <player> commandpanel_menugui"
     key: "NAVIGATOR"
     name: "&dServer navigator"
     item: "COMPASS"
@@ -229,13 +245,13 @@ itemCommandEntries:
       - "&5Opens the server's menu GUI"
   '2':
     enabled: false
-    givePerm: "command64.give.staffpick"
+    givePerm: "command64.give.adminpick"
     givePermValue: true
     usePerm: "essentials.break"
     usePermValue: true
     consoleCommands:
-      - "sudo <player> break"
-    key: "STAFFPICK"
+      - "cmd sudo <player> break"
+    key: "ADMINPICK"
     name: "&4Admin Pickaxe"
     item: "GOLDEN_PICKAXE"
     glowing: true

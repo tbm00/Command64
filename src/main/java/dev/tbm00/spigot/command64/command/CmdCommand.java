@@ -62,6 +62,10 @@ public class CmdCommand implements TabExecutor {
                 if (configHandler.isRewardsEnabled() && sender.hasPermission("command64.enqueuerewards") && args.length > 2)
                     return handleQueueCommand(sender, args);
                 break;
+            case "sudo":
+                if (sender.hasPermission("command64.sudo.console") || sender.hasPermission("command64.sudo.player"))
+                    return cmdRunner.runSudoCommand(sender, args);
+                break;
             default:
                 if (configHandler.isCustomEnabled())
                     return handleCustomCommand(sender, args);
@@ -72,11 +76,12 @@ public class CmdCommand implements TabExecutor {
 
     private boolean handleHelpCommand(CommandSender sender) {
         sender.sendMessage(ChatColor.DARK_RED + "--- " + ChatColor.RED + "Command64 Admin Commands" + ChatColor.DARK_RED + " ---\n"
-            + ChatColor.WHITE + "/cmd help" + ChatColor.GRAY + " Display this command list\n"
-            + ChatColor.WHITE + "/cmd give <itemKey> [player]" + ChatColor.GRAY + " Spawn a custom item\n"
-            + ChatColor.WHITE + "/cmd <customCommand> [argument] [argument2]" + ChatColor.GRAY + " Run custom command as Console w/ optional argument(s)\n"
-            + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument] [argument2]" + ChatColor.GRAY + " Run delayed custom command as Console w/ optional argument(s)\n"
-            + ChatColor.WHITE + "/cmd reward <rewardName> <player> [argument]" + ChatColor.GRAY + " Add reward to a player's queue w/ optional argument\n"
+            + ChatColor.WHITE + "/cmd help" + ChatColor.GRAY + " Display the admin command list\n"
+            + ChatColor.WHITE + "/cmd sudo CONSOLE/<player> <cmd>" + ChatColor.GRAY + " Run command as someone else (underscores convert to spaces in cmd)\n"
+            + ChatColor.WHITE + "/cmd give <itemKey> [player] [amount]" + ChatColor.GRAY + " Spawn custom item(s)\n"
+            + ChatColor.WHITE + "/cmd <customCommand> [argument] [argument2]" + ChatColor.GRAY + " Run custom command w/ optional argument(s)\n"
+            + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument] [argument2]" + ChatColor.GRAY + " Schedule delayed custom command w/ optional argument(s)\n"
+            + ChatColor.WHITE + "/cmd reward <rewardName> <player> [argument]" + ChatColor.GRAY + " Add reward to a player's queue w/ optional argument"
             );
         return true;
     }
@@ -126,12 +131,14 @@ public class CmdCommand implements TabExecutor {
     
     private boolean handleGiveCommand(CommandSender sender, String[] args) {
         Player player;
+        int quantity = 1;
     
         if (args.length < 3) {
             if (!(sender instanceof Player)) {
                 sender.sendMessage(prefix + ChatColor.RED + "This command can only be run by a player!");
                 return false;
             }
+
             player = (Player) sender;
         } else {
             player = javaPlugin.getServer().getPlayer(args[2]);
@@ -139,19 +146,27 @@ public class CmdCommand implements TabExecutor {
                 sender.sendMessage(prefix + ChatColor.RED + "Could not find target player!");
                 return false;
             }
+            if (args.length==4) {
+                try {
+                    quantity = Integer.parseInt(args[3]);
+                } catch (Exception e) {
+                    sender.sendMessage(prefix + ChatColor.RED + "Quantity must an integer!");
+                    return false;
+                }
+            }
         }
     
         for (ItemCmdEntry entry : configHandler.getItemCmdEntries()) {
             if (args[1].equals(entry.getKeyString()))
                 if ((sender.hasPermission(entry.getGivePerm()) == entry.getGivePermValue()) || sender instanceof ConsoleCommandSender) {
-                    giveItemToPlayer(player, entry);
+                    giveItemToPlayer(player, entry, quantity);
                     return true;
                 }
         }
         return false;
     }
 
-    private void giveItemToPlayer(Player player, ItemCmdEntry entry) {
+    private void giveItemToPlayer(Player player, ItemCmdEntry entry, int quantity) {
         ItemStack item = new ItemStack(Material.valueOf(entry.getItem()));
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
@@ -164,9 +179,10 @@ public class CmdCommand implements TabExecutor {
             meta.getPersistentDataContainer().set(new NamespacedKey(javaPlugin, entry.getKeyString()), PersistentDataType.STRING, "true");
             item.setItemMeta(meta);
         }
+        if (quantity>1) item.setAmount(quantity);
         player.getInventory().addItem(item);
-        player.sendMessage(prefix + ChatColor.GREEN + "You have been given the " + entry.getKeyString());
-        javaPlugin.getLogger().info(player.getName() + " has been given the " + entry.getKeyString());
+        player.sendMessage(prefix + ChatColor.GREEN + "You have been given " + quantity + " " + entry.getKeyString());
+        javaPlugin.getLogger().info(player.getName() + " has been given " + quantity + " " + entry.getKeyString());
     }
 
     @Override
@@ -201,6 +217,9 @@ public class CmdCommand implements TabExecutor {
             if (sender.hasPermission("command64.enqueuerewards")) {
                 list.add("reward");
             }
+            if (sender.hasPermission("command64.sudo.players")||sender.hasPermission("command64.sudo.console")) {
+                list.add("sudo");
+            }
         }
         
         if (args.length == 2) {
@@ -220,8 +239,11 @@ public class CmdCommand implements TabExecutor {
             } else if (args[0].toString().equals("-d")) {
                 list.add("<#>");
             } else if (!args[0].toString().equals("help")) {
+                if (args[0].toString().equals("sudo")) {
+                    if ("CONSOLE".startsWith(args[1])||"console".startsWith(args[1])) list.add("CONSOLE");
+                }
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    list.add(p.getName());
+                    if (p.getName().startsWith(args[1])) list.add(p.getName());
                 }
             }
         }
@@ -236,7 +258,7 @@ public class CmdCommand implements TabExecutor {
                 }
             } else if (args[0].toString().equals("give") || args[0].toString().equals("reward")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    list.add(p.getName());
+                    if (p.getName().startsWith(args[2])) list.add(p.getName());
                 }
             }
         }
@@ -245,7 +267,7 @@ public class CmdCommand implements TabExecutor {
             list.clear();
             if (args[0].toString().equals("-d")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    list.add(p.getName());
+                    if (p.getName().startsWith(args[3])) list.add(p.getName());
                 }
             }
         }

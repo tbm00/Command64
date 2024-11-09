@@ -55,6 +55,47 @@ public class CommandRunner {
         return true;
     }
 
+    public boolean runSudoCommand(CommandSender sender, String[] args) {
+        String targetName = null, cmd = null;
+        if (args.length==3) {
+            targetName = args[1];
+            cmd = args[2];
+            cmd = cmd.replace("_", " ");
+            cmd = cmd.replace("<me>", sender.getName());
+        } else { 
+            sender.sendMessage(prefix + ChatColor.RED + "Sudo requires a command sender and a command.");
+            if (sender.hasPermission("command64.sudo.console")) {
+                sender.sendMessage(ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say_hello_world");
+                sender.sendMessage(ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say_<me>_says_hello");
+            } else if (sender.hasPermission("command64.sudo.player")) {
+                sender.sendMessage(ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say_<me>_says_hello");
+                sender.sendMessage(ChatColor.WHITE + "Ex Usage: /cmd sudo Notch pay_Steve_10000");
+                sender.sendMessage(ChatColor.WHITE + "Ex Usage: /cmd sudo Notch pay_<me>_10000");
+            }
+            return false;
+        }
+
+        CommandSender target = null;
+        if (targetName.equalsIgnoreCase("CONSOLE") || targetName.equalsIgnoreCase("_CONSOLE_")) {
+            if (!sender.hasPermission("command64.sudo.console")) return false;
+            target = console;
+        } else {
+            if (!sender.hasPermission("command64.sudo.player")) return false; 
+            target = javaPlugin.getServer().getPlayer(targetName);
+        }
+
+        if (target==null) {
+            sender.sendMessage(prefix + ChatColor.RED + "Couldn't find target: " + target);
+            return false;
+        }
+
+        javaPlugin.getLogger().info(sender.getName() + " triggered sudo command: <"+targetName+"> " + cmd);
+        sender.sendMessage(prefix + ChatColor.YELLOW + "Running sudo command: " + ChatColor.WHITE + "<"+targetName+"> " + cmd);
+
+        Bukkit.dispatchCommand(target, cmd);
+        return true;
+    }
+
     public boolean runItemCommand(List<String> consoleCmds, Player player) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
@@ -146,20 +187,20 @@ public class CommandRunner {
                         target = javaPlugin.getServer().getPlayer(args[3]);
                     else {
                         javaPlugin.getLogger().info(name + "'s delayed command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
-                        sender.sendMessage(prefix + ChatColor.GREEN + "Delayed command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                        sender.sendMessage(prefix + ChatColor.RED + "Delayed command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
                         return;
                     }
 
                     if (target==null) {
                         javaPlugin.getLogger().info(name + "'s delayed command failed because " + target + " is null... Aborting!");
-                        sender.sendMessage(prefix + ChatColor.GREEN + "Delayed command failed because " + target + " is null... Aborting!");
+                        sender.sendMessage(prefix + ChatColor.RED + "Delayed command failed because " + target + " is null... Aborting!");
                         return;
                     }
 
                     // check for space
                     List<String> bkupConsoleCommands = entry.getBkupConsoleCommands();
                     if ((target.getInventory().firstEmpty() == -1)) {
-                        sender.sendMessage(prefix + ChatColor.GREEN + "Delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if applicable...");
+                        sender.sendMessage(prefix + ChatColor.YELLOW + "Delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if any...");
                         for (String consoleCmd : bkupConsoleCommands) {
                             consoleCmd = consoleCmd.replace("<player>", name);
 
