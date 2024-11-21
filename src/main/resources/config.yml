@@ -1,12 +1,26 @@
-# Command64 v1.1.4 by @tbm00
+# Command64 v1.2.0 by @tbm00
 # https://github.com/tbm00/Command64/
 
-# By default, all moduels are disabled is disabled.
+# By default, all modules are disabled.
 # You should configure each section to your own liking.
 
 # The predefined config is there to give you and idea of what  
 # you can do when using this plugin with other plugins, like 
 # EssentialsX, LuckPerms, MythicMobs, a crate plugin, and more.
+
+
+
+# -----------------------------------cronSchedule--------------------------------------- #
+# consoleCommand gets scheduled by the entry's cron expression.
+#
+# Use https://crontab.guru/ for help.
+# -------------------------------------------------------------------------------------- #
+cronSchedule:
+  enabled: false
+  taskEntries:
+  # - "m h dom mon dow consoleCommand"
+    - "0 0 */1 * * say This command is triggered at midnight!"
+    - "0,*/10 11-14 * * * say This command is triggered every 10 minutes between 11:00 AM and 2:59 PM!"
 
 
 
@@ -202,7 +216,7 @@ itemCommandEntries:
     consoleCommands:
       - "cmd sudo <player> commandpanel_menugui"
     key: "NAVIGATOR"
-    name: "&dServer navigator"
+    name: "&dServer Navigator"
     item: "COMPASS"
     glowing: true
     lore:

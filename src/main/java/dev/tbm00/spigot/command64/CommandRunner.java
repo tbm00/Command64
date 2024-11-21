@@ -96,6 +96,16 @@ public class CommandRunner {
         return true;
     }
 
+    public boolean runCronCommand(String timing, String consoleCmd) {
+        if (consoleCmd == null || consoleCmd.isEmpty()) return false;
+        
+        javaPlugin.getLogger().info("CronSchedule triggered a taskEntry: " + timing + " " + consoleCmd);
+
+        Bukkit.dispatchCommand(console, consoleCmd);
+
+        return true;
+    }
+
     public boolean runItemCommand(List<String> consoleCmds, Player player) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 

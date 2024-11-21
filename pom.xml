@@ -6,12 +6,12 @@
 
     <groupId>dev.tbm00</groupId>
     <artifactId>Command64</artifactId>
-    <version>1.1.4</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
 
     <name>Command64</name>
 
-    <description>This plugin runs commands with configurable triggers, and introduces a user-friendly reward system​</description>
+    <description>This plugin installs a local cron scheduler, runs commands with configurable triggers, and introduces a user-friendly reward system​</description>
     <properties>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

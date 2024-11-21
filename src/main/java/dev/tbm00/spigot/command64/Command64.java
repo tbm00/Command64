@@ -12,6 +12,7 @@ public class Command64 extends JavaPlugin {
     private static ConfigHandler configHandler;
     private static CommandRunner cmdRunner;
     private static QueueManager queueManager;
+    private static CronManager cronManager;
 
     @Override
     public void onEnable() {
@@ -27,17 +28,21 @@ public class Command64 extends JavaPlugin {
         // initialize managers, listeners, & commands
         configHandler = new ConfigHandler(this);
         cmdRunner = new CommandRunner(this);
+
+        if (configHandler.isCronEnabled()) {
+            cronManager = new CronManager(this, cmdRunner, configHandler);
+        } else cronManager = null;
         
-        if (this.getConfig().getBoolean("rewardSystem.enabled")) {
+        if (configHandler.isRewardsEnabled()) {
             queueManager = new QueueManager(this, cmdRunner, configHandler);
             getCommand("redeemreward").setExecutor(new RedeemCommand(configHandler, queueManager));
         } else queueManager = null;
         
         getCommand("cmd").setExecutor(new CmdCommand(this, cmdRunner, configHandler, queueManager));
 
-        if (this.getConfig().getBoolean("itemCommandEntries.enabled"))
+        if (configHandler.isItemEnabled())
             getServer().getPluginManager().registerEvents(new ItemUse(this, cmdRunner, configHandler), this);
-        if (this.getConfig().getBoolean("joinCommandEntries.enabled") || this.getConfig().getBoolean("rewardSystem.enabled")) 
+        if (configHandler.isJoinEnabled() || configHandler.isRewardsEnabled()) 
             getServer().getPluginManager().registerEvents(new PlayerConnection(this, cmdRunner, configHandler, queueManager), this);
     }
 
@@ -50,6 +55,9 @@ public class Command64 extends JavaPlugin {
     public void onDisable() {
         if (queueManager != null) {
             queueManager.shutdown();
+        }
+        if (cronManager != null) {
+            cronManager.shutdown();
         }
     }
 }

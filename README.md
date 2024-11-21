@@ -1,15 +1,16 @@
 # Command64 <img align="left" src="icon.png" alt="Item64 Icon" width="40"/>
-A spigot plugin that runs commands with configurable triggers, and introduces a user-friendly reward system.
+A spigot plugin that installs a local cron scheduler, runs commands with configurable triggers, and introduces a user-friendly reward system.
 
 Created by tbm00 for play.mc64.wtf.
 
 ## Features
-- **Simple, but Powerful** Use the 4 different entry types to create a variety of things from events to custom items. Use delays & checks to create chains or loops of commands that are initially triggered by a parent/root command, item, or player join(s). Or just use it for simpler means :D
-- **Reward System** Let players redeem rewards FROM ANY PLUGIN when they want to, without losing items due to full inventory space.
-- **Command Items** Run predefined command(s) when a player uses a custom item, with optional permission checks.
+- **Simple, but Powerful** Use the 5 different entry types to create a variety of things from events to custom items. Use delays & checks to create chains or loops of commands that are initially triggered by a parent/root command, item, or player join(s). Or just use it for simpler means :D
+- **Cron Schedule** Schedule command(s) to be run during specific times and/or intervals!
+- **Sudo Commands** Run any command as someone else or the console.
 - **Join Commands** Run predefined command(s) when a player joins the server, with optional permission checks.
 - **Custom Commands** Run predefined command(s) when a player uses a custom command, with optional delays, permission checks, and inventory checks.
-- **Sudo Commands** Run any command as someone else or the console.
+- **Command Items** Run predefined command(s) when a player uses a custom item, with optional permission checks.
+- **Reward System** Let players redeem rewards FROM ANY PLUGIN when they want to, without losing items due to full inventory space.
 
 ## Dependencies
 - **Java 17+**: REQUIRED
@@ -26,7 +27,7 @@ Created by tbm00 for play.mc64.wtf.
 - `/redeemreward` Redeem the reward at the top of your queue
 #### Permissions
 Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfilled for a player to use the respective feature. The only hardcoded permission nodes are:
-- `command64.help` Ability to display the command list *(Default: OP)*
+- `command64.help` Ability to display the admin command list *(Default: OP)*
 - `command64.sudo.console` Ability to run commands as the console *(Default: OP)*
 - `command64.sudo.player` Ability to run commands as someone else *(Default: OP)*
 - `command64.enqueuerewards` Ability to add rewards to a player's queue *(Default: OP)*
@@ -34,15 +35,29 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 
 ## Default Config
 ```
-# Command64 v1.1.4 by @tbm00
+# Command64 v1.2.0 by @tbm00
 # https://github.com/tbm00/Command64/
 
-# By default, all moduels are disabled is disabled.
+# By default, all modules are disabled.
 # You should configure each section to your own liking.
 
 # The predefined config is there to give you and idea of what  
 # you can do when using this plugin with other plugins, like 
 # EssentialsX, LuckPerms, MythicMobs, a crate plugin, and more.
+
+
+
+# -----------------------------------cronSchedule--------------------------------------- #
+# consoleCommand gets scheduled by the entry's cron expression.
+#
+# Use https://crontab.guru/ for help.
+# -------------------------------------------------------------------------------------- #
+cronSchedule:
+  enabled: false
+  taskEntries:
+  # - "m h dom mon dow consoleCommand"
+    - "0 0 */1 * * say This command is triggered at midnight!"
+    - "0,*/10 11-14 * * * say This command is triggered every 10 minutes between 11:00 AM and 2:59 PM!"
 
 
 
@@ -238,7 +253,7 @@ itemCommandEntries:
     consoleCommands:
       - "cmd sudo <player> commandpanel_menugui"
     key: "NAVIGATOR"
-    name: "&dServer navigator"
+    name: "&dServer Navigator"
     item: "COMPASS"
     glowing: true
     lore:

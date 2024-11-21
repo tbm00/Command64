@@ -10,13 +10,16 @@ import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.ItemCmdEntry;
 import dev.tbm00.spigot.command64.model.JoinCmdEntry;
 import dev.tbm00.spigot.command64.model.RewardCmdEntry;
+import dev.tbm00.spigot.command64.model.CronTaskEntry;
 
 public class ConfigHandler {
     private final JavaPlugin javaPlugin;
+    private final List<CronTaskEntry> cronTaskEntries = new ArrayList<>();
     private final List<RewardCmdEntry> rewardCmdEntries = new ArrayList<>();
     private final List<CustomCmdEntry> customCmdEntries = new ArrayList<>();
     private final List<ItemCmdEntry> itemCmdEntries = new ArrayList<>();
     private final List<JoinCmdEntry> joinCmdEntries = new ArrayList<>();
+    private boolean cronEnabled;
     private boolean rewardsEnabled;
     private boolean itemEnabled;
     private boolean customEnabled;
@@ -31,6 +34,8 @@ public class ConfigHandler {
 
     public ConfigHandler(JavaPlugin javaPlugin) {
         this.javaPlugin = javaPlugin;
+        if (!loadCronConfig()) cronEnabled = false;
+        else cronEnabled = true;
         if (!loadRewardConfig()) rewardsEnabled = false;
         else rewardsEnabled = true;
         if (!loadItemConfig()) itemEnabled = false;
@@ -39,6 +44,30 @@ public class ConfigHandler {
         else customEnabled = true;
         if (!loadJoinConfig()) joinEnabled = false;
         else joinEnabled = true;
+    }
+
+    private boolean loadCronConfig() {
+        ConfigurationSection cronScheduleSec = javaPlugin.getConfig().getConfigurationSection("cronSchedule");
+        if (cronScheduleSec == null || !cronScheduleSec.getBoolean("enabled")) return false;
+        List<String> taskEntries = cronScheduleSec.getStringList("taskEntries");
+
+        for (String entry : taskEntries) {
+            String[] parts = entry.split("\\s+", 6);
+            if (parts.length < 6) {
+                javaPlugin.getLogger().warning("Error: Poorly defined cronTaskEntry: " + entry);
+                continue;
+            }
+
+            String timing = String.join(" ", parts[0], parts[1], parts[2], parts[3], parts[4]);
+            String consoleCommand = parts[5];
+
+            if (timing != null && consoleCommand != null) {
+                CronTaskEntry taskEntry = new CronTaskEntry(timing, consoleCommand);
+                cronTaskEntries.add(taskEntry);
+                javaPlugin.getLogger().info("Loaded cronTaskEntry: " + timing + " " + consoleCommand);
+            } else
+                javaPlugin.getLogger().warning("Error: Poorly defined cronTaskEntry: " + entry);
+        } return true;
     }
 
     private boolean loadRewardConfig() {
@@ -181,7 +210,15 @@ public class ConfigHandler {
     public List<RewardCmdEntry> getRewardCmdEntries() {
         return rewardCmdEntries;
     }
+
+    public List<CronTaskEntry> getCronTaskEntries() {
+        return cronTaskEntries;
+    }
     
+    public boolean isCronEnabled() {
+        return cronEnabled;
+    }
+
     public boolean isRewardsEnabled() {
         return rewardsEnabled;
     }
