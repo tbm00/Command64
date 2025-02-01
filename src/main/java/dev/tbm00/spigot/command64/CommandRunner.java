@@ -1,9 +1,11 @@
 package dev.tbm00.spigot.command64;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,9 +16,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import net.md_5.bungee.api.chat.TextComponent;
+
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.DelayedTask;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandRunner {
     private final JavaPlugin javaPlugin;
@@ -135,6 +138,9 @@ public class CommandRunner {
         return true;
     }
 
+    // args[0] = custom command
+    // args[1] = configurable [argument]
+    // args[2] = configurable [argument2]
     public boolean runCustomCommand(CustomCmdEntry entry, CommandSender sender, String[] args) {
         List<String> consoleCmds = entry.getConsoleCommands();
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
@@ -151,7 +157,7 @@ public class CommandRunner {
             if (checkPlayer.equalsIgnoreCase("SENDER"))
                 target = (Player) sender;
             else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
-                target = javaPlugin.getServer().getPlayer(args[3]);
+                target = javaPlugin.getServer().getPlayer(args[1]);
             else {
                 sendMessage(sender, ChatColor.RED + "Custom command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
                 return false;
@@ -176,6 +182,7 @@ public class CommandRunner {
     // args[1] = tick wait
     // args[2] = custom command
     // args[3] = configurable [argument]
+    // args[4] = configurable [argument2]
     public boolean runDelayedCommand(CustomCmdEntry entry, CommandSender sender, String[] args) {
         List<String> consoleCmds = entry.getConsoleCommands();
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
@@ -226,8 +233,10 @@ public class CommandRunner {
     }
 
     private void runConsoleCmds(List<String> consoleCmds, String senderName, String argument, String argument2) {
+        String randomPlayer = getRandomPlayer();
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", senderName);
+            consoleCmd = consoleCmd.replace("<random_player>", randomPlayer);
 
             if (argument2!=null && argument!=null) {
                 consoleCmd = consoleCmd.replace("<argument>", argument);
@@ -246,5 +255,17 @@ public class CommandRunner {
     private void sendMessage(CommandSender target, String string) {
         if (!string.isBlank())
             target.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', prefix + string)));
+    }
+    
+    private String getRandomPlayer() {
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+        if (players.isEmpty()) return "Notch"; //return null; 
+        int randomIndex = new Random().nextInt(players.size());
+        int currentIndex = 0;
+        for (Player p : players) {
+            if (currentIndex == randomIndex) return p.getName();
+            currentIndex++;
+        }
+        return "Notch"; //return null; 
     }
 }

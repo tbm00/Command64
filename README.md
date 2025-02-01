@@ -35,7 +35,7 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 
 ## Default Config
 ```
-# Command64 v1.2.0 by @tbm00
+# Command64 v1.2.1 by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, all modules are disabled.
@@ -155,6 +155,7 @@ joinCommandEntries:
 #
 # Optional Arguments:
 # <player> == player who used the command
+# <random_player> == random online player
 # <argument> == string included as running command's argument (underscores DON'T convert to spaces)
 # <argument2> == string included as running command's argument (underscores convert to spaces)
 # -------------------------------------------------------------------------------------- #
@@ -231,6 +232,13 @@ customCommandEntries:
       - "mm mobs spawn BossMinion -t world,-673,46,722"
       - "mm mobs spawn BossMinion -t world,-677,52,727"
       - "mm mobs spawn BossMinion -t world,-667,52,726"
+  '8': # Intended Usage "/cmd reward-random-crate"
+    enabled: false
+    usePerm: "command64.admin"
+    usePermValue: true
+    customCommand: "reward-random-crate"
+    consoleCommands:
+      - "cmd reward cratekey <random_player>"
   # Add/remove entries as needed
 
 
