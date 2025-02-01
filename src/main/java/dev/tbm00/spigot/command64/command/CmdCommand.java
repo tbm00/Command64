@@ -118,11 +118,11 @@ public class CmdCommand implements TabExecutor {
             if (sender.hasPermission(entry.getPerm()) != entry.getPermValue()) 
                 continue;
             else if (args[0].equalsIgnoreCase("-d") && args[2].equalsIgnoreCase(entry.getPlayerCommand())) {
-                if (cmdRunner.runDelayedCommand(entry.getConsoleCommands(), sender, entry, args))
+                if (cmdRunner.runDelayedCommand(entry, sender, args))
                     return true;
                 else return false;
             } else if (args[0].equalsIgnoreCase(entry.getPlayerCommand())) {
-                if (cmdRunner.runCustomCommand(entry.getConsoleCommands(), sender, args))
+                if (cmdRunner.runCustomCommand(entry, sender, args))
                     return true;
                 else return false;
             }

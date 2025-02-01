@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.DelayedTask;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandRunner {
     private final JavaPlugin javaPlugin;
@@ -31,7 +32,6 @@ public class CommandRunner {
 
     public boolean runJoinCommand(List<String> consoleCmds, Player player, long tickDelay) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
-
         String name = player.getName();
 
         Bukkit.getScheduler().runTaskLaterAsynchronously(javaPlugin, () -> {
@@ -46,7 +46,6 @@ public class CommandRunner {
             Bukkit.getScheduler().runTask(javaPlugin, () -> {
                 for (String processedCmd : processedCmds) {
                     javaPlugin.getLogger().info(name + " triggered join command: " + processedCmd);
-
                     Bukkit.dispatchCommand(console, processedCmd);
                 }
             });
@@ -63,18 +62,19 @@ public class CommandRunner {
             cmd = cmd.replace("_", " ");
             cmd = cmd.replace("<me>", sender.getName());
         } else { 
-            sender.sendMessage(prefix + ChatColor.RED + "Sudo requires a command sender and a command.");
+            sendMessage(sender, ChatColor.RED + "Sudo requires a command sender and a command.");
             if (sender.hasPermission("command64.sudo.console")) {
-                sender.sendMessage(ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say_hello_world");
-                sender.sendMessage(ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say_<me>_says_hello");
+                sendMessage(sender, ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say_hello_world");
+                sendMessage(sender, ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say_<me>_says_hello");
             } else if (sender.hasPermission("command64.sudo.player")) {
-                sender.sendMessage(ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say_<me>_says_hello");
-                sender.sendMessage(ChatColor.WHITE + "Ex Usage: /cmd sudo Notch pay_Steve_10000");
-                sender.sendMessage(ChatColor.WHITE + "Ex Usage: /cmd sudo Notch pay_<me>_10000");
+                sendMessage(sender, ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say_<me>_says_hello");
+                sendMessage(sender, ChatColor.WHITE + "Ex Usage: /cmd sudo Notch pay_Steve_10000");
+                sendMessage(sender, ChatColor.WHITE + "Ex Usage: /cmd sudo Notch pay_<me>_10000");
             }
             return false;
         }
 
+        // get target
         CommandSender target = null;
         if (targetName.equalsIgnoreCase("CONSOLE") || targetName.equalsIgnoreCase("_CONSOLE_")) {
             if (!sender.hasPermission("command64.sudo.console")) return false;
@@ -82,16 +82,13 @@ public class CommandRunner {
         } else {
             if (!sender.hasPermission("command64.sudo.player")) return false; 
             target = javaPlugin.getServer().getPlayer(targetName);
-        }
-
-        if (target==null) {
-            sender.sendMessage(prefix + ChatColor.RED + "Couldn't find target: " + target);
+        } if (target==null) {
+            sendMessage(sender, ChatColor.RED + "Couldn't find target: " + target);
             return false;
         }
 
         javaPlugin.getLogger().info(sender.getName() + " triggered sudo command: <"+targetName+"> " + cmd);
-        sender.sendMessage(prefix + ChatColor.YELLOW + "Running sudo command: " + ChatColor.WHITE + "<"+targetName+"> " + cmd);
-
+        sendMessage(sender, ChatColor.YELLOW + "Running sudo command: " + ChatColor.WHITE + "<"+targetName+"> " + cmd);
         Bukkit.dispatchCommand(target, cmd);
         return true;
     }
@@ -100,9 +97,7 @@ public class CommandRunner {
         if (consoleCmd == null || consoleCmd.isEmpty()) return false;
         
         javaPlugin.getLogger().info("CronSchedule triggered a taskEntry: " + timing + " " + consoleCmd);
-
         Bukkit.dispatchCommand(console, consoleCmd);
-
         return true;
     }
 
@@ -115,7 +110,6 @@ public class CommandRunner {
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", name);
             javaPlugin.getLogger().info(name + " triggered item command: " + consoleCmd);
-
             Bukkit.dispatchCommand(console, consoleCmd);
         }
         return true;
@@ -141,32 +135,40 @@ public class CommandRunner {
         return true;
     }
 
-    public boolean runCustomCommand(List<String> consoleCmds, CommandSender sender, String[] args) {
+    public boolean runCustomCommand(CustomCmdEntry entry, CommandSender sender, String[] args) {
+        List<String> consoleCmds = entry.getConsoleCommands();
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
-        String argument = null, argument2 = null;
-        if (args.length>1) argument = args[1];
-        if (args.length>2) argument2 = args[2];
+        String senderName = sender.getName();
+        javaPlugin.getLogger().info(senderName + " triggered a customCmdEntry's consoleCommands...");
+        sendMessage(sender, ChatColor.YELLOW + "Running custom command...");
 
-        String name = sender.getName();
-        javaPlugin.getLogger().info(name + " triggered a customCmdEntry's consoleCommands...");
-        sender.sendMessage(prefix + ChatColor.YELLOW + "Running custom command...");
+        if (entry.getCheckInv()) {
+            String checkPlayer = entry.getCheckPlayer();
+            Player target = null;
 
-        for (String consoleCmd : consoleCmds) {
-            consoleCmd = consoleCmd.replace("<player>", name);
+            // get target
+            if (checkPlayer.equalsIgnoreCase("SENDER"))
+                target = (Player) sender;
+            else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
+                target = javaPlugin.getServer().getPlayer(args[3]);
+            else {
+                sendMessage(sender, ChatColor.RED + "Custom command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                return false;
+            } if (target==null) {
+                sendMessage(sender, ChatColor.RED + "Custom command failed because " + target + " is null... Aborting!");
+                return false;
+            }
 
-            if (args.length==2 && argument !=null) {
-                consoleCmd = consoleCmd.replace("<argument>", argument);
-                javaPlugin.getLogger().info(name + " triggered custom command: <"+argument+"> " + consoleCmd);
-            } else if (args.length==3 && argument !=null && argument2 !=null) {
-                consoleCmd = consoleCmd.replace("<argument>", argument);
-                argument2 = argument2.replace("_", " ");
-                consoleCmd = consoleCmd.replace("<argument2>", argument2);
-                javaPlugin.getLogger().info(name + " triggered custom command: <"+argument+":"+argument2+"> " + consoleCmd);
-            } else javaPlugin.getLogger().info(name + " triggered custom command: " + consoleCmd);
-
-            Bukkit.dispatchCommand(console, consoleCmd);
+            // if target doesnt have inv space, run backup commands
+            List<String> bkupConsoleCommands = entry.getBkupConsoleCommands();
+            if ((target.getInventory().firstEmpty() == -1)) {
+                sendMessage(sender, ChatColor.YELLOW + "Custom command failed because " + target.getName() + " has no inv space... Running backup command(s) if any...");
+                runConsoleCmds(bkupConsoleCommands, senderName, args[1], args[2]);
+                return true;
+            }
         }
+        runConsoleCmds(consoleCmds, senderName, args[1], args[2]);
         return true;
     }
 
@@ -174,7 +176,8 @@ public class CommandRunner {
     // args[1] = tick wait
     // args[2] = custom command
     // args[3] = configurable [argument]
-    public boolean runDelayedCommand(List<String> consoleCmds, CommandSender sender, CustomCmdEntry entry, String[] args) {
+    public boolean runDelayedCommand(CustomCmdEntry entry, CommandSender sender, String[] args) {
+        List<String> consoleCmds = entry.getConsoleCommands();
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = sender.getName();
@@ -182,7 +185,7 @@ public class CommandRunner {
         DelayedTask delayedTask = new DelayedTask(entry, args);
 
         javaPlugin.getLogger().info(name + " triggered a customCmdEntry's consoleCommands... (delayed " + tickDelay + " ticks)");
-        sender.sendMessage(prefix + ChatColor.YELLOW + "Running delayed custom command in " + tickDelay + " ticks...");
+        sendMessage(sender, ChatColor.YELLOW + "Running delayed custom command in " + tickDelay + " ticks...");
         
         BukkitTask bukkitTask = new BukkitRunnable() {
             @Override
@@ -191,63 +194,57 @@ public class CommandRunner {
                     String checkPlayer = entry.getCheckPlayer();
                     Player target = null;
 
+                    // get target
                     if (checkPlayer.equalsIgnoreCase("SENDER"))
                         target = (Player) sender;
                     else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
                         target = javaPlugin.getServer().getPlayer(args[3]);
                     else {
-                        javaPlugin.getLogger().info(name + "'s delayed command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
-                        sender.sendMessage(prefix + ChatColor.RED + "Delayed command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                        sendMessage(sender, ChatColor.RED + "Delayed command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                        return;
+                    } if (target==null) {
+                        sendMessage(sender, ChatColor.RED + "Delayed command failed because " + target + " is null... Aborting!");
                         return;
                     }
 
-                    if (target==null) {
-                        javaPlugin.getLogger().info(name + "'s delayed command failed because " + target + " is null... Aborting!");
-                        sender.sendMessage(prefix + ChatColor.RED + "Delayed command failed because " + target + " is null... Aborting!");
-                        return;
-                    }
-
-                    // check for space
+                    // if target doesnt have inv space, run backup commands
                     List<String> bkupConsoleCommands = entry.getBkupConsoleCommands();
                     if ((target.getInventory().firstEmpty() == -1)) {
-                        sender.sendMessage(prefix + ChatColor.YELLOW + "Delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if any...");
-                        for (String consoleCmd : bkupConsoleCommands) {
-                            consoleCmd = consoleCmd.replace("<player>", name);
-
-                            if (args.length==4) {
-                                consoleCmd = consoleCmd.replace("<argument>", args[3]);
-                                javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: <"+args[3]+"> " + consoleCmd);
-                            } else if (args.length==5) {
-                                consoleCmd = consoleCmd.replace("<argument>", args[3]);
-                                args[4] = args[4].replace("_", " ");
-                                consoleCmd = consoleCmd.replace("<argument2>", args[4]);
-                                javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: <"+args[3]+":"+args[4]+"> " + consoleCmd);
-                            } else javaPlugin.getLogger().info(name + " triggered delayed custom command bkup command: " + consoleCmd);
-                            
-                            Bukkit.dispatchCommand(console, consoleCmd);
-                        } pendingTasks.remove(delayedTask);
+                        sendMessage(sender, ChatColor.YELLOW + "Delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if any...");
+                        runConsoleCmds(bkupConsoleCommands, name, args[3], args[4]);
+                        pendingTasks.remove(delayedTask);
                         return;
                     }
                 }
-                for (String consoleCmd : consoleCmds) {
-                    consoleCmd = consoleCmd.replace("<player>", name);
-
-                    if (args.length==4) {
-                        consoleCmd = consoleCmd.replace("<argument>", args[3]);
-                        javaPlugin.getLogger().info(name + " triggered delayed custom command command: <"+args[3]+"> " + consoleCmd);
-                    } else if (args.length==5) {
-                        consoleCmd = consoleCmd.replace("<argument>", args[3]);
-                        args[4] = args[4].replace("_", " ");
-                        consoleCmd = consoleCmd.replace("<argument2>", args[4]);
-                        javaPlugin.getLogger().info(name + " triggered delayed custom command command: <"+args[3]+":"+args[4]+"> " + consoleCmd);
-                    } else javaPlugin.getLogger().info(name + " triggered delayed custom command command: " + consoleCmd);
-                    
-                    Bukkit.dispatchCommand(console, consoleCmd);
-                } pendingTasks.remove(delayedTask);
+                runConsoleCmds(consoleCmds, name, args[3], args[4]);
+                pendingTasks.remove(delayedTask);
             }
         }.runTaskLater(javaPlugin, tickDelay);
 
         pendingTasks.put(delayedTask, bukkitTask);
         return true;
+    }
+
+    private void runConsoleCmds(List<String> consoleCmds, String senderName, String argument, String argument2) {
+        for (String consoleCmd : consoleCmds) {
+            consoleCmd = consoleCmd.replace("<player>", senderName);
+
+            if (argument2!=null && argument!=null) {
+                consoleCmd = consoleCmd.replace("<argument>", argument);
+                argument2 = argument2.replace("_", " ");
+                consoleCmd = consoleCmd.replace("<argument2>", argument2);
+                javaPlugin.getLogger().info(senderName + " triggered console command: <"+argument+":"+argument2+"> " + consoleCmd);
+            } else if (argument!=null) {
+                consoleCmd = consoleCmd.replace("<argument>", argument);
+                javaPlugin.getLogger().info(senderName + " triggered console command: <"+argument+"> " + consoleCmd);
+            } else javaPlugin.getLogger().info(senderName + " triggered console command: " + consoleCmd);
+            
+            Bukkit.dispatchCommand(console, consoleCmd);
+        }
+    }
+
+    private void sendMessage(CommandSender target, String string) {
+        if (!string.isBlank())
+            target.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', prefix + string)));
     }
 }
