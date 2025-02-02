@@ -146,6 +146,9 @@ public class CommandRunner {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String senderName = sender.getName();
+        String argument = args.length > 1 ? args[1] : "";
+        String argument2 = args.length > 2 ? args[2] : "";
+        
         javaPlugin.getLogger().info(senderName + " triggered a customCmdEntry's consoleCommands...");
         sendMessage(sender, ChatColor.YELLOW + "Running custom command...");
 
@@ -157,7 +160,7 @@ public class CommandRunner {
             if (checkPlayer.equalsIgnoreCase("SENDER"))
                 target = (Player) sender;
             else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
-                target = javaPlugin.getServer().getPlayer(args[1]);
+                target = javaPlugin.getServer().getPlayer(argument);
             else {
                 sendMessage(sender, ChatColor.RED + "Custom command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
                 return false;
@@ -170,11 +173,11 @@ public class CommandRunner {
             List<String> bkupConsoleCommands = entry.getBkupConsoleCommands();
             if ((target.getInventory().firstEmpty() == -1)) {
                 sendMessage(sender, ChatColor.YELLOW + "Custom command failed because " + target.getName() + " has no inv space... Running backup command(s) if any...");
-                runConsoleCmds(bkupConsoleCommands, senderName, args[1], args[2]);
+                runConsoleCmds(bkupConsoleCommands, senderName, argument, argument2);
                 return true;
             }
         }
-        runConsoleCmds(consoleCmds, senderName, args[1], args[2]);
+        runConsoleCmds(consoleCmds, senderName, argument, argument2);
         return true;
     }
 
@@ -187,11 +190,19 @@ public class CommandRunner {
         List<String> consoleCmds = entry.getConsoleCommands();
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
-        String name = sender.getName();
-        int tickDelay = Integer.parseInt(args[1]);
+        String senderName = sender.getName();
+        String argument = args.length > 3 ? args[3] : "";
+        String argument2 = args.length > 4 ? args[4] : "";
+        int tickDelay;
+        try {
+            tickDelay = Integer.parseInt(args[1]);
+        } catch (NumberFormatException e) {
+            sendMessage(sender, ChatColor.RED + "Invalid tick delay: " + args[1]);
+            return false;
+        }
         DelayedTask delayedTask = new DelayedTask(entry, args);
 
-        javaPlugin.getLogger().info(name + " triggered a customCmdEntry's consoleCommands... (delayed " + tickDelay + " ticks)");
+        javaPlugin.getLogger().info(senderName + " triggered a customCmdEntry's consoleCommands... (delayed " + tickDelay + " ticks)");
         sendMessage(sender, ChatColor.YELLOW + "Running delayed custom command in " + tickDelay + " ticks...");
         
         BukkitTask bukkitTask = new BukkitRunnable() {
@@ -205,7 +216,7 @@ public class CommandRunner {
                     if (checkPlayer.equalsIgnoreCase("SENDER"))
                         target = (Player) sender;
                     else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
-                        target = javaPlugin.getServer().getPlayer(args[3]);
+                        target = javaPlugin.getServer().getPlayer(argument);
                     else {
                         sendMessage(sender, ChatColor.RED + "Delayed command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
                         return;
@@ -218,12 +229,12 @@ public class CommandRunner {
                     List<String> bkupConsoleCommands = entry.getBkupConsoleCommands();
                     if ((target.getInventory().firstEmpty() == -1)) {
                         sendMessage(sender, ChatColor.YELLOW + "Delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if any...");
-                        runConsoleCmds(bkupConsoleCommands, name, args[3], args[4]);
+                        runConsoleCmds(bkupConsoleCommands, senderName, argument, argument2);
                         pendingTasks.remove(delayedTask);
                         return;
                     }
                 }
-                runConsoleCmds(consoleCmds, name, args[3], args[4]);
+                runConsoleCmds(consoleCmds, senderName, argument, argument2);
                 pendingTasks.remove(delayedTask);
             }
         }.runTaskLater(javaPlugin, tickDelay);
@@ -238,12 +249,12 @@ public class CommandRunner {
             consoleCmd = consoleCmd.replace("<player>", senderName);
             consoleCmd = consoleCmd.replace("<random_player>", randomPlayer);
 
-            if (argument2!=null && argument!=null) {
+            if (!argument.isEmpty() && !argument2.isEmpty()) {
                 consoleCmd = consoleCmd.replace("<argument>", argument);
                 argument2 = argument2.replace("_", " ");
                 consoleCmd = consoleCmd.replace("<argument2>", argument2);
                 javaPlugin.getLogger().info(senderName + " triggered console command: <"+argument+":"+argument2+"> " + consoleCmd);
-            } else if (argument!=null) {
+            } else if (!argument.isEmpty()) {
                 consoleCmd = consoleCmd.replace("<argument>", argument);
                 javaPlugin.getLogger().info(senderName + " triggered console command: <"+argument+"> " + consoleCmd);
             } else javaPlugin.getLogger().info(senderName + " triggered console command: " + consoleCmd);
