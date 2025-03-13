@@ -112,6 +112,8 @@ Desktop.ini
 # Compiled class file
 *.class
 
+logo.png
+
 # Log file
 *.log
 
