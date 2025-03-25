@@ -61,7 +61,7 @@ public class PlayerConnection implements Listener {
                     continue;
                 
                 if (entry.getCheckNewbie()) {
-                    if (!isNewbie) {
+                    if (isNewbie) {
                         if (!cmdRunner.runJoinCommand(entry.getCheckNewbieConsoleCommands(), player, entry.getTickDelay(), "Newbie-Backup "))
                             javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for joinCmdEntry's bkup commands: " + entry.toString());
                         continue;

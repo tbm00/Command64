@@ -108,12 +108,13 @@ rewardSystem:
 #   connects to the server.
 #
 # You can add an firstJoinCheck to any customCommandEntry, that confirms player who joined
-#   has not joined before running the consoleCommands. If they have, any defined backup commands 
-#   will run. Use this module on any joinCommandEntries:
-#    firstJoinCheck:
-#      enabled: true
-#      isFirstJoinConsoleCommands:
-#        - "say <argument> joined for the first time!"
+#   is not joining for the first time before running the consoleCommands. If they have not,
+#   are joining for the first time, any defined backup commands will run. 
+#   Use this module on any joinCommandEntries:
+#     firstJoinCheck:
+#       enabled: true
+#       isFirstJoinConsoleCommands:
+#         - "say <argument> joined for the first time!"
 #
 # Optional Argument:
 # <player> == player who joined
@@ -165,19 +166,19 @@ joinCommandEntries:
 # You can add an invCheck to any customCommandEntry, that confirms ARGUMENT or SENDER has
 #   one spot avaliable in their inventory before running the consoleCommands. If they don't,
 #   any defined backup commands will run. Use this module on any customCommandEntry:
-#    invCheck:
-#      enabled: true
-#      checkOnPlayer: "ARGUMENT"
-#      ifNoSpaceConsoleCommands:
-#        - "msg <argument> &4You do not have space in your inventory..."
+#     invCheck:
+#       enabled: true
+#       checkOnPlayer: "ARGUMENT"
+#       ifNoSpaceConsoleCommands:
+#         - "msg <argument> &4You do not have space in your inventory..."
 # You can add an onlineCheck to any customCommandEntry, that confirms ARGUMENT or SENDER is
 #   online before running the consoleCommands. If they are not, any defined backup commands 
 #   will run. Use this module on any customCommandEntry:
-#    onlineCheck:
-#      enabled: true
-#      checkOnPlayer: "ARGUMENT"
-#      ifNotOnlineConsoleCommands:
-#        - "msg Console <argument> is not online!"
+#     onlineCheck:
+#       enabled: true
+#       checkOnPlayer: "ARGUMENT"
+#       ifNotOnlineConsoleCommands:
+#         - "msg Console <argument> is not online!"
 #
 # Optional Arguments:
 # <player> == player who used the command
