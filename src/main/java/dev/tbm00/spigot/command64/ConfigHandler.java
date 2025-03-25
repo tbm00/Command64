@@ -141,12 +141,16 @@ public class ConfigHandler {
             Boolean usePermValue = customCmdEntry.contains("") ? customCmdEntry.getBoolean("usePermValue") : null;
             String playerCommand = customCmdEntry.contains("") ? customCmdEntry.getString("customCommand") : null;
             List<String> consoleCommands = customCmdEntry.contains("") ? customCmdEntry.getStringList("consoleCommands") : null;
-            Boolean checkInv = customCmdEntry.contains("") ? customCmdEntry.getBoolean("invCheck.checkIfSpaceBeforeRun") : false;
-            String checkPlayer = customCmdEntry.contains("") ? customCmdEntry.getString("invCheck.checkOnPlayer") : "";
-            List<String> bkupConsoleCommands = customCmdEntry.contains("") ? customCmdEntry.getStringList("invCheck.ifNoSpaceConsoleCommands") : null;
+            Boolean checkInv = customCmdEntry.contains("") ? customCmdEntry.getBoolean("invCheck.enabled") : 
+                    (customCmdEntry.contains("") ? customCmdEntry.getBoolean("invCheck.checkIfSpaceBeforeRun") : false);
+            String checkInvPlayer = customCmdEntry.contains("") ? customCmdEntry.getString("invCheck.checkOnPlayer") : "";
+            List<String> checkInvConsoleCommands = customCmdEntry.contains("") ? customCmdEntry.getStringList("invCheck.ifNoSpaceConsoleCommands") : null;
+            Boolean checkOnline = customCmdEntry.contains("") ? customCmdEntry.getBoolean("onlineCheck.enabled") : false;
+            String checkOnlinePlayer = customCmdEntry.contains("") ? customCmdEntry.getString("onlineCheck.checkOnPlayer") : "";
+            List<String> checkOnlineConsoleCommands = customCmdEntry.contains("") ? customCmdEntry.getStringList("onlineCheck.ifNotOnlineConsoleCommands") : null;
 
-            if (usePerm != null && playerCommand != null && (consoleCommands != null && !consoleCommands.isEmpty()) || (bkupConsoleCommands != null && !bkupConsoleCommands.isEmpty())) {
-                CustomCmdEntry entry = new CustomCmdEntry(usePerm, usePermValue, playerCommand, consoleCommands, checkInv, checkPlayer, bkupConsoleCommands);
+            if (usePerm != null && playerCommand != null && (consoleCommands != null && !consoleCommands.isEmpty())) {
+                CustomCmdEntry entry = new CustomCmdEntry(usePerm, usePermValue, playerCommand, consoleCommands, checkInv, checkInvPlayer, checkInvConsoleCommands, checkOnline, checkOnlinePlayer, checkOnlineConsoleCommands);
                 customCmdEntries.add(entry);
                 javaPlugin.getLogger().info("Loaded customCmdEntry: " + playerCommand);
             } else 
@@ -167,9 +171,11 @@ public class ConfigHandler {
             Boolean checkPermValue = joinCmdEntry.getBoolean("checkPermValue");
             List<String> consoleCommands = joinCmdEntry.getStringList("consoleCommands");
             Long tickDelay = joinCmdEntry.getLong("tickDelay");
+            Boolean checkNewbie = joinCmdEntry.contains("") ? joinCmdEntry.getBoolean("firstJoinCheck.enabled") : false;
+            List<String> checkNewbieConsoleCommands = joinCmdEntry.contains("") ? joinCmdEntry.getStringList("firstJoinCheck.isFirstJoinConsoleCommands") : null;
 
             if (checkPerm != null && consoleCommands != null && !consoleCommands.isEmpty() && tickDelay != null) {
-                JoinCmdEntry entry = new JoinCmdEntry(checkPerm, checkPermValue, consoleCommands, tickDelay);
+                JoinCmdEntry entry = new JoinCmdEntry(checkPerm, checkPermValue, consoleCommands, tickDelay, checkNewbie, checkNewbieConsoleCommands);
                 joinCmdEntries.add(entry);
                 javaPlugin.getLogger().info("Loaded joinCmdEntry: " + checkPerm + " " + checkPermValue + " " + consoleCommands + " " + tickDelay);
             } else

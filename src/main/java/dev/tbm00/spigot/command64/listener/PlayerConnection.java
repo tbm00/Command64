@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,10 +40,35 @@ public class PlayerConnection implements Listener {
         Player player = event.getPlayer();
 
         if (configHandler.isJoinEnabled()) {
+            // checking players' playtime
+            int current_ticks=0;
+            boolean isNewbie=false;
+            try {
+                current_ticks = player.getStatistic(Statistic.valueOf("PLAY_ONE_MINUTE"));
+            } catch (Exception e) {
+                try {
+                    current_ticks = player.getStatistic(Statistic.valueOf("PLAY_ONE_TICK"));
+                } catch (Exception e2) {
+                    e.printStackTrace();
+                    e2.printStackTrace();
+                }
+            } if (current_ticks <= 5) {
+                isNewbie=true;
+            } 
+
             for (JoinCmdEntry entry : joinCmdEntries) {
                 if (player.hasPermission(entry.getPerm()) != entry.getPermValue())
                     continue;
-                if (!cmdRunner.runJoinCommand(entry.getConsoleCommands(), player, entry.getTickDelay()))
+                
+                if (entry.getCheckNewbie()) {
+                    if (!isNewbie) {
+                        if (!cmdRunner.runJoinCommand(entry.getCheckNewbieConsoleCommands(), player, entry.getTickDelay(), "Newbie-Backup "))
+                            javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for joinCmdEntry's bkup commands: " + entry.toString());
+                        continue;
+                    }
+                }
+
+                if (!cmdRunner.runJoinCommand(entry.getConsoleCommands(), player, entry.getTickDelay(), ""))
                     javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for joinCmdEntry: " + entry.toString());
             }
         }

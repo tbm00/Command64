@@ -8,17 +8,23 @@ public class CustomCmdEntry {
     private String playerCommand;
     private List<String> consoleCommands;
     private Boolean checkInv;
-    private String checkPlayer;
-    private List<String> bkupConsoleCommands;
+    private String checkInvPlayer;
+    private List<String> checkInvConsoleCommands;
+    private Boolean checkOnline;
+    private String checkOnlinePlayer;
+    private List<String> checkOnlineConsoleCommands;
 
-    public CustomCmdEntry(String perm, Boolean permValue, String playerCommand, List<String> consoleCommands, Boolean checkInv, String checkPlayer, List<String> bkupConsoleCommands) {
+    public CustomCmdEntry(String perm, Boolean permValue, String playerCommand, List<String> consoleCommands, Boolean checkInv, String checkInvPlayer, List<String> checkInvConsoleCommands, Boolean checkOnline, String checkOnlinePlayer, List<String> checkOnlineConsoleCommands) {
         this.perm = perm;
         this.permValue = permValue;
         this.playerCommand = playerCommand;
         this.consoleCommands = consoleCommands;
         this.checkInv = checkInv;
-        this.checkPlayer = checkPlayer;
-        this.bkupConsoleCommands = bkupConsoleCommands;
+        this.checkInvPlayer = checkInvPlayer;
+        this.checkInvConsoleCommands = checkInvConsoleCommands;
+        this.checkOnline = checkOnline;
+        this.checkOnlinePlayer = checkOnlinePlayer;
+        this.checkOnlineConsoleCommands = checkOnlineConsoleCommands;
     }
 
     public Boolean getPermValue() {
@@ -61,19 +67,43 @@ public class CustomCmdEntry {
         this.checkInv = checkInv;
     }
 
-    public String getCheckPlayer() {
-        return checkPlayer;
+    public String getCheckInvPlayer() {
+        return checkInvPlayer;
     }
 
-    public void getCheckPlayer(String checkPlayer) {
-        this.checkPlayer = checkPlayer;
+    public void getCheckInvPlayer(String checkInvPlayer) {
+        this.checkInvPlayer = checkInvPlayer;
     }
 
-    public List<String> getBkupConsoleCommands() {
-        return bkupConsoleCommands;
+    public List<String> getCheckInvConsoleCommands() {
+        return checkInvConsoleCommands;
     }
 
-    public void setBkupConsoleCommands(List<String> bkupConsoleCommands) {
-        this.bkupConsoleCommands = bkupConsoleCommands;
+    public void setCheckInvConsoleCommands(List<String> checkInvConsoleCommands) {
+        this.checkInvConsoleCommands = checkInvConsoleCommands;
+    }
+
+    public Boolean getCheckOnline() {
+        return checkOnline;
+    }
+
+    public void setCheckOnline(Boolean checkOnline) {
+        this.checkOnline = checkOnline;
+    }
+
+    public String getCheckOnlinePlayer() {
+        return checkOnlinePlayer;
+    }
+
+    public void getCheckOnlinePlayer(String checkOnlinePlayer) {
+        this.checkOnlinePlayer = checkOnlinePlayer;
+    }
+
+    public List<String> getCheckOnlineConsoleCommands() {
+        return checkOnlineConsoleCommands;
+    }
+
+    public void setCheckOnlineConsoleCommands(List<String> checkOnlineConsoleCommands) {
+        this.checkOnlineConsoleCommands = checkOnlineConsoleCommands;
     }
 }

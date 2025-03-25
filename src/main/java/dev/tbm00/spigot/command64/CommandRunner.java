@@ -33,14 +33,14 @@ public class CommandRunner {
         this.pendingTasks = new HashMap<>();
     }
 
-    public boolean runJoinCommand(List<String> consoleCmds, Player player, long tickDelay) {
+    public boolean runJoinCommand(List<String> consoleCmds, Player player, long tickDelay, String type) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
         String name = player.getName();
 
         Bukkit.getScheduler().runTaskLaterAsynchronously(javaPlugin, () -> {
             if (!player.isOnline()) return;
 
-            javaPlugin.getLogger().info(name + " triggered a joinCmdEntry's consoleCommands...");
+            javaPlugin.getLogger().info(name + " triggered a joinCmdEntry's "+type+"consoleCommands...");
 
             List<String> processedCmds = new ArrayList<>();
             for (String consoleCmd : consoleCmds)
@@ -152,8 +152,30 @@ public class CommandRunner {
         javaPlugin.getLogger().info(senderName + " triggered a customCmdEntry's consoleCommands...");
         sendMessage(sender, ChatColor.YELLOW + "Running custom command...");
 
+        if (entry.getCheckOnline()) {
+            String checkPlayer = entry.getCheckOnlinePlayer();
+            Player target = null;
+
+            // get target
+            if (checkPlayer.equalsIgnoreCase("SENDER"))
+                target = (Player) sender;
+            else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
+                target = javaPlugin.getServer().getPlayer(argument);
+            else {
+                sendMessage(sender, ChatColor.RED + "Custom command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                return false;
+            }
+
+            // if target isnt online, run backup commands
+            if (target==null || !target.isOnline()) {
+                sendMessage(sender, ChatColor.YELLOW + "Custom command failed because " + checkPlayer + " is not online... Running backup command(s) if any...");
+                runConsoleCmds(entry.getCheckOnlineConsoleCommands(), senderName, argument, argument2);
+                return true;
+            }
+        }
+
         if (entry.getCheckInv()) {
-            String checkPlayer = entry.getCheckPlayer();
+            String checkPlayer = entry.getCheckInvPlayer();
             Player target = null;
 
             // get target
@@ -170,10 +192,9 @@ public class CommandRunner {
             }
 
             // if target doesnt have inv space, run backup commands
-            List<String> bkupConsoleCommands = entry.getBkupConsoleCommands();
             if ((target.getInventory().firstEmpty() == -1)) {
                 sendMessage(sender, ChatColor.YELLOW + "Custom command failed because " + target.getName() + " has no inv space... Running backup command(s) if any...");
-                runConsoleCmds(bkupConsoleCommands, senderName, argument, argument2);
+                runConsoleCmds(entry.getCheckInvConsoleCommands(), senderName, argument, argument2);
                 return true;
             }
         }
@@ -209,7 +230,7 @@ public class CommandRunner {
             @Override
             public void run() {
                 if (entry.getCheckInv()) {
-                    String checkPlayer = entry.getCheckPlayer();
+                    String checkPlayer = entry.getCheckInvPlayer();
                     Player target = null;
 
                     // get target
@@ -226,7 +247,7 @@ public class CommandRunner {
                     }
 
                     // if target doesnt have inv space, run backup commands
-                    List<String> bkupConsoleCommands = entry.getBkupConsoleCommands();
+                    List<String> bkupConsoleCommands = entry.getCheckInvConsoleCommands();
                     if ((target.getInventory().firstEmpty() == -1)) {
                         sendMessage(sender, ChatColor.YELLOW + "Delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if any...");
                         runConsoleCmds(bkupConsoleCommands, senderName, argument, argument2);
