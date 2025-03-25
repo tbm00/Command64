@@ -58,19 +58,22 @@ public class Command64 extends JavaPlugin {
 
     public String getRandomPlayer() {
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
-        if (players.isEmpty()) return "Herobrine";
-        int randomIndex = new Random().nextInt(players.size());
-        int currentIndex = 0;
-        while (true) {
-            for (Player p : players) {
-                if (currentIndex == randomIndex && p.isOnline()) { 
-                    return p.getName();
-                };
-                currentIndex++;
-            }
-            if (players.isEmpty()) return "Herobrine";
+        if (players.isEmpty()) {
+            return "Herobrine";
         }
+    
+        int targetIndex = new Random().nextInt(players.size());
+        int i = 0;
+        for (Player player : players) {
+            if (i == targetIndex) {
+                return player.getName();
+            }
+            i++;
+        }
+    
+        return "Herobrine";
     }
+    
 
     @Override
     public void onDisable() {

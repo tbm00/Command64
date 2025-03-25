@@ -229,7 +229,14 @@ customCommandEntries:
     customCommand: "reward-random-crate"
     consoleCommands:
       - "cmd reward cratekey <random_player>"
-  '9': # Intended Usage "/cmd newbie-gift <argument>"
+  '9': # Intended Usage "/cmd tpr"
+    enabled: false
+    usePerm: "command64.mod"
+    usePermValue: true
+    customCommand: "tpr"
+    consoleCommands:
+      - "cmd sudo <player> tp_<random_player>"
+  '10': # Intended Usage "/cmd newbie-gift <argument>"
     enabled: false
     usePerm: "command64.admin"
     usePermValue: true
@@ -263,7 +270,7 @@ itemCommandEntries:
     enabled: false
     givePerm: "command64.give.navigator"
     givePermValue: true
-    usePerm: "commandpanel.panel.menugui"
+    usePerm: "group.default"
     usePermValue: true
     consoleCommands:
       - "cmd sudo <player> commandpanel_menugui"
@@ -287,4 +294,18 @@ itemCommandEntries:
     glowing: true
     lore:
       - "&cBreaks bedrock"
+  '3':
+    enabled: false
+    givePerm: "group.mod"
+    givePermValue: true
+    usePerm: "group.mod"
+    usePermValue: true
+    consoleCommands:
+      - "cmd sudo <player> cmd_tpr"
+    key: "NAVIGATOR"
+    name: "&4Player Teleporter"
+    item: "COMPASS"
+    glowing: true
+    lore:
+      - "&cTeleports you to a random player"
   # Add/remove entries as needed
