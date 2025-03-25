@@ -107,6 +107,14 @@ rewardSystem:
 # consoleCommands get triggered when a player (whose checkPerm==checkPermValue)
 #   connects to the server.
 #
+# You can add an firstJoinCheck to any customCommandEntry, that confirms player who joined
+#   has not joined before running the consoleCommands. If they have, any defined backup commands 
+#   will run. Use this module on any joinCommandEntries:
+#    firstJoinCheck:
+#      enabled: true
+#      isFirstJoinConsoleCommands:
+#        - "say <argument> joined for the first time!"
+#
 # Optional Argument:
 # <player> == player who joined
 # -------------------------------------------------------------------------------------- #
@@ -134,6 +142,16 @@ joinCommandEntries:
     consoleCommands:
       - "say <player>, why haven't you donated?"
       - "say Gimme yo money!"
+  '4':
+    enabled: false
+    checkPerm: "group.default"
+    checkPermValue: false
+    tickDelay: 1200
+    consoleCommands: []
+    firstJoinCheck:
+      enabled: true
+      isFirstJoinConsoleCommands:
+        - "cmd newbie-gift <player>"
   # Add/remove entries as needed
 
 
@@ -148,10 +166,18 @@ joinCommandEntries:
 #   one spot avaliable in their inventory before running the consoleCommands. If they don't,
 #   any defined backup commands will run. Use this module on any customCommandEntry:
 #    invCheck:
-#      checkIfSpaceBeforeRun: true
+#      enabled: true
 #      checkOnPlayer: "ARGUMENT"
 #      ifNoSpaceConsoleCommands:
 #        - "msg <argument> &4You do not have space in your inventory..."
+# You can add an onlineCheck to any customCommandEntry, that confirms ARGUMENT or SENDER is
+#   online before running the consoleCommands. If they are not, any defined backup commands 
+#   will run. Use this module on any customCommandEntry:
+#    onlineCheck:
+#      enabled: true
+#      checkOnPlayer: "ARGUMENT"
+#      ifNotOnlineConsoleCommands:
+#        - "msg Console <argument> is not online!"
 #
 # Optional Arguments:
 # <player> == player who used the command
@@ -200,7 +226,7 @@ customCommandEntries:
     consoleCommands:
       - "msg <player> <argument> has space for an item!"
     invCheck:
-      checkIfSpaceBeforeRun: true
+      enabled: true
       checkOnPlayer: "ARGUMENT"
       ifNoSpaceConsoleCommands:
         - "msg <player> <argument> has a full inventory! Checking again in 2 minutes..."
@@ -239,6 +265,23 @@ customCommandEntries:
     customCommand: "reward-random-crate"
     consoleCommands:
       - "cmd reward cratekey <random_player>"
+  '9': # Intended Usage "/cmd newbie-gift <argument>"
+    enabled: false
+    usePerm: "command64.admin"
+    usePermValue: true
+    customCommand: "newbie-gift"
+    consoleCommands:
+      - "crates givekey Crate <player>"
+    invCheck:
+      enabled: true
+      checkOnPlayer: "ARGUMENT"
+      ifNoSpaceConsoleCommands:
+        - "cmd reward cratekey <argument>"
+    onlineCheck:
+      enabled: true
+      checkOnPlayer: "ARGUMENT"
+      ifNotOnlineConsoleCommands:
+        - "cmd reward cratekey <argument>"
   # Add/remove entries as needed
 
 

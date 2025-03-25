@@ -189,7 +189,7 @@ customCommandEntries:
     consoleCommands:
       - "msg <player> <argument> has space for an item!"
     invCheck:
-      checkIfSpaceBeforeRun: true
+      enabled: true
       checkOnPlayer: "ARGUMENT"
       ifNoSpaceConsoleCommands:
         - "msg <player> <argument> has a full inventory! Checking again in 2 minutes..."
