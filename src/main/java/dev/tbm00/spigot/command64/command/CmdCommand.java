@@ -13,27 +13,28 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 
+import net.md_5.bungee.api.chat.TextComponent;
+
+import dev.tbm00.spigot.command64.Command64;
 import dev.tbm00.spigot.command64.ConfigHandler;
 import dev.tbm00.spigot.command64.CommandRunner;
 import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.ItemCmdEntry;
 import dev.tbm00.spigot.command64.model.RewardCmdEntry;
 import dev.tbm00.spigot.command64.reward.QueueManager;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class CmdCommand implements TabExecutor {
-    private final JavaPlugin javaPlugin;
+    private final Command64 javaPlugin;
     private final CommandRunner cmdRunner;
     private final ConfigHandler configHandler;
     private final QueueManager queueManager;
-    private final String prefix = ChatColor.DARK_GRAY + "[" + ChatColor.WHITE + "cmd" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
+    private final String prefix = ChatColor.DARK_GRAY + "[" + ChatColor.WHITE + "-" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
 
-    public CmdCommand(JavaPlugin javaPlugin, CommandRunner cmdRunner, ConfigHandler configHandler, QueueManager queueManager) {
+    public CmdCommand(Command64 javaPlugin, CommandRunner cmdRunner, ConfigHandler configHandler, QueueManager queueManager) {
         this.javaPlugin = javaPlugin;
         this.cmdRunner = cmdRunner;
         this.configHandler = configHandler;
@@ -81,7 +82,7 @@ public class CmdCommand implements TabExecutor {
             + ChatColor.WHITE + "/cmd give <itemKey> [player] [amount]" + ChatColor.GRAY + " Spawn custom item(s)\n"
             + ChatColor.WHITE + "/cmd <customCommand> [argument] [argument2]" + ChatColor.GRAY + " Run custom command w/ optional argument(s)\n"
             + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument] [argument2]" + ChatColor.GRAY + " Schedule delayed custom command w/ optional argument(s)\n"
-            + ChatColor.WHITE + "/cmd reward <rewardName> <player> [argument]" + ChatColor.GRAY + " Add reward to a player's queue w/ optional argument"
+            + ChatColor.WHITE + "/cmd reward <rewardName> <player>/random [argument]" + ChatColor.GRAY + " Add reward to a player's queue w/ optional argument"
             );
         return true;
     }
@@ -90,6 +91,9 @@ public class CmdCommand implements TabExecutor {
         for (RewardCmdEntry entry : configHandler.getRewardCmdEntries()) {
             if (args[1].equalsIgnoreCase(entry.getName())) {
                 String playerName = args[2];
+                if (playerName.equalsIgnoreCase("random")||playerName.equalsIgnoreCase("random_player")) {
+                    playerName = javaPlugin.getRandomPlayer();
+                }
                 String argument = null;
                 if (args.length>3) argument = args[3];
                 if (queueManager.enqueueReward(playerName, entry.getName(), argument)) {
@@ -182,7 +186,7 @@ public class CmdCommand implements TabExecutor {
         }
         if (quantity>1) item.setAmount(quantity);
         player.getInventory().addItem(item);
-        player.sendMessage(prefix + ChatColor.GREEN + "You have been given " + quantity + " " + entry.getKeyString());
+        player.sendMessage(prefix  + "You received " + ChatColor.GREEN + quantity + ChatColor.WHITE + " " + ChatColor.GREEN + entry.getName() + ChatColor.WHITE + "!");
         javaPlugin.getLogger().info(player.getName() + " has been given " + quantity + " " + entry.getKeyString());
     }
 

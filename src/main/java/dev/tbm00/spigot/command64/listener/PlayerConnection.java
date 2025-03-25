@@ -80,7 +80,8 @@ public class PlayerConnection implements Listener {
                 public void run() {
                     Player player = Bukkit.getPlayer(uuid);
                     if (player!=null && queueManager.getPlayersQueueSize(player.getName())>0) {
-                        player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getJoinMessage())));
+                        if (configHandler.getJoinMessage()!=null&& !configHandler.getJoinMessage().isBlank())
+                            player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getJoinMessage())));
                     }
                 }
             }.runTaskLater(javaPlugin, configHandler.getJoinMessageDelay());

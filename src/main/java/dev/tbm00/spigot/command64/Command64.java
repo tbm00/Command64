@@ -1,6 +1,11 @@
 package dev.tbm00.spigot.command64;
 
+import java.util.Collection;
+import java.util.Random;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -50,6 +55,18 @@ public class Command64 extends JavaPlugin {
 		for (String s : strings)
             getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + s);
 	}
+
+    public String getRandomPlayer() {
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+        if (players.isEmpty()) return "Notch"; //return null; 
+        int randomIndex = new Random().nextInt(players.size());
+        int currentIndex = 0;
+        for (Player p : players) {
+            if (currentIndex == randomIndex) return p.getName();
+            currentIndex++;
+        }
+        return "Notch"; //return null; 
+    }
 
     @Override
     public void onDisable() {

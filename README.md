@@ -7,8 +7,8 @@ Created by tbm00 for play.mc64.wtf.
 - **Simple, but Powerful** Use the 5 different entry types to create a variety of things from events to custom items. Use delays & checks to create chains or loops of commands that are initially triggered by a parent/root command, item, or player join(s). Or just use it for simpler means :D
 - **Cron Schedule** Schedule command(s) to be run during specific times and/or intervals!
 - **Sudo Commands** Run any command as someone else or the console.
-- **Join Commands** Run predefined command(s) when a player joins the server, with optional permission checks.
-- **Custom Commands** Run predefined command(s) when a player uses a custom command, with optional delays, permission checks, and inventory checks.
+- **Join Commands** Run predefined command(s) when a player joins the server, with optional permission checks & newbie checks.
+- **Custom Commands** Run predefined command(s) when a player uses a custom command, with optional delays, permission checks, online checks, inventory checks.
 - **Command Items** Run predefined command(s) when a player uses a custom item, with optional permission checks.
 - **Reward System** Let players redeem rewards FROM ANY PLUGIN when they want to, without losing items due to full inventory space.
 
@@ -23,7 +23,7 @@ Created by tbm00 for play.mc64.wtf.
 - `/cmd give <itemKey> [player] [amount]` Spawn custom item(s)
 - `/cmd <customCommand> [argument] [argument2]` Run custom command w/ optional argument(s)
 - `/cmd -d <tickDelay> <customCommand> [argument] [argument2]` Schedule delayed custom command w/ optional argument(s)
-- `/cmd reward <rewardName> <player> [argument]` Add reward to a player's queue w/ optional argument
+- `/cmd reward <rewardName> <player>/random [argument]` Add reward to a player's queue w/ optional argument
 - `/redeemreward` Redeem the reward at the top of your queue
 #### Permissions
 Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfilled for a player to use the respective feature. The only hardcoded permission nodes are:
@@ -89,12 +89,12 @@ rewardSystem:
     noInvSpaceMessage: "&8[&fRewards&8] &cYou don't have enough inventory space for your reward!"
     rewardedMessage: "&8[&fRewards&8] &aYou redeemed a reward!"
   rewardEntries:
-    '1': # Usage: `/cmd reward cratekey <player>`
+    '1': # Usage: `/cmd reward cratekey <player>/random` i.e. "/cmd reward cratekey Notch"
       name: "cratekey"
       consoleCommands:
-        - "crates givekey Crate <player>"
+        - "crates givekey Crate <player> <argument>"
       invCheck: true
-    '2': # Usage: `/cmd reward money <player> 1000`
+    '2': # Usage: `/cmd reward money <player>/random <quantity>` i.e. "/cmd reward money random 1000"
       name: "money"
       consoleCommands:
         - "eco give <player> <argument>"

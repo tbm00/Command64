@@ -31,7 +31,8 @@ public class RedeemCommand implements TabExecutor {
         Player player = (Player) sender;
 
         if (queueManager.getPlayersQueueSize(player.getName())<=0) {
-            player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getNoRewardMessage())));
+            if (configHandler.getNoRewardMessage()!=null&& !configHandler.getNoRewardMessage().isBlank())
+                player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getNoRewardMessage())));
             return false;
         }
 
@@ -39,15 +40,18 @@ public class RedeemCommand implements TabExecutor {
         // else run the first queued reward
         if ((player.getInventory().firstEmpty() == -1)) {
             if (queueManager.redeemReward(player.getName(), false)) {
-                player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getRewardedMessage())));
+                if (configHandler.getRewardedMessage()!=null&& !configHandler.getRewardedMessage().isBlank())
+                    player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getRewardedMessage())));
                 return true;
             } else {
-                player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getNoInvSpaceMessage())));
+                if (configHandler.getNoInvSpaceMessage()!=null&& !configHandler.getNoInvSpaceMessage().isBlank())
+                    player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getNoInvSpaceMessage())));
                 return true;
             }
         } else {
             if (queueManager.redeemReward(player.getName(), true)) {
-                player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getRewardedMessage())));
+                if (configHandler.getRewardedMessage()!=null&& !configHandler.getRewardedMessage().isBlank())
+                    player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getRewardedMessage())));
                 return true;
             } else {
                 return false;

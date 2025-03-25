@@ -1,18 +1,15 @@
 package dev.tbm00.spigot.command64;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -22,12 +19,12 @@ import dev.tbm00.spigot.command64.model.CustomCmdEntry;
 import dev.tbm00.spigot.command64.model.DelayedTask;
 
 public class CommandRunner {
-    private final JavaPlugin javaPlugin;
+    private final Command64 javaPlugin;
     private final ConsoleCommandSender console;
     private final Map<DelayedTask, BukkitTask> pendingTasks;
     private final String prefix = ChatColor.DARK_GRAY + "[" + ChatColor.WHITE + "cmd" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET;
 
-    public CommandRunner(JavaPlugin javaPlugin) {
+    public CommandRunner(Command64 javaPlugin) {
         this.javaPlugin = javaPlugin;
         this.console = Bukkit.getServer().getConsoleSender();
         this.pendingTasks = new HashMap<>();
@@ -265,7 +262,7 @@ public class CommandRunner {
     }
 
     private void runConsoleCmds(List<String> consoleCmds, String senderName, String argument, String argument2) {
-        String randomPlayer = getRandomPlayer();
+        String randomPlayer = javaPlugin.getRandomPlayer();
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", senderName);
             consoleCmd = consoleCmd.replace("<random_player>", randomPlayer);
@@ -288,16 +285,5 @@ public class CommandRunner {
         if (!string.isBlank())
             target.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', prefix + string)));
     }
-    
-    private String getRandomPlayer() {
-        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
-        if (players.isEmpty()) return "Notch"; //return null; 
-        int randomIndex = new Random().nextInt(players.size());
-        int currentIndex = 0;
-        for (Player p : players) {
-            if (currentIndex == randomIndex) return p.getName();
-            currentIndex++;
-        }
-        return "Notch"; //return null; 
-    }
+
 }
