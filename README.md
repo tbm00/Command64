@@ -94,10 +94,10 @@ rewardSystem:
     noInvSpaceMessage: "&8[&fRewards&8] &cYou don't have enough inventory space for your reward!"
     rewardedMessage: "&8[&fRewards&8] &aYou redeemed a reward!"
   rewardEntries:
-    '1': # Usage: `/cmd reward cratekey <player>/RANDOM_PLAYER` i.e. "/cmd reward cratekey Notch"
+    '1': # Usage: `/cmd reward cratekey <player>/RANDOM_PLAYER` i.e. "/cmd reward cratekey Notch 1"
       name: "cratekey"
       consoleCommands:
-        - "crates givekey Crate <player> <argument>"
+        - "crates givekey Crate <player>"
       invCheck: true
     '2': # Usage: `/cmd reward money <player>/RANDOM_PLAYER <quantity>` i.e. "/cmd reward money RANDOM_PLAYER 1000"
       name: "money"
