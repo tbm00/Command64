@@ -52,7 +52,7 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 #
 # Use https://crontab.guru/ for help.
 #
-# Optional Arguments:
+# Optional Argument:
 # <random_player> == random online player
 # -------------------------------------------------------------------------------------- #
 cronSchedule:
@@ -121,7 +121,7 @@ rewardSystem:
 #       isFirstJoinConsoleCommands:
 #         - "say <argument> joined for the first time!"
 #
-# Optional Argument:
+# Optional Arguments:
 # <player> == player who joined
 # <random_player> == random online player
 # -------------------------------------------------------------------------------------- #
@@ -309,7 +309,7 @@ customCommandEntries:
 # consoleCommands get triggered when a player (whose usePerm==userPermVaue)
 #   uses a custom item.
 #
-# Optional Argument:
+# Optional Arguments:
 # <player> == player who used the item
 # <random_player> == random online player
 # -------------------------------------------------------------------------------------- #
