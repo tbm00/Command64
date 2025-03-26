@@ -33,7 +33,7 @@ public class CommandRunner {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
         String name = player.getName();
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(javaPlugin, () -> {
+        Bukkit.getScheduler().runTaskLater(javaPlugin, () -> {
             if (!player.isOnline()) return;
 
             javaPlugin.getLogger().info(name + " triggered a joinCmdEntry's "+type+"consoleCommands...");
