@@ -57,7 +57,7 @@ public class QueueManager {
     public boolean enqueueReward(String playerName, String rewardName, String argument) {
         String stored = null; 
         if (argument!=null && !argument.isBlank())
-            stored = rewardName + ":" + argument;
+            stored = rewardName + ":" + argument.replace("+"," ");
         else stored = rewardName;
         
         synchronized (rewardQueues) {

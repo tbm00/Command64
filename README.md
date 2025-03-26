@@ -6,7 +6,7 @@ Created by tbm00 for play.mc64.wtf.
 ## Features
 - **Simple, but Powerful** Use the 5 different entry types to create a variety of things from events to custom items. Use delays & checks to create chains or loops of commands that are initially triggered by a parent/root command, item, or player join(s). Or just use it for simpler means :D
 - **Cron Schedule** Schedule command(s) to be run during specific times and/or intervals!
-- **Sudo Commands** Run any command as someone else or the console.
+- **Sudo Commands** Run any command as someone else, a random player, or the console.
 - **Join Commands** Run predefined command(s) when a player joins the server, with optional permission checks & newbie checks.
 - **Custom Commands** Run predefined command(s) when a player uses a custom command, with optional delays, permission checks, online checks, inventory checks.
 - **Command Items** Run predefined command(s) when a player uses a custom item, with optional permission checks.
@@ -19,11 +19,11 @@ Created by tbm00 for play.mc64.wtf.
 ## Commands & Permissions
 #### Commands
 - `/cmd help` Display the admin command list
-- `/cmd sudo CONSOLE/<player> <cmd>` Run command as someone else (underscores convert to spaces in cmd)
-- `/cmd give <itemKey> [player] [amount]` Spawn custom item(s)
-- `/cmd <customCommand> [argument] [argument2]` Run custom command w/ optional argument(s)
-- `/cmd -d <tickDelay> <customCommand> [argument] [argument2]` Schedule delayed custom command w/ optional argument(s)
-- `/cmd reward <rewardName> <player>/random [argument]` Add reward to a player's queue w/ optional argument
+- `/cmd sudo <player>/RANDOM_PLAYER/CONSOLE <cmd>` Run command as someone else (plus signs convert to spaces in cmd)
+- `/cmd give <itemKey> [player]/RANDOM_PLAYER [amount]` Spawn custom item(s)
+- `/cmd <customCommand> [argument]/RANDOM_PLAYER [argument2]` Run custom command w/ optional argument(s)
+- `/cmd -d <tickDelay> <customCommand> [argument]/RANDOM_PLAYER [argument2]` Schedule delayed custom command w/ optional argument(s)
+- `/cmd reward <rewardName> <player>/RANDOM_PLAYER [argument]` Add reward to a player's queue w/ optional argument
 - `/redeemreward` Redeem the reward at the top of your queue
 #### Permissions
 Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfilled for a player to use the respective feature. The only hardcoded permission nodes are:
@@ -35,7 +35,7 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 
 ## Default Config
 ```
-# Command64 v1.2.2 by @tbm00
+# Command64 v1.2.1 by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, all modules are disabled.
@@ -51,6 +51,9 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 # consoleCommand gets scheduled by the entry's cron expression.
 #
 # Use https://crontab.guru/ for help.
+#
+# Optional Arguments:
+# <random_player> == random online player
 # -------------------------------------------------------------------------------------- #
 cronSchedule:
   enabled: false
@@ -58,6 +61,7 @@ cronSchedule:
   # - "m h dom mon dow consoleCommand"
     - "0 0 */1 * * say This command is triggered at midnight!"
     - "0,*/10 11-14 * * * say This command is triggered every 10 minutes between 11:00 AM and 2:59 PM!"
+    - "0 * * * * eco give <random_player> 1000"
 
 
 
@@ -75,7 +79,8 @@ cronSchedule:
 #
 # Optional Arguments:
 # <player> == player who is rewarded
-# <argument> == string included as running command's argument (underscores convert to spaces)
+# <random_player> == random online player
+# <argument> == string included as running command's argument (plus signs convert to spaces)
 # -------------------------------------------------------------------------------------- #
 rewardSystem:
   enabled: false
@@ -89,12 +94,12 @@ rewardSystem:
     noInvSpaceMessage: "&8[&fRewards&8] &cYou don't have enough inventory space for your reward!"
     rewardedMessage: "&8[&fRewards&8] &aYou redeemed a reward!"
   rewardEntries:
-    '1': # Usage: `/cmd reward cratekey <player>/random` i.e. "/cmd reward cratekey Notch"
+    '1': # Usage: `/cmd reward cratekey <player>/RANDOM_PLAYER` i.e. "/cmd reward cratekey Notch"
       name: "cratekey"
       consoleCommands:
         - "crates givekey Crate <player> <argument>"
       invCheck: true
-    '2': # Usage: `/cmd reward money <player>/random <quantity>` i.e. "/cmd reward money random 1000"
+    '2': # Usage: `/cmd reward money <player>/RANDOM_PLAYER <quantity>` i.e. "/cmd reward money RANDOM_PLAYER 1000"
       name: "money"
       consoleCommands:
         - "eco give <player> <argument>"
@@ -118,6 +123,7 @@ rewardSystem:
 #
 # Optional Argument:
 # <player> == player who joined
+# <random_player> == random online player
 # -------------------------------------------------------------------------------------- #
 joinCommandEntries:
   enabled: false
@@ -183,8 +189,8 @@ joinCommandEntries:
 # Optional Arguments:
 # <player> == player who used the command
 # <random_player> == random online player
-# <argument> == string included as running command's argument (underscores DON'T convert to spaces)
-# <argument2> == string included as running command's argument (underscores convert to spaces)
+# <argument> == string included as running command's argument (plus signs DON'T convert to spaces)
+# <argument2> == string included as running command's argument (plus signs convert to spaces)
 # -------------------------------------------------------------------------------------- #
 customCommandEntries:
   enabled: false
@@ -204,35 +210,22 @@ customCommandEntries:
     consoleCommands:
       - "say <player> is stopping the server!"
       - "stop"
-  '3': # Usage: "/cmd promotedonor <argument>" i.e. "/cmd promotedonor Notch"
+  '3': # Usage: "/cmd promote-donor <argument>" i.e. "/cmd promote-donor Notch"
     enabled: false
     usePerm: "command64.admin"
     usePermValue: true
-    customCommand: "promotedonor"
+    customCommand: "promote-donor"
     consoleCommands:
       - "lp user <argument> promote donor"
       - "say <argument> donated to the server and was promoted by <player>!"
-  '4': # Usage: "/cmd consolemsg <argument> <argument2>" i.e. "/cmd consolemsg Notch hi_underscores_convert_to_spaces"
+  '4': # Usage: "/cmd console-msg <argument> <argument2>" i.e. "/cmd console-msg Notch hi+plus+signs+convert+to+spaces"
     enabled: false
     usePerm: "command64.admin"
     usePermValue: true
-    customCommand: "consolemsg"
+    customCommand: "console-msg"
     consoleCommands:
       - "msg <argument> <argument2>"
-  '5': # Usage: "/cmd invSpaceCheckLoop <argument>" i.e. "/cmd invSpaceCheckLoop Notch"
-    enabled: false
-    usePerm: "command64.mod"
-    usePermValue: true
-    customCommand: "invSpaceCheckLoop"
-    consoleCommands:
-      - "msg <player> <argument> has space for an item!"
-    invCheck:
-      enabled: true
-      checkOnPlayer: "ARGUMENT"
-      ifNoSpaceConsoleCommands:
-        - "msg <player> <argument> has a full inventory! Checking again in 2 minutes..."
-        - "cmd -d 2400 invSpaceCheckLoop <argument>" # 2 minute delay
-  '6': # Usage "/cmd boss-fight-start"
+  '5': # Usage "/cmd boss-fight-start"
     enabled: false
     usePerm: "command64.mod"
     usePermValue: true
@@ -247,7 +240,7 @@ customCommandEntries:
       - "mm mobs spawn BossMob -t world,-672,36,727"
       - "broadcast &bBoss fight started!"
       - "cmd -d 1200 boss-fight-round2" # 1 minute delay
-  '7': # Intended Usage "/cmd -d <tickDelay> boss-fight-round2" i.e. "/cmd -d 1200 boss-fight-round2"
+  '6': # Intended Usage "/cmd -d <tickDelay> boss-fight-round2" i.e. "/cmd -d 1200 boss-fight-round2"
     enabled: false
     usePerm: "command64.hide"
     usePermValue: true
@@ -259,27 +252,45 @@ customCommandEntries:
       - "mm mobs spawn BossMinion -t world,-673,46,722"
       - "mm mobs spawn BossMinion -t world,-677,52,727"
       - "mm mobs spawn BossMinion -t world,-667,52,726"
-  '8': # Intended Usage "/cmd reward-random-crate"
-    enabled: false
-    usePerm: "command64.admin"
-    usePermValue: true
-    customCommand: "reward-random-crate"
-    consoleCommands:
-      - "cmd reward cratekey <random_player>"
-  '9': # Intended Usage "/cmd tpr"
+  '7': # Intended Usage "/cmd tpr" - teleports the caller to a random player
     enabled: false
     usePerm: "command64.mod"
     usePermValue: true
     customCommand: "tpr"
     consoleCommands:
-      - "cmd sudo <player> tp_<random_player>"
+      - "cmd sudo <player> tp+<random_player>"
+  '8': # Intended Usage "/cmd tprr RANDOM_PLAYER" - teleports a random player to another random player
+    enabled: false
+    usePerm: "command64.hide"
+    usePermValue: true
+    customCommand: "tprr"
+    consoleCommands:
+      - "cmd sudo CONSOLE tp+<argument>+<random_player>"
+  '9': # Usage: "/cmd invSpaceCheckLoop <argument>" i.e. "/cmd invSpaceCheckLoop Notch"
+    enabled: false
+    usePerm: "command64.mod"
+    usePermValue: true
+    customCommand: "invSpaceCheckLoop"
+    consoleCommands:
+      - "msg <player> <argument> has space for an item!"
+    invCheck:
+      enabled: true
+      checkOnPlayer: "ARGUMENT"
+      ifNoSpaceConsoleCommands:
+        - "msg <player> <argument> has a full inventory! Checking again in 2 minutes..."
+        - "cmd -d 2400 invSpaceCheckLoop <argument>" # Re-call check with 2 minute delay
+    onlineCheck:
+      enabled: true
+      checkOnPlayer: "ARGUMENT"
+      ifNotOnlineConsoleCommands:
+        - "msg <player> <argument> is not online... Ending loop!"
   '10': # Intended Usage "/cmd newbie-gift <argument>"
     enabled: false
     usePerm: "command64.admin"
     usePermValue: true
     customCommand: "newbie-gift"
     consoleCommands:
-      - "crates givekey Crate <player>"
+      - "crates givekey Crate <argument>"
     invCheck:
       enabled: true
       checkOnPlayer: "ARGUMENT"
@@ -300,6 +311,7 @@ customCommandEntries:
 #
 # Optional Argument:
 # <player> == player who used the item
+# <random_player> == random online player
 # -------------------------------------------------------------------------------------- #
 itemCommandEntries:
   enabled: false
@@ -310,7 +322,7 @@ itemCommandEntries:
     usePerm: "group.default"
     usePermValue: true
     consoleCommands:
-      - "cmd sudo <player> commandpanel_menugui"
+      - "cmd sudo <player> commandpanel+menugui"
     key: "NAVIGATOR"
     name: "&dServer Navigator"
     item: "COMPASS"
@@ -338,8 +350,8 @@ itemCommandEntries:
     usePerm: "group.mod"
     usePermValue: true
     consoleCommands:
-      - "cmd sudo <player> cmd_tpr"
-    key: "NAVIGATOR"
+      - "tp <player> <random_player>"
+    key: "TELEPORTER"
     name: "&4Player Teleporter"
     item: "COMPASS"
     glowing: true

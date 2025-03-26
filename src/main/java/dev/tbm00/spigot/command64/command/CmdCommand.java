@@ -78,11 +78,11 @@ public class CmdCommand implements TabExecutor {
     private boolean handleHelpCommand(CommandSender sender) {
         sender.sendMessage(ChatColor.DARK_RED + "--- " + ChatColor.RED + "Command64 Admin Commands" + ChatColor.DARK_RED + " ---\n"
             + ChatColor.WHITE + "/cmd help" + ChatColor.GRAY + " Display the admin command list\n"
-            + ChatColor.WHITE + "/cmd sudo CONSOLE/<player> <cmd>" + ChatColor.GRAY + " Run command as someone else (underscores convert to spaces in cmd)\n"
-            + ChatColor.WHITE + "/cmd give <itemKey> [player] [amount]" + ChatColor.GRAY + " Spawn custom item(s)\n"
-            + ChatColor.WHITE + "/cmd <customCommand> [argument] [argument2]" + ChatColor.GRAY + " Run custom command w/ optional argument(s)\n"
-            + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument] [argument2]" + ChatColor.GRAY + " Schedule delayed custom command w/ optional argument(s)\n"
-            + ChatColor.WHITE + "/cmd reward <rewardName> <player>/random [argument]" + ChatColor.GRAY + " Add reward to a player's queue w/ optional argument"
+            + ChatColor.WHITE + "/cmd sudo <player>/RANDOM_PLAYER/CONSOLE <cmd>" + ChatColor.GRAY + " Run command as someone else (plus signs convert to spaces in cmd)\n"
+            + ChatColor.WHITE + "/cmd give <itemKey> [player]/RANDOM_PLAYER [amount]" + ChatColor.GRAY + " Spawn custom item(s)\n"
+            + ChatColor.WHITE + "/cmd <customCommand> [argument]/RANDOM_PLAYER [argument2]" + ChatColor.GRAY + " Run custom command w/ optional argument(s)\n"
+            + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument]/RANDOM_PLAYER [argument2]" + ChatColor.GRAY + " Schedule delayed custom command w/ optional argument(s)\n"
+            + ChatColor.WHITE + "/cmd reward <rewardName> <player>/RANDOM_PLAYER [argument]" + ChatColor.GRAY + " Add reward to a player's queue w/ optional argument"
             );
         return true;
     }
@@ -91,8 +91,8 @@ public class CmdCommand implements TabExecutor {
         for (RewardCmdEntry entry : configHandler.getRewardCmdEntries()) {
             if (args[1].equalsIgnoreCase(entry.getName())) {
                 String playerName = args[2];
-                if (playerName.equalsIgnoreCase("random")||playerName.equalsIgnoreCase("random_player")) {
-                    playerName = javaPlugin.getRandomPlayer();
+                if (playerName.equalsIgnoreCase("RANDOM_PLAYER")) {
+                    playerName = javaPlugin.getRandomPlayer(sender.getName());
                 }
                 String argument = null;
                 if (args.length>3) argument = args[3];
@@ -118,19 +118,26 @@ public class CmdCommand implements TabExecutor {
     }
 
     private boolean handleCustomCommand(CommandSender sender, String[] args) {
+        if (args.length > 1 && args[1].equalsIgnoreCase("RANDOM_PLAYER")) {
+            args[1] = javaPlugin.getRandomPlayer(sender.getName());
+        }
         for (CustomCmdEntry entry : configHandler.getCustomCmdEntries()) {
             if (sender.hasPermission(entry.getPerm()) != entry.getPermValue()) 
                 continue;
             else if (args[0].equalsIgnoreCase("-d") && args[2].equalsIgnoreCase(entry.getPlayerCommand())) {
                 if (cmdRunner.runDelayedCommand(entry, sender, args))
                     return true;
-                else return false;
+                sender.sendMessage(prefix + ChatColor.RED + "Delayed custom command entry failed!");
+                return false;
             } else if (args[0].equalsIgnoreCase(entry.getPlayerCommand())) {
                 if (cmdRunner.runCustomCommand(entry, sender, args))
                     return true;
-                else return false;
+                sender.sendMessage(prefix + ChatColor.RED + "Custom command entry failed!");
+                return false;
             }
         }
+
+        sender.sendMessage(prefix + ChatColor.RED + "Command failed!");
         return false;
     }
     
@@ -146,6 +153,9 @@ public class CmdCommand implements TabExecutor {
 
             player = (Player) sender;
         } else {
+            if (args.length > 1 && args[1].equalsIgnoreCase("RANDOM_PLAYER")) {
+                args[2] = javaPlugin.getRandomPlayer(sender.getName());
+            }
             player = javaPlugin.getServer().getPlayer(args[2]);
             if (player == null) {
                 sender.sendMessage(prefix + ChatColor.RED + "Could not find target player!");
@@ -184,10 +194,36 @@ public class CmdCommand implements TabExecutor {
             meta.getPersistentDataContainer().set(new NamespacedKey(javaPlugin, entry.getKeyString()), PersistentDataType.STRING, "true");
             item.setItemMeta(meta);
         }
-        if (quantity>1) item.setAmount(quantity);
-        player.getInventory().addItem(item);
-        player.sendMessage(prefix  + "You received " + ChatColor.GREEN + quantity + ChatColor.WHITE + " " + ChatColor.GREEN + entry.getName() + ChatColor.WHITE + "!");
+        item.setAmount(quantity);
+        giveItem(player, item, entry);
         javaPlugin.getLogger().info(player.getName() + " has been given " + quantity + " " + entry.getKeyString());
+    }
+
+    /**
+     * Gives a player an ItemStack.
+     * If they have a full inv, it drops on the ground.
+     */
+    private void giveItem(Player player, ItemStack item, ItemCmdEntry entry) {
+        boolean inInv = true;
+        
+        if ((player.getInventory().firstEmpty() == -1)) {
+            player.getWorld().dropItemNaturally(player.getLocation(), item);
+            inInv = false;
+        } else {
+            player.getInventory().addItem(item);
+        }
+
+        if (inInv) {
+            if (item.getAmount()==1) 
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', (prefix  + "You received a &a" + entry.getName() + "&f!")));
+            else
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', (prefix  + "You received &l" + item.getAmount() + " &r&a" + entry.getName() + "s &f!")));
+        } else {
+            if (item.getAmount()==1) 
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', (prefix  + "You received a &a" + entry.getName() + "&f... &cBut your inventory was full so it dropped on the ground!")));
+            else
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', (prefix  + "You received &l" + item.getAmount() + " &r&a" + entry.getName() + "&fs... &cBut your inventory was full so they dropped on the ground!")));
+        }
     }
 
     @Override
@@ -250,6 +286,7 @@ public class CmdCommand implements TabExecutor {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (p.getName().startsWith(args[1])) list.add(p.getName());
                 }
+                if ("RANDOM_PLAYER".startsWith(args[1])||"random_player".startsWith(args[1])) list.add("RANDOM_PLAYER");
             }
         }
         
@@ -265,6 +302,7 @@ public class CmdCommand implements TabExecutor {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (p.getName().startsWith(args[2])) list.add(p.getName());
                 }
+                if ("RANDOM_PLAYER".startsWith(args[1])||"random_player".startsWith(args[1])) list.add("RANDOM_PLAYER");
             }
         }
         
@@ -274,6 +312,7 @@ public class CmdCommand implements TabExecutor {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (p.getName().startsWith(args[3])) list.add(p.getName());
                 }
+                if ("RANDOM_PLAYER".startsWith(args[1])||"random_player".startsWith(args[1])) list.add("RANDOM_PLAYER");
             }
         }
         

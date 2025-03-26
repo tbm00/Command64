@@ -1,6 +1,8 @@
 package dev.tbm00.spigot.command64;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -18,6 +20,7 @@ public class Command64 extends JavaPlugin {
     private static CommandRunner cmdRunner;
     private static QueueManager queueManager;
     private static CronManager cronManager;
+    private final Random random = new Random();
 
     @Override
     public void onEnable() {
@@ -56,24 +59,19 @@ public class Command64 extends JavaPlugin {
             getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + s);
 	}
 
-    public String getRandomPlayer() {
+    public String getRandomPlayer(String excludedPlayer) {
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
-        if (players.isEmpty()) {
-            return "Herobrine";
-        }
-    
-        int targetIndex = new Random().nextInt(players.size());
-        int i = 0;
-        for (Player player : players) {
-            if (i == targetIndex) {
-                return player.getName();
-            }
-            i++;
-        }
-    
-        return "Herobrine";
+        if (players.isEmpty()) return "Herobrine";
+
+        List<? extends Player> list = new ArrayList<>(players);
+        Player chosen = list.get(random.nextInt(list.size()));
+        
+        if (chosen.getName().equalsIgnoreCase(excludedPlayer))
+            return getRandomPlayer(excludedPlayer);
+        else if (!chosen.isOnline())
+            return getRandomPlayer(excludedPlayer);
+        else return chosen.getName();
     }
-    
 
     @Override
     public void onDisable() {
