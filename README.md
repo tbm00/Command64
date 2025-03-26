@@ -1,5 +1,5 @@
 # Command64 <img align="left" src="icon.png" alt="Item64 Icon" width="40"/>
-A spigot plugin that installs a local cron scheduler, runs commands with configurable triggers, and introduces a user-friendly reward system.
+A spigot plugin that installs a local cron scheduler, runs commands with configurable triggers, delays, and checks, and introduces a user-friendly reward system.
 
 Created by tbm00 for play.mc64.wtf.
 

@@ -11,7 +11,7 @@
 
     <name>Command64</name>
 
-    <description>This plugin installs a local cron scheduler, runs commands with configurable triggers, and introduces a user-friendly reward system​</description>
+    <description>This plugin installs a local cron scheduler, runs commands with configurable triggers, delays, and checks, and introduces a user-friendly reward system​</description>
     <properties>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
