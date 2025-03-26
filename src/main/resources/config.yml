@@ -76,9 +76,9 @@ rewardSystem:
 #   connects to the server.
 #
 # You can add an firstJoinCheck to any customCommandEntry, that confirms player who joined
-#   is not joining for the first time before running the consoleCommands. If they have not,
-#   are joining for the first time, any defined backup commands will run. 
-#   Use this module on any joinCommandEntries:
+#   is not joining for the first time before running the consoleCommands. If they have are
+#   joining for the first time, any defined backup commands will run. Use this module on 
+#   any join CommandEntry:
 #     firstJoinCheck:
 #       enabled: true
 #       isFirstJoinConsoleCommands:
@@ -133,15 +133,15 @@ joinCommandEntries:
 # You can run any customCommand with a delay by using the "-d" command flag.
 #   i.e. "/cmd -d 1200 stop" to stop the server in 1 minute,
 # You can add an invCheck to any customCommandEntry, that confirms ARGUMENT or SENDER has
-#   one spot avaliable in their inventory before running the consoleCommands. If they don't,
-#   any defined backup commands will run. Use this module on any customCommandEntry:
+#   one spot avaliable in their inventory before running the consoleCommands. If they don't have
+#   have space, any defined backup commands will run. Use this module on any customCommandEntry:
 #     invCheck:
 #       enabled: true
 #       checkOnPlayer: "ARGUMENT"
 #       ifNoSpaceConsoleCommands:
 #         - "msg <argument> &4You do not have space in your inventory..."
 # You can add an onlineCheck to any customCommandEntry, that confirms ARGUMENT or SENDER is
-#   online before running the consoleCommands. If they are not, any defined backup commands 
+#   online before running the consoleCommands. If they are offline, any defined backup commands 
 #   will run. Use this module on any customCommandEntry:
 #     onlineCheck:
 #       enabled: true
