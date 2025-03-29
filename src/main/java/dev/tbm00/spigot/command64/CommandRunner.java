@@ -264,7 +264,7 @@ public class CommandRunner {
         consoleCmd = consoleCmd.replace("RANDOM_PLAYER", randomPlayer);
 
         if (consoleCmd!=null) {
-            Bukkit.dispatchCommand(console, consoleCmd);
+            Bukkit.dispatchCommand(sender, consoleCmd);
         }
     }
 
