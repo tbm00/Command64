@@ -1,7 +1,6 @@
 package dev.tbm00.spigot.command64.reward;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Iterator;
@@ -91,13 +90,10 @@ public class QueueManager {
                 if (reward.length>1) arg = reward[1];
 
                 if (rewardName != null) {
-                    List<String> consoleCommands = configHandler.getRewardCommandsByName(rewardName);
-                    Boolean invCheck = configHandler.getRewardInvCheckByName(rewardName);
-                    if (consoleCommands == null || invCheck == null) {
-                        javaPlugin.getLogger().warning(playerName + "'s Reward '" + rewardName + "' not found in config..!");
+                    if (!cmdRunner.runRewardCommand(configHandler.getRewardCommandsByName(rewardName), playerName, arg)) {
+                        javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for rewardEntry: " + rewardName);
                         return false;
                     }
-                    cmdRunner.runRewardCommand(consoleCommands, playerName, arg);
                     return true;
                 }
             } else { // redeem the first reward that doesn't require space
@@ -109,12 +105,10 @@ public class QueueManager {
                     Boolean invCheck = configHandler.getRewardInvCheckByName(rewardName);
                     if (invCheck != null && !invCheck) {
                         iterator.remove();
-                        List<String> consoleCommands = configHandler.getRewardCommandsByName(rewardName);
-                        if (consoleCommands == null) {
-                            javaPlugin.getLogger().warning("Reward '" + rewardName + "' not found in config.");
+                        if (!cmdRunner.runRewardCommand(configHandler.getRewardCommandsByName(rewardName), playerName, arg)) {
+                            javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for rewardEntry: " + rewardName);
                             return false;
                         }
-                        cmdRunner.runRewardCommand(consoleCommands, playerName, arg);
                         return true;
                     }
                 }

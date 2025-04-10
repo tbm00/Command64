@@ -35,7 +35,7 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 
 ## Default Config
 ```
-# Command64 v1.2.2 by @tbm00
+# Command64 v1.2.3 by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, all modules are disabled.

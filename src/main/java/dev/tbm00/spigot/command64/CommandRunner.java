@@ -36,7 +36,7 @@ public class CommandRunner {
         Bukkit.getScheduler().runTaskLater(javaPlugin, () -> {
             if (!player.isOnline()) return;
 
-            javaPlugin.getLogger().info(name + " triggered a joinCmdEntry's "+type+"consoleCommands...");
+            //javaPlugin.getLogger().info(name + " triggered a joinCmdEntry's "+type+"consoleCommands...");
             runConsoleCmds(consoleCmds, name, null, null);
         }, tickDelay);
         
@@ -81,7 +81,7 @@ public class CommandRunner {
 
         javaPlugin.getLogger().info(sender.getName() + " triggered sudo command: <"+targetName+"> " + cmd);
         sendMessage(sender, ChatColor.YELLOW + "Running sudo command: " + ChatColor.WHITE + "<"+targetName+"> " + cmd);
-        runConsoleCmd(target, cmd);
+        runCmd(target, cmd);
         return true;
     }
 
@@ -90,7 +90,7 @@ public class CommandRunner {
         consoleCmd = consoleCmd.replace("<random_player>", javaPlugin.getRandomPlayer("null"));
         
         javaPlugin.getLogger().info("CronSchedule triggered a taskEntry: " + timing + " " + consoleCmd);
-        runConsoleCmd(console, consoleCmd);
+        runCmd(console, consoleCmd);
         return true;
     }
 
@@ -98,7 +98,7 @@ public class CommandRunner {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = player.getName();
-        javaPlugin.getLogger().info(name + " triggered an itemCmdEntry's consoleCommands...");
+        //javaPlugin.getLogger().info(name + " triggered an itemCmdEntry's consoleCommands...");
         runConsoleCmds(consoleCmds, name, null, null);
 
         return true;
@@ -107,7 +107,7 @@ public class CommandRunner {
     public boolean runRewardCommand(List<String> consoleCmds, String player, String argument) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
-        javaPlugin.getLogger().info(player + " triggered a rewardEntry's consoleCommands...");
+        //javaPlugin.getLogger().info(player + " triggered a rewardEntry's consoleCommands...");
         runConsoleCmds(consoleCmds, player, null, null);
         
         return true;
@@ -124,7 +124,7 @@ public class CommandRunner {
         String argument = args.length > 1 ? args[1] : "";
         String argument2 = args.length > 2 ? args[2] : "";
         
-        javaPlugin.getLogger().info(senderName + " triggered a customCmdEntry's consoleCommands...");
+        //javaPlugin.getLogger().info(senderName + " triggered a customCmdEntry's consoleCommands...");
         sendMessage(sender, ChatColor.YELLOW + "Running custom command...");
 
         if (entry.getCheckOnline()) {
@@ -198,7 +198,7 @@ public class CommandRunner {
         }
         DelayedTask delayedTask = new DelayedTask(entry, args);
 
-        javaPlugin.getLogger().info(senderName + " triggered a customCmdEntry's consoleCommands... (delayed " + tickDelay + " ticks)");
+        //javaPlugin.getLogger().info(senderName + " triggered a customCmdEntry's consoleCommands... (delayed " + tickDelay + " ticks)");
         sendMessage(sender, ChatColor.YELLOW + "Running delayed custom command in " + tickDelay + " ticks...");
         
         BukkitTask bukkitTask = new BukkitRunnable() {
@@ -240,6 +240,10 @@ public class CommandRunner {
     }
 
     private void runConsoleCmds(List<String> consoleCmds, String senderName, String argument, String argument2) {
+        if (consoleCmds == null || consoleCmds.isEmpty()) {
+            javaPlugin.getLogger().warning(senderName + " triggered NULL console commands!");
+            return;
+        }
         String randomPlayer = javaPlugin.getRandomPlayer(senderName);
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", senderName);
@@ -259,7 +263,11 @@ public class CommandRunner {
         }
     }
 
-    private void runConsoleCmd(CommandSender sender, String consoleCmd) {
+    private void runCmd(CommandSender sender, String consoleCmd) {
+        if (consoleCmd == null || consoleCmd.isBlank()) {
+            javaPlugin.getLogger().warning(sender.getName() + " triggered NULL console command!");
+            return;
+        }
         String randomPlayer = javaPlugin.getRandomPlayer(sender.getName());
         consoleCmd = consoleCmd.replace("RANDOM_PLAYER", randomPlayer);
 
