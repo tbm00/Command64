@@ -52,7 +52,7 @@ public class ItemUse implements Listener {
             event.setCancelled(true);
     
             if (!cmdRunner.runItemCommand(entry.getConsoleCommands(), player))
-                javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for itemCmdEntry: " + entry.toString());
+                javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for itemCmdEntry: " + entry.getName());
         }
     }
 }

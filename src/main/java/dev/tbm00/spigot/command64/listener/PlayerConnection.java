@@ -59,17 +59,16 @@ public class PlayerConnection implements Listener {
             for (JoinCmdEntry entry : joinCmdEntries) {
                 if (player.hasPermission(entry.getPerm()) != entry.getPermValue())
                     continue;
-                boolean newbieAndNewbieCheck = false;
                 if (entry.getCheckNewbie()) {
                     if (isNewbie) {
                         if (!cmdRunner.runJoinCommand(entry.getCheckNewbieConsoleCommands(), player, entry.getTickDelay(), "Newbie-Backup "))
                             javaPlugin.getLogger().warning("Error: 'isFirstJoinConsoleCommands' is null or empty for joinCmdEntry's bkup commands: " + entry.getPerm() + " " + entry.getTickDelay());
-                        newbieAndNewbieCheck = true;
+                        continue;
                     }
                 }
 
-                if (!newbieAndNewbieCheck && !cmdRunner.runJoinCommand(entry.getConsoleCommands(), player, entry.getTickDelay(), ""))
-                    javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for joinCmdEntry: " + entry.getPerm() + " " + entry.getTickDelay());
+                cmdRunner.runJoinCommand(entry.getConsoleCommands(), player, entry.getTickDelay(), "");
+                //javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for joinCmdEntry: " + entry.getPerm() + " " + entry.getTickDelay());
             }
         }
 
