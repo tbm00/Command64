@@ -79,6 +79,7 @@ cronSchedule:
 #
 # Optional Arguments:
 # <player> == player who is rewarded
+# <player_uuid> == player's UUID
 # <random_player> == random online player
 # <argument> == string included as running command's argument (plus signs convert to spaces)
 # -------------------------------------------------------------------------------------- #
@@ -123,6 +124,7 @@ rewardSystem:
 #
 # Optional Arguments:
 # <player> == player who joined
+# <player_uuid> == player's UUID
 # <random_player> == random online player
 # -------------------------------------------------------------------------------------- #
 joinCommandEntries:
@@ -188,6 +190,7 @@ joinCommandEntries:
 #
 # Optional Arguments:
 # <player> == player who used the command
+# <player_uuid> == player's UUID
 # <random_player> == random online player
 # <argument> == string included as running command's argument (plus signs DON'T convert to spaces)
 # <argument2> == string included as running command's argument (plus signs convert to spaces)

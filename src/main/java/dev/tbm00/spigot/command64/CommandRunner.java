@@ -247,6 +247,7 @@ public class CommandRunner {
         String randomPlayer = javaPlugin.getRandomPlayer(senderName);
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", senderName);
+            consoleCmd = consoleCmd.replace("<player_uuid>", Bukkit.getServer().getPlayer(senderName).getUniqueId().toString());
             consoleCmd = consoleCmd.replace("<random_player>", randomPlayer);
 
             if ((argument!=null)&&(argument2!=null) && !argument.isBlank() && !argument2.isEmpty()) {
