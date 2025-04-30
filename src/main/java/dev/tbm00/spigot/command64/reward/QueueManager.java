@@ -77,42 +77,60 @@ public class QueueManager {
     public boolean redeemReward(String playerName, boolean hasInvSpace) {
         synchronized (rewardQueues) {
             Queue<String> queue = rewardQueues.get(playerName);
-
             if (queue == null || queue.isEmpty()) {
                 return false;
             }
 
-            if (hasInvSpace) { // redeem first rewards since there is space
-                // Player has inventory space, redeem the first reward
-                String[] reward = queue.poll().split(":");
-                String rewardName = reward[0];
-                String arg = null;
-                if (reward.length>1) arg = reward[1];
-
-                if (rewardName != null) {
-                    if (!cmdRunner.runRewardCommand(configHandler.getRewardCommandsByName(rewardName), playerName, arg)) {
-                        javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for rewardEntry: " + rewardName);
-                        return false;
-                    }
+            // first, try the head
+            String firstRewardEntry = queue.peek();
+            String[] firstParts = firstRewardEntry.split(":", 2);
+            String firstRewardName = firstParts[0];
+            String firstArg = firstParts.length>1 ? firstParts[1] : null;
+            Boolean firstInvCheck = configHandler.getRewardInvCheckByName(firstRewardName);
+            if (Boolean.FALSE.equals(firstInvCheck) || hasInvSpace) {
+                if (triggerRewardCommands(playerName, firstRewardName, firstArg)) {
+                    queue.poll();
                     return true;
-                }
-            } else { // redeem the first reward that doesn't require space
-                Iterator<String> iterator = queue.iterator();
-                while (iterator.hasNext()) {
-                    String[] reward = queue.poll().split(":");
-                    String rewardName = reward[0];
-                    String arg = reward[1];
+                } else return false;
+            } else {
+                // head requires inv space & player doesnt have it
+                // start looping through the rest of the queue to run the first entry without an invCheck
+                Iterator<String> iter = queue.iterator();
+                iter.next(); // skip the head, we already tried it
+    
+                while (iter.hasNext()) {
+                    String rewardEntry = iter.next();
+                    String[] parts = rewardEntry.split(":", 2);
+                    String rewardName = parts[0];
+                    String arg = parts.length > 1 ? parts[1] : null;
                     Boolean invCheck = configHandler.getRewardInvCheckByName(rewardName);
-                    if (invCheck != null && !invCheck) {
-                        iterator.remove();
-                        if (!cmdRunner.runRewardCommand(configHandler.getRewardCommandsByName(rewardName), playerName, arg)) {
-                            javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for rewardEntry: " + rewardName);
+    
+                    // only pick those with invCheck == false
+                    if (Boolean.FALSE.equals(invCheck)) {
+                        if (triggerRewardCommands(playerName, rewardName, arg)) {
+                            iter.remove();
+                            return true;
+                        } else {
                             return false;
                         }
-                        return true;
                     }
                 }
             }
+        }
+        javaPlugin.getLogger().warning("Error: Ran out of queued rewards... no rewards triggered: " + playerName + " hasInvSpace:" + hasInvSpace);
+        return false;
+    }
+
+    private boolean triggerRewardCommands(String playerName, String rewardName, String arg) {
+        if (rewardName != null) {
+            if (cmdRunner.runRewardCommands(configHandler.getRewardCommandsByName(rewardName), playerName, arg)) {
+                return true;
+            } else {
+                javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for rewardEntry: " + rewardName);
+                return false;
+            }
+        } else {
+            javaPlugin.getLogger().warning("Error: rewardEntry's 'name' is null or empty for the reward " + playerName + " is trying to redeem!");
             return false;
         }
     }

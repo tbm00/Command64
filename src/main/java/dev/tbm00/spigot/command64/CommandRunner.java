@@ -29,7 +29,7 @@ public class CommandRunner {
         this.pendingTasks = new HashMap<>();
     }
 
-    public boolean runJoinCommand(List<String> consoleCmds, Player player, long tickDelay, String type) {
+    public boolean runJoinCommands(List<String> consoleCmds, Player player, long tickDelay, String type) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
         String name = player.getName();
 
@@ -94,7 +94,7 @@ public class CommandRunner {
         return true;
     }
 
-    public boolean runItemCommand(List<String> consoleCmds, Player player) {
+    public boolean runItemCommands(List<String> consoleCmds, Player player) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = player.getName();
@@ -104,11 +104,11 @@ public class CommandRunner {
         return true;
     }
 
-    public boolean runRewardCommand(List<String> consoleCmds, String player, String argument) {
+    public boolean runRewardCommands(List<String> consoleCmds, String player, String argument) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         //javaPlugin.getLogger().info(player + " triggered a rewardEntry's consoleCommands...");
-        runConsoleCmds(consoleCmds, player, null, null);
+        runConsoleCmds(consoleCmds, player, argument, null);
         
         return true;
     }
