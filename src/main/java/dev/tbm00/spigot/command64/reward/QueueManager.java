@@ -40,16 +40,19 @@ public class QueueManager {
         if (configHandler.getSaveDataInterval()>0) {
             long ticks = configHandler.getSaveDataInterval()*1200;
             this.saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(javaPlugin, () -> {
-                jsonHandler.saveRewards(rewardQueues);
+                synchronized (rewardQueues) {
+                    jsonHandler.saveRewards(rewardQueues);
+                }
                 javaPlugin.getLogger().info("Saved player rewards to JSON.");
             }, ticks, ticks);
         } else saveTask = null;
     }
 
     public void shutdown() {
-        if (saveTask != null && !saveTask.isCancelled())
-            saveTask.cancel();
-        jsonHandler.saveRewards(rewardQueues);
+        if (saveTask != null && !saveTask.isCancelled()) saveTask.cancel();
+        synchronized (rewardQueues) {
+            jsonHandler.saveRewards(rewardQueues);
+        }
     }
 
     // get or make player's queue and add reward to it

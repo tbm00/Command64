@@ -3,7 +3,6 @@ package dev.tbm00.spigot.command64.reward;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.Map;
 import java.util.LinkedList;
 import java.util.HashMap;
@@ -31,10 +30,14 @@ public class JSONHandler {
         this.jsonFile = new File(javaPlugin.getDataFolder(), "player_rewards.json");
         try {
             if (!jsonFile.exists()) {
-                jsonFile.createNewFile();
-                try (Writer writer = new FileWriter(jsonFile)) {
-                    gson.toJson(new HashMap<String, Queue<String>>(), writer);
+                if (jsonFile.createNewFile()) {
+                    try (Writer writer = new FileWriter(jsonFile)) {
+                        gson.toJson(new HashMap<String, Queue<String>>(), writer);
+                    }
+                } else {
+                    javaPlugin.getLogger().severe("Could not create player_rewards.json..!");
                 }
+
             }
         } catch (IOException e) {
             javaPlugin.getLogger().severe("Could not create player_rewards.json: " + e.getMessage());
@@ -64,7 +67,7 @@ public class JSONHandler {
             }
         }
 
-        CompletableFuture.runAsync(() -> {
+        javaPlugin.getServer().getScheduler().runTaskAsynchronously(javaPlugin, () -> {
             try (Writer writer = new FileWriter(jsonFile)) {
                 gson.toJson(rewardQueuesCopy, writer);
             } catch (IOException e) {
