@@ -62,8 +62,13 @@ public class Command64 extends JavaPlugin {
     public String getRandomPlayer(String excludedPlayer) {
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
         if (players.isEmpty()) return "Herobrine";
-        if (players.size()<=1 && !(excludedPlayer.equals("null") || excludedPlayer.equals(Bukkit.getServer().getConsoleSender().getName())))
-            return "HEROBRINE";
+        if (players.size()==1) {
+            if (getServer().getPlayer(excludedPlayer)!=null && getServer().getPlayer(excludedPlayer).isOnline()) {
+                return "HEROBRINE";
+            }
+            List<? extends Player> list = new ArrayList<>(players);
+            return list.get(0).getName();
+        }
 
         List<? extends Player> list = new ArrayList<>(players);
         Player chosen = list.get(random.nextInt(list.size()));

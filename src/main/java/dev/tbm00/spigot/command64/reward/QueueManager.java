@@ -80,7 +80,10 @@ public class QueueManager {
     public boolean redeemReward(String playerName, boolean hasInvSpace) {
         synchronized (rewardQueues) {
             Queue<String> queue = rewardQueues.get(playerName);
-            if (queue == null || queue.isEmpty()) {
+            if (queue == null) {
+                return false;
+            } if (queue.isEmpty()) {
+                rewardQueues.remove(playerName);
                 return false;
             }
 
@@ -89,8 +92,8 @@ public class QueueManager {
             String[] firstParts = firstRewardEntry.split(":", 2);
             String firstRewardName = firstParts[0];
             String firstArg = firstParts.length>1 ? firstParts[1] : null;
-            Boolean firstInvCheck = configHandler.getRewardInvCheckByName(firstRewardName);
-            if (Boolean.FALSE.equals(firstInvCheck) || hasInvSpace) {
+            boolean firstInvCheck = Boolean.TRUE.equals(configHandler.getRewardInvCheckByName(firstRewardName));
+            if (!firstInvCheck || hasInvSpace) {
                 if (triggerRewardCommands(playerName, firstRewardName, firstArg)) {
                     queue.poll();
                     return true;
@@ -106,10 +109,10 @@ public class QueueManager {
                     String[] parts = rewardEntry.split(":", 2);
                     String rewardName = parts[0];
                     String arg = parts.length > 1 ? parts[1] : null;
-                    Boolean invCheck = configHandler.getRewardInvCheckByName(rewardName);
+                    boolean invCheck = Boolean.TRUE.equals(configHandler.getRewardInvCheckByName(rewardName));
     
                     // only pick those with invCheck == false
-                    if (Boolean.FALSE.equals(invCheck)) {
+                    if (!invCheck) {
                         if (triggerRewardCommands(playerName, rewardName, arg)) {
                             iter.remove();
                             return true;
