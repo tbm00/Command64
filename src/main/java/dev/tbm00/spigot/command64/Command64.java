@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,6 +26,7 @@ public class Command64 extends JavaPlugin {
     @Override
     public void onEnable() {
         this.saveDefaultConfig();
+        getConfig().setDefaults(new YamlConfiguration());
 
         final PluginDescriptionFile pdf = this.getDescription();
 		log(
