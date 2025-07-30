@@ -110,24 +110,24 @@ public class CommandRunner {
         return true;
     }
 
-    public boolean triggerRewardCommands(List<String> consoleCmds, String player, String argument) {
+    public boolean triggerRewardCommands(List<String> consoleCmds, String player, String argument1) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         //javaPlugin.getLogger().info(player + " triggered a rewardEntry's consoleCommands...");
-        runConsoleCmds(consoleCmds, player, argument, null);
+        runConsoleCmds(consoleCmds, player, argument1, null);
         
         return true;
     }
 
     // args[0] = custom command
-    // args[1] = configurable [argument]
+    // args[1] = configurable [argument1]
     // args[2] = configurable [argument2]
     public boolean triggerCustomCmdEntry(CustomCmdEntry entry, CommandSender sender, String[] args) {
         List<String> consoleCmds = entry.getConsoleCommands();
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String senderName = sender.getName();
-        String argument = args.length > 1 ? args[1] : "";
+        String argument1 = args.length > 1 ? args[1] : "";
         String argument2 = args.length > 2 ? args[2] : "";
         
         //javaPlugin.getLogger().info(senderName + " triggered a customCmdEntry's consoleCommands...");
@@ -140,17 +140,17 @@ public class CommandRunner {
             // get target
             if (checkPlayer.equalsIgnoreCase("SENDER"))
                 target = (Player) sender;
-            else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
-                target = javaPlugin.getServer().getPlayer(argument);
+            else if (checkPlayer.equalsIgnoreCase("ARGUMENT1"))
+                target = javaPlugin.getServer().getPlayer(argument1);
             else {
-                sendMessage(sender, ChatColor.RED + "Custom command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                sendMessage(sender, ChatColor.RED + "Custom command failed because " + checkPlayer + " is not SENDER or ARGUMENT1... Aborting!");
                 return false;
             }
 
             // if target isnt online, run backup commands
             if (target==null || !target.isOnline()) {
                 sendMessage(sender, ChatColor.YELLOW + "Custom command failed because " + checkPlayer + " is not online... Running backup command(s) if any...");
-                runConsoleCmds(entry.getCheckOnlineConsoleCommands(), senderName, argument, argument2);
+                runConsoleCmds(entry.getCheckOnlineConsoleCommands(), senderName, argument1, argument2);
                 return true;
             }
         }
@@ -162,10 +162,10 @@ public class CommandRunner {
             // get target
             if (checkPlayer.equalsIgnoreCase("SENDER"))
                 target = (Player) sender;
-            else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
-                target = javaPlugin.getServer().getPlayer(argument);
+            else if (checkPlayer.equalsIgnoreCase("ARGUMENT1"))
+                target = javaPlugin.getServer().getPlayer(argument1);
             else {
-                sendMessage(sender, ChatColor.RED + "Custom command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                sendMessage(sender, ChatColor.RED + "Custom command failed because " + checkPlayer + " is not SENDER or ARGUMENT1... Aborting!");
                 return false;
             } if (target==null) {
                 sendMessage(sender, ChatColor.RED + "Custom command failed because " + target + " is null... Aborting!");
@@ -175,25 +175,25 @@ public class CommandRunner {
             // if target doesnt have inv space, run backup commands
             if ((target.getInventory().firstEmpty() == -1)) {
                 sendMessage(sender, ChatColor.YELLOW + "Custom command failed because " + target.getName() + " has no inv space... Running backup command(s) if any...");
-                runConsoleCmds(entry.getCheckInvConsoleCommands(), senderName, argument, argument2);
+                runConsoleCmds(entry.getCheckInvConsoleCommands(), senderName, argument1, argument2);
                 return true;
             }
         }
-        runConsoleCmds(consoleCmds, senderName, argument, argument2);
+        runConsoleCmds(consoleCmds, senderName, argument1, argument2);
         return true;
     }
 
     // args[0] = "delayed"
     // args[1] = tick wait
     // args[2] = custom command
-    // args[3] = configurable [argument]
+    // args[3] = configurable [argument1]
     // args[4] = configurable [argument2]
     public boolean triggerDelayedCmdEntry(CustomCmdEntry entry, CommandSender sender, String[] args) {
         List<String> consoleCmds = entry.getConsoleCommands();
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String senderName = sender.getName();
-        String argument = args.length > 3 ? args[3] : "";
+        String argument1 = args.length > 3 ? args[3] : "";
         String argument2 = args.length > 4 ? args[4] : "";
         int tickDelay;
         try {
@@ -217,10 +217,10 @@ public class CommandRunner {
                     // get target
                     if (checkPlayer.equalsIgnoreCase("SENDER"))
                         target = (Player) sender;
-                    else if (checkPlayer.equalsIgnoreCase("ARGUMENT"))
-                        target = javaPlugin.getServer().getPlayer(argument);
+                    else if (checkPlayer.equalsIgnoreCase("ARGUMENT1"))
+                        target = javaPlugin.getServer().getPlayer(argument1);
                     else {
-                        sendMessage(sender, ChatColor.RED + "Delayed command failed because " + checkPlayer + " is not SENDER or ARGUMENT... Aborting!");
+                        sendMessage(sender, ChatColor.RED + "Delayed command failed because " + checkPlayer + " is not SENDER or ARGUMENT1... Aborting!");
                         return;
                     } if (target==null) {
                         sendMessage(sender, ChatColor.RED + "Delayed command failed because " + target + " is null... Aborting!");
@@ -231,12 +231,12 @@ public class CommandRunner {
                     List<String> bkupConsoleCommands = entry.getCheckInvConsoleCommands();
                     if ((target.getInventory().firstEmpty() == -1)) {
                         sendMessage(sender, ChatColor.YELLOW + "Delayed command failed because " + target.getName() + " has no inv space... Running backup command(s) if any...");
-                        runConsoleCmds(bkupConsoleCommands, senderName, argument, argument2);
+                        runConsoleCmds(bkupConsoleCommands, senderName, argument1, argument2);
                         pendingTasks.remove(delayedTask);
                         return;
                     }
                 }
-                runConsoleCmds(consoleCmds, senderName, argument, argument2);
+                runConsoleCmds(consoleCmds, senderName, argument1, argument2);
                 pendingTasks.remove(delayedTask);
             }
         }.runTaskLater(javaPlugin, tickDelay);
@@ -245,7 +245,7 @@ public class CommandRunner {
         return true;
     }
 
-    private void runConsoleCmds(List<String> consoleCmds, String senderName, String argument, String argument2) {
+    private void runConsoleCmds(List<String> consoleCmds, String senderName, String argument1, String argument2) {
         if (consoleCmds == null || consoleCmds.isEmpty()) {
             javaPlugin.getLogger().warning(senderName + " triggered NULL console commands!");
             return;
@@ -263,14 +263,15 @@ public class CommandRunner {
             consoleCmd = consoleCmd.replace("<random_player>", randomPlayer.getName());
             consoleCmd = consoleCmd.replace("<random_uuid>", randomPlayer.getUniqueId().toString());
 
-            if ((argument!=null)&&(argument2!=null) && !argument.isBlank() && !argument2.isEmpty()) {
-                consoleCmd = consoleCmd.replace("<argument>", argument);
+            if ((argument1!=null)&&(argument2!=null) && !argument1.isBlank() && !argument1.isEmpty()) {
+                consoleCmd = consoleCmd.replace("<argument1>", argument1);
+                consoleCmd = consoleCmd.replace("<argument1_uuid>", javaPlugin.getServer().getOfflinePlayer(argument1).getUniqueId().toString());
                 argument2 = argument2.replace("+", " ");
                 consoleCmd = consoleCmd.replace("<argument2>", argument2);
-                javaPlugin.getLogger().info(senderName + " triggered console command: <"+argument+":"+argument2+"> " + consoleCmd);
-            } else if (argument!=null && !argument.isBlank()) {
-                consoleCmd = consoleCmd.replace("<argument>", argument);
-                javaPlugin.getLogger().info(senderName + " triggered console command: <"+argument+"> " + consoleCmd);
+                javaPlugin.getLogger().info(senderName + " triggered console command: <"+argument1+":"+argument2+"> " + consoleCmd);
+            } else if (argument1!=null && !argument1.isBlank()) {
+                consoleCmd = consoleCmd.replace("<argument1>", argument1);
+                javaPlugin.getLogger().info(senderName + " triggered console command: <"+argument1+"> " + consoleCmd);
             } else javaPlugin.getLogger().info(senderName + " triggered console command: " + consoleCmd);
             
             Bukkit.dispatchCommand(console, consoleCmd);

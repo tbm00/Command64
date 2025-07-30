@@ -79,10 +79,10 @@ public class CmdCommand implements TabExecutor {
         sender.sendMessage(ChatColor.DARK_RED + "--- " + ChatColor.RED + "Command64 Admin Commands" + ChatColor.DARK_RED + " ---\n"
             + ChatColor.WHITE + "/cmd help" + ChatColor.GRAY + " Display the admin command list\n"
             + ChatColor.WHITE + "/cmd sudo <player>/RANDOM_PLAYER/CONSOLE <cmd>" + ChatColor.GRAY + " Run command as someone else (plus signs convert to spaces in cmd)\n"
-            + ChatColor.WHITE + "/cmd give <itemKey> [player]/RANDOM_PLAYER [amount]" + ChatColor.GRAY + " Spawn custom item(s)\n"
-            + ChatColor.WHITE + "/cmd <customCommand> [argument]/RANDOM_PLAYER [argument2]" + ChatColor.GRAY + " Run custom command w/ optional argument(s)\n"
-            + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [argument]/RANDOM_PLAYER [argument2]" + ChatColor.GRAY + " Schedule delayed custom command w/ optional argument(s)\n"
-            + ChatColor.WHITE + "/cmd reward <rewardName> <player>/RANDOM_PLAYER [argument]" + ChatColor.GRAY + " Add reward to a player's queue w/ optional argument"
+            + ChatColor.WHITE + "/cmd give <itemKey> [<player>/RANDOM_PLAYER] [amount]" + ChatColor.GRAY + " Spawn custom item(s)\n"
+            + ChatColor.WHITE + "/cmd <customCommand> [<argument1>/RANDOM_PLAYER] [argument2]" + ChatColor.GRAY + " Run custom command w/ optional argument(s)\n"
+            + ChatColor.WHITE + "/cmd -d <tickDelay> <customCommand> [<argument1>/RANDOM_PLAYER] [argument2]" + ChatColor.GRAY + " Schedule delayed custom command w/ optional argument(s)\n"
+            + ChatColor.WHITE + "/cmd reward <rewardName> <player>/RANDOM_PLAYER [argument1]" + ChatColor.GRAY + " Add reward to a player's queue w/ optional argument"
             );
         return true;
     }

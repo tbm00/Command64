@@ -19,11 +19,11 @@ Created by tbm00 for play.mc64.wtf.
 ## Commands & Permissions
 #### Commands
 - `/cmd help` Display the admin command list
-- `/cmd sudo <player>/RANDOM_PLAYER/CONSOLE <cmd>` Run command as someone else (plus signs convert to spaces in cmd)
-- `/cmd give <itemKey> [player]/RANDOM_PLAYER [amount]` Spawn custom item(s)
-- `/cmd <customCommand> [argument]/RANDOM_PLAYER [argument2]` Run custom command w/ optional argument(s)
-- `/cmd -d <tickDelay> <customCommand> [argument]/RANDOM_PLAYER [argument2]` Schedule delayed custom command w/ optional argument(s)
-- `/cmd reward <rewardName> <player>/RANDOM_PLAYER [argument]` Add reward to a player's queue w/ optional argument
+- `/cmd sudo <player>/RANDOM_PLAYER/CONSOLE <cmd>` Run command as someone else (plus signs convert to spaces in \<cmd>)
+- `/cmd give <itemKey> [<player>/RANDOM_PLAYER] [amount]` Spawn custom item(s)
+- `/cmd <customCommand> [<argument1>/RANDOM_PLAYER] [argument2]` Run custom command w/ optional argument(s)
+- `/cmd -d <tickDelay> <customCommand> [<argument1>/RANDOM_PLAYER] [argument2]` Schedule delayed custom command w/ optional argument(s)
+- `/cmd reward <rewardName> <player>/RANDOM_PLAYER [argument1]` Add reward to a player's queue w/ optional argument
 - `/redeemreward` Redeem the reward at the top of your queue
 #### Permissions
 Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable permission nodes (in `config.yml`) that must be fulfilled for a player to use the respective feature. The only hardcoded permission nodes are:
@@ -35,7 +35,7 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 
 ## Default Config
 ```
-# Command64 v1.2.3 by @tbm00
+# Command64 v1.2.4-beta by @tbm00
 # https://github.com/tbm00/Command64/
 
 # By default, all modules are disabled.
@@ -73,7 +73,7 @@ cronSchedule:
 # This module gives players the ability redeem pending rewards (commands).
 #
 # 1st) Admins/Console add rewardEntries to a player's pending queue
-#        by using `/cmd reward <rewardName> <username> [argument]`.
+#        by using `/cmd reward <rewardName> <username> [argument1]`.
 # 2nd) Players redeem rewards (in-order, unless there are skips due to full inv) by using `/redeemreward`.
 #      -- If the player has no pending rewards, they will be sent noPendingRewardMessage.
 #      -- Else if the the player has inventory space, the first rewardEntry's consoleCommands 
@@ -86,8 +86,8 @@ cronSchedule:
 # <player_uuid> == UUID of the player who is rewarded
 # <random_player> == random online player
 # <random_uuid> == UUID of random online player
-# <argument> == string included as running command's argument (plus signs DON'T convert to spaces)
-# <argument_uuid> == UUID of the attached argument player, if they are actually a player
+# <argument1> == string included as running command's argument (plus signs DON'T convert to spaces)
+# <argument1_uuid> == UUID converted from string included as running command's argument (if the string matches a player's name)
 # -------------------------------------------------------------------------------------- #
 rewardSystem:
   enabled: false
@@ -109,7 +109,7 @@ rewardSystem:
     '2': # Usage: `/cmd reward money <player>/RANDOM_PLAYER <quantity>` i.e. "/cmd reward money RANDOM_PLAYER 1000"
       name: "money"
       consoleCommands:
-        - "eco give <player> <argument>"
+        - "eco give <player> <argument1>"
       invCheck: false
     # Add/remove entries as needed
 
@@ -178,31 +178,31 @@ joinCommandEntries:
 #
 # You can run any customCommand with a delay by using the "-d" command flag.
 #   i.e. "/cmd -d 1200 stop" to stop the server in 1 minute,
-# You can add an invCheck to any customCommandEntry, that confirms "ARGUMENT" or "SENDER" has
-#   one spot avaliable in their inventory before running the consoleCommands. If they don't have
+# You can add an invCheck to any customCommandEntry, that confirms "ARGUMENT1" or "SENDER" has
+#   at least one spot avaliable in their inventory before running the consoleCommands. If they don't
 #   have space, any defined backup commands will run. Use this module on any customCommandEntry:
 #     invCheck:
 #       enabled: true
-#       checkOnPlayer: "ARGUMENT"
+#       checkOnPlayer: "ARGUMENT1"
 #       ifNoSpaceConsoleCommands:
-#         - "msg <argument> &4You do not have space in your inventory..."
-# You can add an onlineCheck to any customCommandEntry, that confirms "ARGUMENT" or "SENDER" is
+#         - "msg <argument1> &4You do not have space in your inventory..."
+# You can add an onlineCheck to any customCommandEntry, that confirms "ARGUMENT1" or "SENDER" is
 #   online before running the consoleCommands. If they are offline, any defined backup commands 
 #   will run. Use this module on any customCommandEntry:
 #     onlineCheck:
 #       enabled: true
-#       checkOnPlayer: "ARGUMENT"
+#       checkOnPlayer: "ARGUMENT1"
 #       ifNotOnlineConsoleCommands:
-#         - "msg Console <argument> is not online!"
+#         - "msg Console <argument1> is not online!"
 #
 # Optional Arguments:
 # <player> == player who used the command
 # <player_uuid> == UUID of the player who used the command
 # <random_player> == random online player
 # <random_uuid> == UUID of random online player
-# <argument> == string included as running command's argument (plus signs DON'T convert to spaces)
+# <argument1> == string included as running command's argument (plus signs DON'T convert to spaces)
+# <argument1_uuid> == UUID converted from string included as running command's argument (if the string matches a player's name)
 # <argument2> == string included as running command's argument (plus signs convert to spaces)
-# <argument_uuid> == UUID of the attached argument player, if they are actually a player
 # -------------------------------------------------------------------------------------- #
 customCommandEntries:
   enabled: false
@@ -222,21 +222,21 @@ customCommandEntries:
     consoleCommands:
       - "say <player> is stopping the server!"
       - "stop"
-  '3': # Usage: "/cmd promote-donor <argument>" i.e. "/cmd promote-donor Notch"
+  '3': # Usage: "/cmd promote-donor <argument1>" i.e. "/cmd promote-donor Notch"
     enabled: false
     usePerm: "command64.admin"
     usePermValue: true
     customCommand: "promote-donor"
     consoleCommands:
-      - "lp user <argument> promote donor"
-      - "say <argument> donated to the server and was promoted by <player>!"
-  '4': # Usage: "/cmd console-msg <argument> <argument2>" i.e. "/cmd console-msg Notch hi+plus+signs+convert+to+spaces"
+      - "lp user <argument1> promote donor"
+      - "say <argument1> donated to the server and was promoted by <player>!"
+  '4': # Usage: "/cmd console-msg <argument1> <argument2>" i.e. "/cmd console-msg Notch hi+plus+signs+convert+to+spaces"
     enabled: false
     usePerm: "command64.admin"
     usePermValue: true
     customCommand: "console-msg"
     consoleCommands:
-      - "msg <argument> <argument2>"
+      - "msg <argument1> <argument2>"
   '5': # Usage "/cmd boss-fight-start"
     enabled: false
     usePerm: "command64.mod"
@@ -277,42 +277,42 @@ customCommandEntries:
     usePermValue: true
     customCommand: "tprr"
     consoleCommands:
-      - "cmd sudo CONSOLE tp+<argument>+<random_player>"
-  '9': # Usage: "/cmd invSpaceCheckLoop <argument>" i.e. "/cmd invSpaceCheckLoop Notch"
+      - "cmd sudo CONSOLE tp+<argument1>+<random_player>"
+  '9': # Usage: "/cmd invSpaceCheckLoop <argument1>" i.e. "/cmd invSpaceCheckLoop Notch"
     enabled: false
     usePerm: "command64.mod"
     usePermValue: true
     customCommand: "invSpaceCheckLoop"
     consoleCommands:
-      - "msg <player> <argument> has space for an item!"
+      - "msg <player> <argument1> has space for an item!"
     invCheck:
       enabled: true
-      checkOnPlayer: "ARGUMENT"
+      checkOnPlayer: "ARGUMENT1"
       ifNoSpaceConsoleCommands:
-        - "msg <player> <argument> has a full inventory! Checking again in 2 minutes..."
-        - "cmd -d 2400 invSpaceCheckLoop <argument>" # Re-call check with 2 minute delay
+        - "msg <player> <argument1> has a full inventory! Checking again in 2 minutes..."
+        - "cmd -d 2400 invSpaceCheckLoop <argument1>" # Re-call check with 2 minute delay
     onlineCheck:
       enabled: true
-      checkOnPlayer: "ARGUMENT"
+      checkOnPlayer: "ARGUMENT1"
       ifNotOnlineConsoleCommands:
-        - "msg <player> <argument> is not online... Ending loop!"
-  '10': # Intended Usage "/cmd newbie-gift <argument>"
+        - "msg <player> <argument1> is not online... Ending loop!"
+  '10': # Intended Usage "/cmd newbie-gift <argument1>"
     enabled: false
     usePerm: "command64.admin"
     usePermValue: true
     customCommand: "newbie-gift"
     consoleCommands:
-      - "crates givekey Crate <argument>"
+      - "crates givekey Crate <argument1>"
     invCheck:
       enabled: true
-      checkOnPlayer: "ARGUMENT"
+      checkOnPlayer: "ARGUMENT1"
       ifNoSpaceConsoleCommands:
-        - "cmd reward cratekey <argument>"
+        - "cmd reward cratekey <argument1>"
     onlineCheck:
       enabled: true
-      checkOnPlayer: "ARGUMENT"
+      checkOnPlayer: "ARGUMENT1"
       ifNotOnlineConsoleCommands:
-        - "cmd reward cratekey <argument>"
+        - "cmd reward cratekey <argument1>"
   # Add/remove entries as needed
 
 
