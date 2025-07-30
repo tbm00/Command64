@@ -129,7 +129,7 @@ public class QueueManager {
 
     private boolean triggerRewardCommands(String playerName, String rewardName, String arg) {
         if (rewardName != null) {
-            if (cmdRunner.runRewardCommands(configHandler.getRewardCommandsByName(rewardName), playerName, arg)) {
+            if (cmdRunner.triggerRewardCommands(configHandler.getRewardCommandsByName(rewardName), playerName, arg)) {
                 return true;
             } else {
                 javaPlugin.getLogger().warning("Error: 'consoleCommands' is null or empty for rewardEntry: " + rewardName);

@@ -45,7 +45,10 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 # you can do when using this plugin with other plugins, like 
 # EssentialsX, LuckPerms, MythicMobs, a crate plugin, and more.
 
-
+# Notes:
+# - '<random_player>' is not the same as 'RANDOM_PLAYER'.
+#    - '<random_player>' is to be defined in your command entries
+#    - 'RANDOM_PLAYER' is to be used on demand (with /cmd commands)
 
 # -----------------------------------cronSchedule--------------------------------------- #
 # consoleCommand gets scheduled by the entry's cron expression.
@@ -54,6 +57,7 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 #
 # Optional Argument:
 # <random_player> == random online player
+# <random_uuid> == UUID of random online player
 # -------------------------------------------------------------------------------------- #
 cronSchedule:
   enabled: false
@@ -81,7 +85,9 @@ cronSchedule:
 # <player> == player who is rewarded
 # <player_uuid> == UUID of the player who is rewarded
 # <random_player> == random online player
+# <random_uuid> == UUID of random online player
 # <argument> == string included as running command's argument (plus signs DON'T convert to spaces)
+# <argument_uuid> == UUID of the attached argument player, if they are actually a player
 # -------------------------------------------------------------------------------------- #
 rewardSystem:
   enabled: false
@@ -120,12 +126,13 @@ rewardSystem:
 #     firstJoinCheck:
 #       enabled: true
 #       isFirstJoinConsoleCommands:
-#         - "say <argument> joined for the first time!"
+#         - "say <player> joined for the first time!"
 #
 # Optional Arguments:
 # <player> == player who joined
 # <player_uuid> == UUID of the player who joined
 # <random_player> == random online player
+# <random_uuid> == UUID of random online player
 # -------------------------------------------------------------------------------------- #
 joinCommandEntries:
   enabled: false
@@ -171,7 +178,7 @@ joinCommandEntries:
 #
 # You can run any customCommand with a delay by using the "-d" command flag.
 #   i.e. "/cmd -d 1200 stop" to stop the server in 1 minute,
-# You can add an invCheck to any customCommandEntry, that confirms ARGUMENT or SENDER has
+# You can add an invCheck to any customCommandEntry, that confirms "ARGUMENT" or "SENDER" has
 #   one spot avaliable in their inventory before running the consoleCommands. If they don't have
 #   have space, any defined backup commands will run. Use this module on any customCommandEntry:
 #     invCheck:
@@ -179,7 +186,7 @@ joinCommandEntries:
 #       checkOnPlayer: "ARGUMENT"
 #       ifNoSpaceConsoleCommands:
 #         - "msg <argument> &4You do not have space in your inventory..."
-# You can add an onlineCheck to any customCommandEntry, that confirms ARGUMENT or SENDER is
+# You can add an onlineCheck to any customCommandEntry, that confirms "ARGUMENT" or "SENDER" is
 #   online before running the consoleCommands. If they are offline, any defined backup commands 
 #   will run. Use this module on any customCommandEntry:
 #     onlineCheck:
@@ -192,8 +199,10 @@ joinCommandEntries:
 # <player> == player who used the command
 # <player_uuid> == UUID of the player who used the command
 # <random_player> == random online player
+# <random_uuid> == UUID of random online player
 # <argument> == string included as running command's argument (plus signs DON'T convert to spaces)
 # <argument2> == string included as running command's argument (plus signs convert to spaces)
+# <argument_uuid> == UUID of the attached argument player, if they are actually a player
 # -------------------------------------------------------------------------------------- #
 customCommandEntries:
   enabled: false
@@ -314,7 +323,9 @@ customCommandEntries:
 #
 # Optional Arguments:
 # <player> == player who used the item
+# <player_uuid> == player who used the item
 # <random_player> == random online player
+# <random_uuid> == UUID of random online player
 # -------------------------------------------------------------------------------------- #
 itemCommandEntries:
   enabled: false

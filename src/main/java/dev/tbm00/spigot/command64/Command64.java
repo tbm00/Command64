@@ -61,25 +61,33 @@ public class Command64 extends JavaPlugin {
             getServer().getConsoleSender().sendMessage(ChatColor.LIGHT_PURPLE + s);
 	}
 
-    public String getRandomPlayer(String excludedPlayer) {
+    public Player getRandomPlayer(String excludedPlayer) {
         Collection<? extends Player> players = Bukkit.getOnlinePlayers();
-        if (players.isEmpty()) return "Herobrine";
+        if (players.isEmpty()) return null;
         if (players.size()==1) {
-            if (getServer().getPlayer(excludedPlayer)!=null && getServer().getPlayer(excludedPlayer).isOnline()) {
-                return "HEROBRINE";
+            Player excludedPlayerObj = excludedPlayer == null ? null : getServer().getPlayer(excludedPlayer);
+            
+            if (excludedPlayerObj != null && excludedPlayerObj.isOnline()) {
+                return null;
             }
             List<? extends Player> list = new ArrayList<>(players);
-            return list.get(0).getName();
+            return list.get(0);
         }
 
         List<? extends Player> list = new ArrayList<>(players);
         Player chosen = list.get(random.nextInt(list.size()));
         
-        if (chosen.getName().equalsIgnoreCase(excludedPlayer))
+        if (excludedPlayer != null && chosen.getName().equalsIgnoreCase(excludedPlayer))
             return getRandomPlayer(excludedPlayer);
         else if (!chosen.isOnline())
             return getRandomPlayer(excludedPlayer);
-        else return chosen.getName();
+        else return chosen;
+    }
+
+    public String getRandomPlayerName(String excludedPlayer) {
+        Player randomPlayer = getRandomPlayer(excludedPlayer);
+        if (randomPlayer!=null) return randomPlayer.getName();
+        else return "HEROBRINE";
     }
 
     @Override

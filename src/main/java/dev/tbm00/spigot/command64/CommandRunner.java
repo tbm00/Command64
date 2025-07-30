@@ -29,7 +29,7 @@ public class CommandRunner {
         this.pendingTasks = new HashMap<>();
     }
 
-    public boolean runJoinCommands(List<String> consoleCmds, Player player, long tickDelay, String type) {
+    public boolean triggerJoinCommands(List<String> consoleCmds, Player player, long tickDelay, String type) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
         String name = player.getName();
 
@@ -43,22 +43,18 @@ public class CommandRunner {
         return true;
     }
 
-    public boolean runSudoCommand(CommandSender sender, String[] args) {
+    public boolean triggerSudoCommand(CommandSender sender, String[] args) {
         String targetName = null, cmd = null;
         if (args.length==3) {
             targetName = args[1];
             cmd = args[2];
             cmd = cmd.replace("+", " ");
-            cmd = cmd.replace("<me>", sender.getName());
         } else { 
             sendMessage(sender, ChatColor.RED + "Sudo requires a command sender and a command.");
             if (sender.hasPermission("command64.sudo.console")) {
                 sendMessage(sender, ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say+hello+world");
-                sendMessage(sender, ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say+<me>+says+hello");
             } else if (sender.hasPermission("command64.sudo.player")) {
-                sendMessage(sender, ChatColor.WHITE + "Ex Usage: /cmd sudo CONSOLE say+<me>+says+hello");
                 sendMessage(sender, ChatColor.WHITE + "Ex Usage: /cmd sudo Notch pay+Steve+10000");
-                sendMessage(sender, ChatColor.WHITE + "Ex Usage: /cmd sudo Notch pay+<me>+10000");
             }
             return false;
         }
@@ -71,30 +67,40 @@ public class CommandRunner {
         } else {
             if (!sender.hasPermission("command64.sudo.player")) return false;
             if (targetName.equalsIgnoreCase("RANDOM_PLAYER")) {
-                targetName = javaPlugin.getRandomPlayer(sender.getName());
+                target = javaPlugin.getRandomPlayer(sender.getName());
+            } else {
+                target = javaPlugin.getServer().getPlayer(targetName);
             }
-            target = javaPlugin.getServer().getPlayer(targetName);
-        } if (target==null) {
-            sendMessage(sender, ChatColor.RED + "Couldn't find target: " + target);
+        } 
+        
+        if (target==null) {
+            sendMessage(sender, ChatColor.RED + "Couldn't find target: " + targetName);
             return false;
+        } else {
+            targetName = target.getName();
         }
 
         javaPlugin.getLogger().info(sender.getName() + " triggered sudo command: <"+targetName+"> " + cmd);
         sendMessage(sender, ChatColor.YELLOW + "Running sudo command: " + ChatColor.WHITE + "<"+targetName+"> " + cmd);
-        runCmd(target, cmd);
+        runPlayerCmd(target, cmd);
         return true;
     }
 
-    public boolean runCronCommand(String timing, String consoleCmd) {
+    public boolean triggerCronCommand(String timing, String consoleCmd) {
         if (consoleCmd == null || consoleCmd.isEmpty()) return false;
-        consoleCmd = consoleCmd.replace("<random_player>", javaPlugin.getRandomPlayer("null"));
+        
+        if (consoleCmd.contains("<random_player>") || consoleCmd.contains("<random_uuid>")) {
+            Player randomPlayer = javaPlugin.getRandomPlayer("null");
+            consoleCmd = consoleCmd.replace("<random_player>", randomPlayer.getName());
+            consoleCmd = consoleCmd.replace("<random_uuid>", randomPlayer.getUniqueId().toString());
+        }
         
         javaPlugin.getLogger().info("CronSchedule triggered a taskEntry: " + timing + " " + consoleCmd);
-        runCmd(console, consoleCmd);
+        runPlayerCmd(console, consoleCmd);
         return true;
     }
 
-    public boolean runItemCommands(List<String> consoleCmds, Player player) {
+    public boolean triggerItemCommands(List<String> consoleCmds, Player player) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         String name = player.getName();
@@ -104,7 +110,7 @@ public class CommandRunner {
         return true;
     }
 
-    public boolean runRewardCommands(List<String> consoleCmds, String player, String argument) {
+    public boolean triggerRewardCommands(List<String> consoleCmds, String player, String argument) {
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
         //javaPlugin.getLogger().info(player + " triggered a rewardEntry's consoleCommands...");
@@ -116,7 +122,7 @@ public class CommandRunner {
     // args[0] = custom command
     // args[1] = configurable [argument]
     // args[2] = configurable [argument2]
-    public boolean runCustomCommand(CustomCmdEntry entry, CommandSender sender, String[] args) {
+    public boolean triggerCustomCmdEntry(CustomCmdEntry entry, CommandSender sender, String[] args) {
         List<String> consoleCmds = entry.getConsoleCommands();
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
@@ -182,7 +188,7 @@ public class CommandRunner {
     // args[2] = custom command
     // args[3] = configurable [argument]
     // args[4] = configurable [argument2]
-    public boolean runDelayedCommand(CustomCmdEntry entry, CommandSender sender, String[] args) {
+    public boolean triggerDelayedCmdEntry(CustomCmdEntry entry, CommandSender sender, String[] args) {
         List<String> consoleCmds = entry.getConsoleCommands();
         if (consoleCmds == null || consoleCmds.isEmpty()) return false;
 
@@ -244,15 +250,18 @@ public class CommandRunner {
             javaPlugin.getLogger().warning(senderName + " triggered NULL console commands!");
             return;
         }
-        String randomPlayer = javaPlugin.getRandomPlayer(senderName);
-        String playerUuid;
+
+        Player randomPlayer = javaPlugin.getRandomPlayer(senderName);
+        String senderUuid;
         try {
-            playerUuid = Bukkit.getServer().getPlayer(senderName).getUniqueId().toString();
-        } catch (Exception e) {playerUuid=null;}
+            senderUuid = Bukkit.getServer().getPlayer(senderName).getUniqueId().toString();
+        } catch (Exception e) {senderUuid=null;}
+
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", senderName);
-            if (playerUuid!=null) consoleCmd = consoleCmd.replace("<player_uuid>", playerUuid);
-            consoleCmd = consoleCmd.replace("<random_player>", randomPlayer);
+            if (senderUuid!=null) consoleCmd = consoleCmd.replace("<player_uuid>", senderUuid);
+            consoleCmd = consoleCmd.replace("<random_player>", randomPlayer.getName());
+            consoleCmd = consoleCmd.replace("<random_uuid>", randomPlayer.getUniqueId().toString());
 
             if ((argument!=null)&&(argument2!=null) && !argument.isBlank() && !argument2.isEmpty()) {
                 consoleCmd = consoleCmd.replace("<argument>", argument);
@@ -268,12 +277,12 @@ public class CommandRunner {
         }
     }
 
-    private void runCmd(CommandSender sender, String consoleCmd) {
+    private void runPlayerCmd(CommandSender sender, String consoleCmd) {
         if (consoleCmd == null || consoleCmd.isBlank()) {
             javaPlugin.getLogger().warning(sender.getName() + " triggered NULL console command!");
             return;
         }
-        String randomPlayer = javaPlugin.getRandomPlayer(sender.getName());
+        String randomPlayer = javaPlugin.getRandomPlayerName(sender.getName());
         consoleCmd = consoleCmd.replace("RANDOM_PLAYER", randomPlayer);
 
         if (consoleCmd!=null) {

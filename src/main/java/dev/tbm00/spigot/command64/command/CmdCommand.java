@@ -65,7 +65,7 @@ public class CmdCommand implements TabExecutor {
                 break;
             case "sudo":
                 if (sender.hasPermission("command64.sudo.console") || sender.hasPermission("command64.sudo.player"))
-                    return cmdRunner.runSudoCommand(sender, args);
+                    return cmdRunner.triggerSudoCommand(sender, args);
                 break;
             default:
                 if (configHandler.isCustomEnabled())
@@ -90,24 +90,24 @@ public class CmdCommand implements TabExecutor {
     private boolean handleQueueCommand(CommandSender sender, String[] args) {
         for (RewardCmdEntry entry : configHandler.getRewardCmdEntries()) {
             if (args[1].equalsIgnoreCase(entry.getName())) {
-                String playerName = args[2];
-                if (playerName.equalsIgnoreCase("RANDOM_PLAYER")) {
-                    playerName = javaPlugin.getRandomPlayer(sender.getName());
+                String targetName = args[2];
+                if (targetName.equalsIgnoreCase("RANDOM_PLAYER")) {
+                    targetName = javaPlugin.getRandomPlayerName(sender.getName());
                 }
                 String argument = null;
                 if (args.length>3) argument = args[3];
-                if (queueManager.enqueueReward(playerName, entry.getName(), argument)) {
+                if (queueManager.enqueueReward(targetName, entry.getName(), argument)) {
                     if (argument==null) {
-                        sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() + " reward for " + playerName);
-                        javaPlugin.getLogger().info(sender.getName() + " has enqueued the " + entry.getName() + " reward for " + playerName);
+                        sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() + " reward for " + targetName);
+                        javaPlugin.getLogger().info(sender.getName() + " has enqueued the " + entry.getName() + " reward for " + targetName);
                     } else {
-                        sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() +":"+ argument + " reward for " + playerName);
-                        javaPlugin.getLogger().info(sender.getName() + " has enqueued the " + entry.getName() +":"+ argument + " reward for " + playerName);
+                        sender.sendMessage(prefix + ChatColor.GREEN + "You enqueued the " + entry.getName() +":"+ argument + " reward for " + targetName);
+                        javaPlugin.getLogger().info(sender.getName() + " has enqueued the " + entry.getName() +":"+ argument + " reward for " + targetName);
                     }
                     
-                    Player player = javaPlugin.getServer().getPlayer(playerName);
-                    if (player != null && player.isOnline()) {
-                        player.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getNewRewardMessage())));
+                    Player target = javaPlugin.getServer().getPlayer(targetName);
+                    if (target != null && target.isOnline()) {
+                        target.spigot().sendMessage(new TextComponent(ChatColor.translateAlternateColorCodes('&', configHandler.getNewRewardMessage())));
                     }
                     
                     return true;
@@ -119,18 +119,18 @@ public class CmdCommand implements TabExecutor {
 
     private boolean handleCustomCommand(CommandSender sender, String[] args) {
         if (args.length > 1 && args[1].equalsIgnoreCase("RANDOM_PLAYER")) {
-            args[1] = javaPlugin.getRandomPlayer(sender.getName());
+            args[1] = javaPlugin.getRandomPlayerName(sender.getName());
         }
         for (CustomCmdEntry entry : configHandler.getCustomCmdEntries()) {
             if (sender.hasPermission(entry.getPerm()) != entry.getPermValue()) 
                 continue;
             else if (args[0].equalsIgnoreCase("-d") && args[2].equalsIgnoreCase(entry.getPlayerCommand())) {
-                if (cmdRunner.runDelayedCommand(entry, sender, args))
+                if (cmdRunner.triggerDelayedCmdEntry(entry, sender, args))
                     return true;
                 sender.sendMessage(prefix + ChatColor.RED + "Delayed custom command entry failed!");
                 return false;
             } else if (args[0].equalsIgnoreCase(entry.getPlayerCommand())) {
-                if (cmdRunner.runCustomCommand(entry, sender, args))
+                if (cmdRunner.triggerCustomCmdEntry(entry, sender, args))
                     return true;
                 sender.sendMessage(prefix + ChatColor.RED + "Custom command entry failed!");
                 return false;
@@ -154,7 +154,7 @@ public class CmdCommand implements TabExecutor {
             player = (Player) sender;
         } else {
             if (args.length > 1 && args[1].equalsIgnoreCase("RANDOM_PLAYER")) {
-                args[2] = javaPlugin.getRandomPlayer(sender.getName());
+                args[2] = javaPlugin.getRandomPlayerName(sender.getName());
             }
             player = javaPlugin.getServer().getPlayer(args[2]);
             if (player == null) {

@@ -45,7 +45,7 @@ public class CronManager {
     private void checkCronTasks() {
         for (CronTaskEntry entry : cronTaskEntries) {
             if (isCronMatch(entry.getTiming())) {
-                if (!cmdRunner.runCronCommand(entry.getTiming(), entry.getConsoleCommand()))
+                if (!cmdRunner.triggerCronCommand(entry.getTiming(), entry.getConsoleCommand()))
                     javaPlugin.getLogger().warning("Error: 'consoleCommand' is null or missing for cronTaskEntry: " + entry.getTiming());
             }
         }
