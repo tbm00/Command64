@@ -260,8 +260,10 @@ public class CommandRunner {
         for (String consoleCmd : consoleCmds) {
             consoleCmd = consoleCmd.replace("<player>", senderName);
             if (senderUuid!=null) consoleCmd = consoleCmd.replace("<player_uuid>", senderUuid);
-            consoleCmd = consoleCmd.replace("<random_player>", randomPlayer.getName());
-            consoleCmd = consoleCmd.replace("<random_uuid>", randomPlayer.getUniqueId().toString());
+            if (randomPlayer!=null) {
+                consoleCmd = consoleCmd.replace("<random_player>", randomPlayer.getName());
+                consoleCmd = consoleCmd.replace("<random_uuid>", randomPlayer.getUniqueId().toString());
+            }
 
             if ((argument1!=null)&&(argument2!=null) && !argument1.isBlank() && !argument1.isEmpty()) {
                 consoleCmd = consoleCmd.replace("<argument1>", argument1);

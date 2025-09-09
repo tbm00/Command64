@@ -50,6 +50,8 @@ Each JoinCommandEntry, CustomCommandEntry, and ItemCommandEntry has configurable
 #    - '<random_player>' is to be defined in your command entries
 #    - 'RANDOM_PLAYER' is to be used on demand (with /cmd commands)
 
+
+
 # -----------------------------------cronSchedule--------------------------------------- #
 # consoleCommand gets scheduled by the entry's cron expression.
 #
